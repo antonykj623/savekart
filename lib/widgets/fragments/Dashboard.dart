@@ -76,7 +76,15 @@ class _DashboardState extends State<Dashboard> {
 
             child:Column(children: [
 
-              (bannersdata.length>0)? Slidbar(bannersdata) : Container(),
+              (bannersdata.length>0)? Slidbar(bannersdata) : Container(
+                width: double.infinity,
+                height: ResponsiveInfo.isMobile(context)?150:200,
+                child: Center(
+
+                  child: CircularProgressIndicator(),
+                ),
+
+              ),
               SizedBox(
                 height:ResponsiveInfo.isMobile(context)? 20:25,
               ),
@@ -127,12 +135,13 @@ class _DashboardState extends State<Dashboard> {
 
               (categorydata!.length>0)? Container(
                 width: double.infinity,
-                height: MediaQuery.of(context).size.height/2.4,
+                height: 90*((categorydata.length/4)*2),
                 child: GridView.count(
                     crossAxisCount: 4,
                     crossAxisSpacing: 4.0,
                     mainAxisSpacing: 8.0,
                     childAspectRatio: 0.7,
+                    physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     primary: false,
                     children: List.generate(categorydata!.length, (index) {
@@ -188,7 +197,15 @@ class _DashboardState extends State<Dashboard> {
                     }
                     )
                 ),
-              ) : Container(),
+              ) : Container(
+                width: double.infinity,
+                height: ResponsiveInfo.isMobile(context)?150:200,
+                child: Center(
+
+                  child: CircularProgressIndicator(),
+                ),
+
+              ),
 
 
 
@@ -246,7 +263,7 @@ class _DashboardState extends State<Dashboard> {
               // ) : Container(),
 
 
-              ListView.builder(
+              (productbycategorydata.length>0)? ListView.builder(
                   itemCount: productbycategorydata.length,
                   shrinkWrap: true,
                   primary: false,
@@ -413,7 +430,15 @@ class _DashboardState extends State<Dashboard> {
 
 
                     );
-                  })
+                  }) : Container(
+                width: double.infinity,
+                height: ResponsiveInfo.isMobile(context)?150:200,
+                child: Center(
+
+                  child: CircularProgressIndicator(),
+                ),
+
+              )
 
 
               // Trendingproducts(),
@@ -558,10 +583,6 @@ class _DashboardState extends State<Dashboard> {
     var t=EcommerceApiHelper.getTimeStamp();
 
     var response= await  apihelper.get(Apimethodes.getCategories+"?q="+t.toString());
-
-
-
-
 
     var js= jsonDecode(response) ;
 

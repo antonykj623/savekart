@@ -58,14 +58,14 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
                   child: Card(
 
                     child:  ListTile(
-                      title: Text(data![index].productName.toString()),
+                      title: Text(data![index].productName.toString(),style: TextStyle(fontSize: 14),),
                       leading: Padding(
 
 
 
 
                      padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?5:10),
-                     child: Image.network(EcommerceApiHelper.productimageurl+data![index].primeImage.toString(),width: ResponsiveInfo.isMobile(context)?70:100,height: ResponsiveInfo.isMobile(context)?70:100,fit: BoxFit.fill,),
+                     child: Image.network(EcommerceApiHelper.productimageurl+data![index].primeImage.toString(),width: ResponsiveInfo.isMobile(context)?70:100,height: ResponsiveInfo.isMobile(context)?90:120,fit: BoxFit.fill,),
                   ), onTap: () {
 
                       ProductByCategoryDataData pbc=new ProductByCategoryDataData();
