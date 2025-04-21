@@ -17,7 +17,7 @@ class ApiHelper  {
   String resulturl="https://mysaveapp.com/rechargeAPINew/paymentgateway/result.php";
      String imgbaseurl="https://mysaving.in/uploads/profile/";
 
-  static String bannerimageurl="https://mysaveapp.com/images/save_cart_sliders/";
+  static String bannerimageurl="https://mysaving.in/cart/save_cart_sliders/";
 
   final int timeoutDuration = 40;
 

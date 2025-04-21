@@ -34,7 +34,7 @@ class _ProfileState extends State<Profile> {
 
   List<String>arricons=['assets/icons/editprofile.png','assets/icons/house-location.png','assets/icons/wallet.png','assets/icons/product-return.png','assets/icons/update.png','assets/icons/logout.png','assets/icons/user.png'];
 
-  List<String>arrmenus=['Edit Profile','My Address','Wallet','Return Requests','App update','Logout','Delete Account'];
+  List<String>arrmenus=['Edit Profile','My Address','Savekart Wallet','Return Requests','App update','Logout','Delete Account'];
 
   String name="";
 
@@ -361,7 +361,7 @@ class _ProfileState extends State<Profile> {
 
                     // set up the AlertDialog
                     AlertDialog alert = AlertDialog(
-                      title: Text("Save kart"),
+                      title: Text("Savekart"),
                       content: Text("Do you want to logout from Savekart ?"),
                       actions: [
                         okButton,
@@ -402,7 +402,7 @@ class _ProfileState extends State<Profile> {
 
                     // set up the AlertDialog
                     AlertDialog alert = AlertDialog(
-                      title: Text("Save kart"),
+                      title: Text("Savekart"),
                       content: Text("Do you want to delete your account from Savekart ?"),
                       actions: [
                         okButton,

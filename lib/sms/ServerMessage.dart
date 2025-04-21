@@ -41,7 +41,7 @@ class ServerMessage{
      if(Type==registration)
      {
 
-       message="Dear "+username+" Welcome to SAVE App - My Personal App. Your OTP is "+otp+" CGSAVE";
+       message="Dear "+username+" Welcome to SAVEKART App - My Personal App. Your OTP is "+otp+" CGSAVE";
      }
 
 

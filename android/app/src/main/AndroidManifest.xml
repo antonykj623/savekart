@@ -12,7 +12,7 @@
         android:hardwareAccelerated="false"
         android:usesCleartextTraffic="true"
 
-        android:label="Save Kart"
+        android:label="SaveKart"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

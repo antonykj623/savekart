@@ -326,7 +326,7 @@ List<ProductByCategoryDataData>pcdata=[];
 
                                     // set up the AlertDialog
                                     AlertDialog alert = AlertDialog(
-                                      title: Text("Save kart"),
+                                      title: Text("Savekart"),
                                       content: Text("Your wallet point is " +
                                           current_walletpoints.toString() +
                                           ".So you are eligible to redeem points.Do you want to redeem now ?"),
@@ -620,7 +620,7 @@ List<ProductByCategoryDataData>pcdata=[];
 
                                         // set up the AlertDialog
                                         AlertDialog alert = AlertDialog(
-                                          title: Text("Save kart"),
+                                          title: Text("Savekart"),
                                           content: Text("Your wallet point is " +
                                               current_walletpoints.toString() +
                                               ".So you are eligible to redeem points.Do you want to redeem now ?"),
@@ -924,13 +924,16 @@ List<ProductByCategoryDataData>pcdata=[];
                     productStockEntity.data!.priceSales.toString());
                 double savedprice = mrp - savecartprice;
                 price_details = price_details +
-                    "You saved : " + savedprice.toString() + " Rs \n\n";
+                    "You saved : " + savedprice.toString() + " Rs \n";
               }
             }
             else {
               price_details = price_details +
                   "You saved : 0.0 Rs \n";
             }
+
+
+            price_details = price_details +"Free Delivery\n";
           }
 
 

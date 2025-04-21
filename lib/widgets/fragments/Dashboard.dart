@@ -101,7 +101,7 @@ class _DashboardState extends State<Dashboard> {
     Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-    Text("Wallet Balance", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
+    Text("Savekart Wallet Balance", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
     SizedBox(height: 5),
     Row(
     children: [
@@ -117,7 +117,7 @@ class _DashboardState extends State<Dashboard> {
     Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-    Text("Wallet Points", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
+    Text("Purchase Points", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
     SizedBox(height: 5),
     Row(
     children: [

@@ -238,7 +238,7 @@ ResponsiveInfo.showAlertDialog(context, "", "Enter mobile number");
 
                             TextButton(onPressed: (){
 
-                              Navigator.push(context,
+                              Navigator.pushReplacement(context,
                                   MaterialPageRoute(builder:
                                       (context) =>
                                       CreateAccount()

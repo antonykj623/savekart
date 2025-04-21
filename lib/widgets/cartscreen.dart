@@ -143,7 +143,7 @@ class _CounterScreenState extends State<CartScreen> {
 
                                   // set up the AlertDialog
                                   AlertDialog alert = AlertDialog(
-                                    title: Text("Save kart"),
+                                    title: Text("Savekart"),
                                     content: Text("Do you want to delete this product from cart ?"),
                                     actions: [
                                       okButton,

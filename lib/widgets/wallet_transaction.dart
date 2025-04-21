@@ -35,7 +35,7 @@ class _WalletTransactionState extends State<WalletTransaction> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      appBar: AppBar(title: Text("Wallet",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:17,color: Colors.white),),
+      appBar: AppBar(title: Text("Savekart Wallet",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:17,color: Colors.white),),
         leading: GestureDetector(
 
           child:Icon(Icons.arrow_back,color: Colors.white,size:ResponsiveInfo.isMobile(context)?20:25 ,) ,

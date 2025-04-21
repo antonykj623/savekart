@@ -255,7 +255,7 @@ class _OrdersState extends State<Orders> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Save kart"),
+          title: Text("Savekart"),
           content: Text(message),
           actions: [
             TextButton(child: Text("Yes"), onPressed: () {
@@ -401,7 +401,7 @@ if(entity.status==1)
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text("Save kart"),
+      title: Text("Savekart"),
       content: Text(entity.data!.policy.toString()+"\n Do you want to continue ?"),
       actions: [
         okButton,
