@@ -933,7 +933,7 @@ List<ProductByCategoryDataData>pcdata=[];
             }
 
 
-            price_details = price_details +"Free Delivery\n";
+            price_details = price_details +"\nFree Delivery\n";
           }
 
 

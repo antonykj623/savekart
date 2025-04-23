@@ -31,11 +31,27 @@ class _AddressListState extends State<AddressList> {
 
   getAllAddress()async
   {
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      ResponsiveInfo.showLoaderDialog(context);
+
+
+    });
+
     EcommerceApiHelper apihelper = new EcommerceApiHelper();
 
     var t=EcommerceApiHelper.getTimeStamp();
 
     var response= await  apihelper.get(Apimethodes.getAddressList+"?q="+t.toString());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+     Navigator.pop(context);
+
+
+    });
+
 
     var js= jsonDecode( response) ;
 

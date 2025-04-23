@@ -176,6 +176,7 @@ bool iswalletused=false;
                             print("Selected address${id}");
                             setState(() {
                               selected=id;
+                              selected_addressid=id;
                             });
 
                             getAllAddress();
@@ -198,7 +199,62 @@ bool iswalletused=false;
                 ],
               ),
 
-            ) : Container(),
+            ) :
+            Container(width: double.infinity,
+            color: Colors.white54,
+
+            height: 200,
+              child:Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+
+                  Align(
+
+                    alignment: FractionalOffset.center,
+                    child: Text('No Delivery Address Found', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  ),
+
+                  TextButton(onPressed: () async {
+
+                    final result = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => AddressList(),
+                      ),
+                    );
+
+                    // Show the returned result in a dialog
+                    if (result != null) {
+                      String   added = result['added'] ?? '';
+                      String id=result['id']??'';
+                      if(added.compareTo("1")==0)
+                      {
+                        print("Selected address${id}");
+                        setState(() {
+                          selected=id;
+                          selected_addressid=id;
+                        });
+
+                        getAllAddress();
+
+
+
+                      }
+
+
+                    }
+
+                  }, child: Text('Click here to create new', style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal)))
+
+
+                ],
+              )
+
+
+
+
+
+            ),
 
 
             Divider(),
@@ -298,15 +354,16 @@ bool iswalletused=false;
                 onPressed: () async {
                    // PlaceOrder(_totalAmount.toString());
 
-                  if(_totalAmount==0)
-                    {
-
+                  if(selected_addressid?.compareTo("0")!=0) {
+                    if (_totalAmount == 0) {
                       // if( iswalletused)
                       // {
                       //
                       // }
-                     //need to call in placeorder api.php   updateWalletBalance();
-                        PlaceOrder(totalamount_to_paid.toString(),iswalletused,_totalAmount.toString(),3,usedwalletamount.toString());
+                      //need to call in placeorder api.php   updateWalletBalance();
+                      PlaceOrder(totalamount_to_paid.toString(), iswalletused,
+                          _totalAmount.toString(), 3,
+                          usedwalletamount.toString());
 
 
                       // }
@@ -316,8 +373,13 @@ bool iswalletused=false;
 
 
                     }
-                  else {
-                    showSingleSelectionDialog();
+                    else {
+                      showSingleSelectionDialog();
+                    }
+                  }
+                  else{
+
+                    ResponsiveInfo.showAlertDialog(context, "Savekart", "Please Select Your Address");
                   }
 
                   // initiateTransaction();
@@ -494,11 +556,11 @@ bool iswalletused=false;
 
             if(selected.toString().compareTo("0")==0) {
               selected_addressid = _addresses[0].id.toString();
-              _selectedAddress = _addresses[0].name.toString() + "\n" +
+              _selectedAddress = _addresses[0].name.toString() + "," +
                   _addresses[0].housename.toString() + "\n" +
-                  _addresses[0].landmark.toString()+"\n"+
+                  _addresses[0].landmark.toString()+","+
                   _addresses[0].district.toString()+"\n"+
-                  _addresses[0].phone.toString();
+                 "Phone : "+ _addresses[0].phone.toString()+",\nPin code : "+_addresses[0].pincode.toString();
             }
             else{
               for(int i=0;i<_addresses.length;i++)
@@ -509,11 +571,11 @@ bool iswalletused=false;
 
                       setState(() {
                         selected_addressid = _addresses[i].id.toString();
-                        _selectedAddress = _addresses[i].name.toString() + "\n" +
+                        _selectedAddress = _addresses[i].name.toString() + "," +
                             _addresses[i].housename.toString() + "\n" +
-                            _addresses[i].landmark.toString()+"\n"+
+                            _addresses[i].landmark.toString()+","+
                             _addresses[i].district.toString()+"\n"+
-                            _addresses[i].phone.toString();
+                            "Phone : "+_addresses[i].phone.toString()+",\nPin Code : "+_addresses[0].pincode.toString();
 
                       });
 
@@ -568,31 +630,10 @@ bool iswalletused=false;
 
      if(data['status']==1) {
        if (_totalAmount == 0) {
-         // showDialog(
-         //   context: context,
-         //   builder: (context) =>
-         //       AlertDialog(
-         //         title: Text('Order Details'),
-         //         content: Text(
-         //             'Your order has been placed!\n\nDelivery to: $_selectedAddress\nPaid Amount: ' +
-         //                 total.toString()),
-         //         actions: [
-         //           TextButton(
-         //             onPressed: () {
-         //               Navigator.of(context).pushAndRemoveUntil(
-         //                 MaterialPageRoute(builder: (context) => HomeScreen()),
-         //                     (Route<
-         //                     dynamic> route) => false, // Remove all previous routes
-         //               );
-         //             },
-         //             child: Text('OK'),
-         //           ),
-         //         ],
-         //       ),
-         // );
+
          updateWalletBalance();
 
-         showOrderDialog(context, true, "Your order was placed successfully!");
+         showOrderDialog(context, true, "Your order placed successfully!");
        }
        else{
 
@@ -603,7 +644,12 @@ bool iswalletused=false;
 
          NativeBridge().redirectToNative(urldata,c);
         var result= await c.future;
-        showPaymentStatus(result);
+        if(result!=null && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
+          showPaymentStatus(result);
+        }
+        else{
+          ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch your payment details");
+        }
 
        }
      }
