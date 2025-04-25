@@ -250,6 +250,11 @@ class JsonConvert {
       return data.map<OrderDetailsDataCartProduct>((Map<String, dynamic> e) =>
           OrderDetailsDataCartProduct.fromJson(e)).toList() as M;
     }
+    if (<OrderDetailsDataPaymentDetails>[] is M) {
+      return data.map<OrderDetailsDataPaymentDetails>((
+          Map<String, dynamic> e) => OrderDetailsDataPaymentDetails.fromJson(e))
+          .toList() as M;
+    }
     if (<OrderDetailsDataCartReturnRequests>[] is M) {
       return data.map<OrderDetailsDataCartReturnRequests>((
           Map<String, dynamic> e) =>
@@ -481,6 +486,8 @@ class JsonConvertClassCollection {
     (OrderDetailsDataCartOrder).toString(): OrderDetailsDataCartOrder.fromJson,
     (OrderDetailsDataCartStock).toString(): OrderDetailsDataCartStock.fromJson,
     (OrderDetailsDataCartProduct).toString(): OrderDetailsDataCartProduct
+        .fromJson,
+    (OrderDetailsDataPaymentDetails).toString(): OrderDetailsDataPaymentDetails
         .fromJson,
     (OrderDetailsDataCartReturnRequests)
         .toString(): OrderDetailsDataCartReturnRequests.fromJson,

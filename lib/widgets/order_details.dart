@@ -218,7 +218,7 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
               subtitle: (orderDetailsData!.cartReturnRequests!.status.toString().compareTo("1")==0)?
   Padding(padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?5:10),
 
-                child:Text("Your return request accepted" + (orderDetailsData!.cartReturnRequests!.refundStatus.toString().compareTo("1")==0 ? "\n Refunded on "+((orderDetailsData!.cartReturnRequests!.refundedDate!=null)? getFormatedDate(orderDetailsData!.cartReturnRequests!.refundedDate) : "")  : "\nNot Refunded")
+                child:Text("Your return request accepted" + (orderDetailsData!.cartReturnRequests!.refundStatus.toString().compareTo("1")==0 ? "\n Refunded on "+((orderDetailsData!.cartReturnRequests!.refundedDate!=null)? getFormatedDate(orderDetailsData!.cartReturnRequests!.refundedDate.toString()) : "")  : "\nNot Refunded")
 
 
                   ,style: TextStyle(color: Colors.green),) ,
@@ -324,7 +324,7 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
           ),
           Step(
             title: Text("Returned"),
-            subtitle: Text("Order returned successfully. Your return request accepted" + (orderDetailsData!.cartReturnRequests!.refundStatus.toString().compareTo("1")==0 ? "\n Refunded on "+((orderDetailsData!.cartReturnRequests!.refundedDate!=null)? getFormatedDate(orderDetailsData!.cartReturnRequests!.refundedDate) : "")  : "\nNot Refunded")
+            subtitle: Text("Order returned successfully. Your return request accepted" + (orderDetailsData!.cartReturnRequests!.refundStatus.toString().compareTo("1")==0 ? "\n Refunded on "+((orderDetailsData!.cartReturnRequests!.refundedDate!=null)? getFormatedDate(orderDetailsData!.cartReturnRequests!.refundedDate.toString()) : "")  : "\nNot Refunded")
 
 
               ,style: TextStyle(color: Colors.redAccent),),

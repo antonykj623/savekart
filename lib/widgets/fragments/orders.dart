@@ -76,6 +76,7 @@ class _OrdersState extends State<Orders> {
             final order = item.cartOrder!;
             final product = item.cartProduct!;
             final returnRequest = item.cartReturnRequests!;
+            final paymentDetails=item.paymentDetails!;
 
             return GestureDetector(
               onTap: () {
@@ -90,119 +91,133 @@ class _OrdersState extends State<Orders> {
                 margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 elevation: 3,
                 child: Container(
-                  width: double.infinity,
-                  height:  item.cartOrder!.orderItemStatus.toString().compareTo("5")==0 ?150: item.cartOrder!.orderItemStatus.toString().compareTo("0")==0? 180:230 ,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      ListTile(
-                        leading: Image.network(
-                          EcommerceApiHelper.productimageurl + product.primeImage.toString(),
-                          width: ResponsiveInfo.isMobile(context) ? 60 : 75,
-                          height: ResponsiveInfo.isMobile(context) ? 60 : 75,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(child: CircularProgressIndicator());
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(Icons.image, size: 50, color: Colors.black26);
-                          },
-                        ),
-                        title: Text(
-                          product.productName.toString(),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                          "Price : ${order.price} Rs",
-                          style: TextStyle(color: Colors.black),
-                        ),
-                        trailing: IconButton(
-                          icon: Icon(Icons.arrow_forward_ios_sharp, color: Colors.black26),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => OrderItemDetailsScreen(item),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-
-                      // Order Status Messages
-                      if (order.orderItemStatus.toString() == "0")
-                        _buildStatusText("Order created. Please wait...", Colors.green),
-                      if (order.orderItemStatus.toString() == "1")
-                        _buildStatusText("Packing is in progress..", Colors.green),
-                      if (order.orderItemStatus.toString() == "2")
-                        _buildStatusText("Out for delivery", Colors.green),
-                      if (order.orderItemStatus.toString() == "3")
-                        _buildStatusText("Order delivered successfully", Colors.green),
-                      if (order.orderItemStatus.toString() == "4")
-                        _buildStatusText("You returned this product", Colors.redAccent),
-                      if (order.orderItemStatus.toString() == "5")
-                        _buildStatusText("You cancelled this order item", Colors.red),
-                      if (order.status.toString() == "1")
-                        _buildStatusText("You accepted this order item", Colors.green),
-                      if (order.status.toString() == "2")
-                        _buildStatusText("You rejected this order item", Colors.redAccent),
-
-                      // Cancel Button
-                      if (order.status.toString() == "0" && order.orderItemStatus.toString() == "0")
-                        _buildActionButton("Cancel", Colors.white, Color(0xff0B7D97), () {
-                          _showConfirmationDialog(
-                            context,
-                            "Do you want to cancel this order item?",
-                                () => updateOrderCancelStatus(order.id.toString()),
-                          );
-                        }),
-
-                      // Accept/Reject Buttons (on delivery)
-                      if (order.status.toString() == "0" &&
-                          order.orderItemStatus.toString() == "3" &&
-                          isEligibleToShowAcceptReturn(item) &&
-                          returnRequest.id.toString() == "0")
-                        Padding(
-                          padding: EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: _buildActionButton("Reject", Colors.white, Color(0xff0B7D97), () {
-                                  _showConfirmationDialog(
-                                    context,
-                                    "Do you want to return this order item?",
-                                        () => getReturnPolicies(order.productId.toString(), item),
-                                  );
-                                }),
-                              ),
-                              Expanded(
-                                child: _buildActionButton("Accept", Color(0xff0B7D97), Colors.white, () {
-                                  updateOrderAcceptStatus(order.id.toString());
-                                }),
-                              ),
-                            ],
+                    width: double.infinity,
+                    // height:  item.cartOrder!.orderItemStatus.toString().compareTo("5")==0 ?150: item.cartOrder!.orderItemStatus.toString().compareTo("0")==0? 180:230 ,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ListTile(
+                          leading: Image.network(
+                            EcommerceApiHelper.productimageurl + product.primeImage.toString(),
+                            width: ResponsiveInfo.isMobile(context) ? 60 : 75,
+                            height: ResponsiveInfo.isMobile(context) ? 60 : 75,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(child: CircularProgressIndicator());
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(Icons.image, size: 50, color: Colors.black26);
+                            },
+                          ),
+                          title: Text(
+                            product.productName.toString(),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            "Price : ${order.price} Rs",
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.arrow_forward_ios_sharp, color: Colors.black26),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OrderItemDetailsScreen(item),
+                                ),
+                              );
+                            },
                           ),
                         ),
 
-                      // Return Request Status
-                      if (returnRequest.status.toString() == "0" &&
-                          returnRequest.refundStatus.toString() == "0")
-                        _buildStatusText(
-                            "You have submitted a return request on ${getFormatedDate(returnRequest.createdAt.toString())}",
-                            Color(0xff0B7D97)),
-                      if (returnRequest.status.toString() == "1")
-                        _buildStatusText(
-                            "Your return request accepted" +
-                                (returnRequest.refundStatus.toString() == "1"
-                                    ? "\nRefunded on ${returnRequest.refundedDate != null ? getFormatedDate(returnRequest.refundedDate) : ""}"
-                                    : "\nNot Refunded"),
-                            Colors.redAccent),
-                    ],
-                  ),
-                ),
+                        // Order Status Messages
+
+                        ...[
+                          if (paymentDetails.paymentStatus.toString() != "1")
+                            _buildStatusText("Payment failed", Colors.red)
+                          else ...[
+                            if (order.orderItemStatus.toString() == "0")
+                              _buildStatusText("Order created. Please wait...", Colors.green),
+                            if (order.orderItemStatus.toString() == "1")
+                              _buildStatusText("Packing is in progress..", Colors.green),
+                            if (order.orderItemStatus.toString() == "2")
+                              _buildStatusText("Out for delivery", Colors.green),
+                            if (order.orderItemStatus.toString() == "3")
+                              _buildStatusText("Order delivered successfully", Colors.green),
+                            if (order.orderItemStatus.toString() == "4")
+                              _buildStatusText("You returned this product", Colors.redAccent),
+                            if (order.orderItemStatus.toString() == "5")
+                              _buildStatusText("You cancelled this order item", Colors.red),
+                            if (order.status.toString() == "1")
+                              _buildStatusText("You accepted this order item", Colors.green),
+                            if (order.status.toString() == "2")
+                              _buildStatusText("You rejected this order item", Colors.redAccent),
+
+                            // Cancel Button
+                            if (order.status.toString() == "0" && order.orderItemStatus.toString() == "0")
+                              _buildActionButton("Cancel", Colors.white, Color(0xff0B7D97), () {
+                                _showConfirmationDialog(
+                                  context,
+                                  "Do you want to cancel this order item?",
+                                      () => updateOrderCancelStatus(order.id.toString()),
+                                );
+                              }),
+
+                            // Accept/Reject Buttons (on delivery)
+                            if (order.status.toString() == "0" &&
+                                order.orderItemStatus.toString() == "3" &&
+                                isEligibleToShowAcceptReturn(item) &&
+                                returnRequest.id.toString() == "0")
+                              Padding(
+                                padding: EdgeInsets.all(5),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildActionButton("Reject", Colors.white, Color(0xff0B7D97), () {
+                                        _showConfirmationDialog(
+                                          context,
+                                          "Do you want to return this order item?",
+                                              () => getReturnPolicies(order.productId.toString(), item),
+                                        );
+                                      }),
+                                    ),
+                                    Expanded(
+                                      child: _buildActionButton("Accept", Color(0xff0B7D97), Colors.white, () {
+                                        updateOrderAcceptStatus(order.id.toString());
+                                      }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                            // Return Request Status
+                            if (returnRequest.status.toString() == "0" &&
+                                returnRequest.refundStatus.toString() == "0")
+                              _buildStatusText(
+                                "You have submitted a return request on ${getFormatedDate(returnRequest.createdAt.toString())}",
+                                Color(0xff0B7D97),
+                              ),
+                            if (returnRequest.status.toString() == "1")
+                              _buildStatusText(
+                                "Your return request accepted" +
+                                    (returnRequest.refundStatus.toString() == "1"
+                                        ? "\nRefunded on ${returnRequest.refundedDate != null ? getFormatedDate(returnRequest.refundedDate.toString()) : ""}"
+                                        : "\nNot Refunded"),
+                                Colors.redAccent,
+                              ),
+                          ]
+                        ],
+
+                      ],
+                    ),
+                  ) ,
+
+
+
+
               ),
             );
           },

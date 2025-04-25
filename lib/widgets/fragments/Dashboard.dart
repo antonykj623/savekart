@@ -557,8 +557,6 @@ class _DashboardState extends State<Dashboard> {
 
     CartBannersEntity entity=CartBannersEntity.fromJson(js);
 
-
-
     if(entity.status==1)
       {
         entity.data?.sort((a, b) =>

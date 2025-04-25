@@ -66,6 +66,11 @@ OrderDetailsData $OrderDetailsDataFromJson(Map<String, dynamic> json) {
   if (cartProduct != null) {
     orderDetailsData.cartProduct = cartProduct;
   }
+  final OrderDetailsDataPaymentDetails? paymentDetails = jsonConvert.convert<
+      OrderDetailsDataPaymentDetails>(json['payment_details']);
+  if (paymentDetails != null) {
+    orderDetailsData.paymentDetails = paymentDetails;
+  }
   final OrderDetailsDataCartReturnRequests? cartReturnRequests = jsonConvert
       .convert<OrderDetailsDataCartReturnRequests>(
       json['cart_return_requests']);
@@ -80,6 +85,7 @@ Map<String, dynamic> $OrderDetailsDataToJson(OrderDetailsData entity) {
   data['cart_order'] = entity.cartOrder?.toJson();
   data['cart_stock'] = entity.cartStock?.toJson();
   data['cart_product'] = entity.cartProduct?.toJson();
+  data['payment_details'] = entity.paymentDetails?.toJson();
   data['cart_return_requests'] = entity.cartReturnRequests?.toJson();
   return data;
 }
@@ -89,12 +95,14 @@ extension OrderDetailsDataExtension on OrderDetailsData {
     OrderDetailsDataCartOrder? cartOrder,
     OrderDetailsDataCartStock? cartStock,
     OrderDetailsDataCartProduct? cartProduct,
+    OrderDetailsDataPaymentDetails? paymentDetails,
     OrderDetailsDataCartReturnRequests? cartReturnRequests,
   }) {
     return OrderDetailsData()
       ..cartOrder = cartOrder ?? this.cartOrder
       ..cartStock = cartStock ?? this.cartStock
       ..cartProduct = cartProduct ?? this.cartProduct
+      ..paymentDetails = paymentDetails ?? this.paymentDetails
       ..cartReturnRequests = cartReturnRequests ?? this.cartReturnRequests;
   }
 }
@@ -173,12 +181,14 @@ OrderDetailsDataCartOrder $OrderDetailsDataCartOrderFromJson(
     orderDetailsDataCartOrder.vendorConfirmationUpdatedBy =
         vendorConfirmationUpdatedBy;
   }
-  final dynamic vendorConfirmationUpdatedAt = json['vendor_confirmation_updated_at'];
+  final String? vendorConfirmationUpdatedAt = jsonConvert.convert<String>(
+      json['vendor_confirmation_updated_at']);
   if (vendorConfirmationUpdatedAt != null) {
     orderDetailsDataCartOrder.vendorConfirmationUpdatedAt =
         vendorConfirmationUpdatedAt;
   }
-  final dynamic packingEmpoyeeId = json['packing_empoyee_id'];
+  final String? packingEmpoyeeId = jsonConvert.convert<String>(
+      json['packing_empoyee_id']);
   if (packingEmpoyeeId != null) {
     orderDetailsDataCartOrder.packingEmpoyeeId = packingEmpoyeeId;
   }
@@ -195,7 +205,7 @@ OrderDetailsDataCartOrder $OrderDetailsDataCartOrderFromJson(
   if (shippedEmpId != null) {
     orderDetailsDataCartOrder.shippedEmpId = shippedEmpId;
   }
-  final String? shippedAt = jsonConvert.convert<String>(json['shipped_at']);
+  final dynamic shippedAt = json['shipped_at'];
   if (shippedAt != null) {
     orderDetailsDataCartOrder.shippedAt = shippedAt;
   }
@@ -213,8 +223,7 @@ OrderDetailsDataCartOrder $OrderDetailsDataCartOrderFromJson(
     orderDetailsDataCartOrder.deliveryStatusFromAgency =
         deliveryStatusFromAgency;
   }
-  final String? deliveryRecvedDateFromAgency = jsonConvert.convert<String>(
-      json['delivery_recved_date_from_agency']);
+  final dynamic deliveryRecvedDateFromAgency = json['delivery_recved_date_from_agency'];
   if (deliveryRecvedDateFromAgency != null) {
     orderDetailsDataCartOrder.deliveryRecvedDateFromAgency =
         deliveryRecvedDateFromAgency;
@@ -223,7 +232,7 @@ OrderDetailsDataCartOrder $OrderDetailsDataCartOrderFromJson(
   if (createdAt != null) {
     orderDetailsDataCartOrder.createdAt = createdAt;
   }
-  final dynamic cancelledAt = json['cancelled_at'];
+  final String? cancelledAt = jsonConvert.convert<String>(json['cancelled_at']);
   if (cancelledAt != null) {
     orderDetailsDataCartOrder.cancelledAt = cancelledAt;
   }
@@ -283,18 +292,18 @@ extension OrderDetailsDataCartOrderExtension on OrderDetailsDataCartOrder {
     String? userId,
     dynamic updateBy,
     String? vendorConfirmationUpdatedBy,
-    dynamic vendorConfirmationUpdatedAt,
-    dynamic packingEmpoyeeId,
+    String? vendorConfirmationUpdatedAt,
+    String? packingEmpoyeeId,
     String? packedAt,
     String? invoiceStatus,
     dynamic shippedEmpId,
-    String? shippedAt,
+    dynamic shippedAt,
     dynamic deliveringAgencyId,
     dynamic podNumber,
     String? deliveryStatusFromAgency,
-    String? deliveryRecvedDateFromAgency,
+    dynamic deliveryRecvedDateFromAgency,
     String? createdAt,
-    dynamic cancelledAt,
+    String? cancelledAt,
   }) {
     return OrderDetailsDataCartOrder()
       ..id = id ?? this.id
@@ -554,15 +563,15 @@ OrderDetailsDataCartProduct $OrderDetailsDataCartProductFromJson(
   if (sideImage1 != null) {
     orderDetailsDataCartProduct.sideImage1 = sideImage1;
   }
-  final dynamic sideImage2 = json['side_image2'];
+  final String? sideImage2 = jsonConvert.convert<String>(json['side_image2']);
   if (sideImage2 != null) {
     orderDetailsDataCartProduct.sideImage2 = sideImage2;
   }
-  final dynamic sideImage3 = json['side_image3'];
+  final String? sideImage3 = jsonConvert.convert<String>(json['side_image3']);
   if (sideImage3 != null) {
     orderDetailsDataCartProduct.sideImage3 = sideImage3;
   }
-  final dynamic sideImage4 = json['side_image4'];
+  final String? sideImage4 = jsonConvert.convert<String>(json['side_image4']);
   if (sideImage4 != null) {
     orderDetailsDataCartProduct.sideImage4 = sideImage4;
   }
@@ -654,9 +663,9 @@ extension OrderDetailsDataCartProductExtension on OrderDetailsDataCartProduct {
     String? productSpec,
     String? primeImage,
     String? sideImage1,
-    dynamic sideImage2,
-    dynamic sideImage3,
-    dynamic sideImage4,
+    String? sideImage2,
+    String? sideImage3,
+    String? sideImage4,
     String? unitId,
     String? sizeEnabled,
     String? colorEnabled,
@@ -692,6 +701,136 @@ extension OrderDetailsDataCartProductExtension on OrderDetailsDataCartProduct {
       ..status = status ?? this.status
       ..returnable = returnable ?? this.returnable
       ..returnDays = returnDays ?? this.returnDays;
+  }
+}
+
+OrderDetailsDataPaymentDetails $OrderDetailsDataPaymentDetailsFromJson(
+    Map<String, dynamic> json) {
+  final OrderDetailsDataPaymentDetails orderDetailsDataPaymentDetails = OrderDetailsDataPaymentDetails();
+  final String? id = jsonConvert.convert<String>(json['id']);
+  if (id != null) {
+    orderDetailsDataPaymentDetails.id = id;
+  }
+  final String? regId = jsonConvert.convert<String>(json['reg_id']);
+  if (regId != null) {
+    orderDetailsDataPaymentDetails.regId = regId;
+  }
+  final String? dateOrder = jsonConvert.convert<String>(json['date_order']);
+  if (dateOrder != null) {
+    orderDetailsDataPaymentDetails.dateOrder = dateOrder;
+  }
+  final dynamic deliveryDate = json['delivery_date'];
+  if (deliveryDate != null) {
+    orderDetailsDataPaymentDetails.deliveryDate = deliveryDate;
+  }
+  final String? addressId = jsonConvert.convert<String>(json['address_id']);
+  if (addressId != null) {
+    orderDetailsDataPaymentDetails.addressId = addressId;
+  }
+  final String? totalprice = jsonConvert.convert<String>(json['totalprice']);
+  if (totalprice != null) {
+    orderDetailsDataPaymentDetails.totalprice = totalprice;
+  }
+  final String? isWalletUsed = jsonConvert.convert<String>(
+      json['isWalletUsed']);
+  if (isWalletUsed != null) {
+    orderDetailsDataPaymentDetails.isWalletUsed = isWalletUsed;
+  }
+  final String? paidAmount = jsonConvert.convert<String>(json['paid_amount']);
+  if (paidAmount != null) {
+    orderDetailsDataPaymentDetails.paidAmount = paidAmount;
+  }
+  final String? usedWalletAmount = jsonConvert.convert<String>(
+      json['used_wallet_amount']);
+  if (usedWalletAmount != null) {
+    orderDetailsDataPaymentDetails.usedWalletAmount = usedWalletAmount;
+  }
+  final String? paymentType = jsonConvert.convert<String>(json['payment_type']);
+  if (paymentType != null) {
+    orderDetailsDataPaymentDetails.paymentType = paymentType;
+  }
+  final String? transactionId = jsonConvert.convert<String>(
+      json['transaction_id']);
+  if (transactionId != null) {
+    orderDetailsDataPaymentDetails.transactionId = transactionId;
+  }
+  final String? transactionDetails = jsonConvert.convert<String>(
+      json['transaction_details']);
+  if (transactionDetails != null) {
+    orderDetailsDataPaymentDetails.transactionDetails = transactionDetails;
+  }
+  final String? billingStatus = jsonConvert.convert<String>(
+      json['billing_status']);
+  if (billingStatus != null) {
+    orderDetailsDataPaymentDetails.billingStatus = billingStatus;
+  }
+  final String? description = jsonConvert.convert<String>(json['description']);
+  if (description != null) {
+    orderDetailsDataPaymentDetails.description = description;
+  }
+  final String? paymentStatus = jsonConvert.convert<String>(
+      json['payment_status']);
+  if (paymentStatus != null) {
+    orderDetailsDataPaymentDetails.paymentStatus = paymentStatus;
+  }
+  return orderDetailsDataPaymentDetails;
+}
+
+Map<String, dynamic> $OrderDetailsDataPaymentDetailsToJson(
+    OrderDetailsDataPaymentDetails entity) {
+  final Map<String, dynamic> data = <String, dynamic>{};
+  data['id'] = entity.id;
+  data['reg_id'] = entity.regId;
+  data['date_order'] = entity.dateOrder;
+  data['delivery_date'] = entity.deliveryDate;
+  data['address_id'] = entity.addressId;
+  data['totalprice'] = entity.totalprice;
+  data['isWalletUsed'] = entity.isWalletUsed;
+  data['paid_amount'] = entity.paidAmount;
+  data['used_wallet_amount'] = entity.usedWalletAmount;
+  data['payment_type'] = entity.paymentType;
+  data['transaction_id'] = entity.transactionId;
+  data['transaction_details'] = entity.transactionDetails;
+  data['billing_status'] = entity.billingStatus;
+  data['description'] = entity.description;
+  data['payment_status'] = entity.paymentStatus;
+  return data;
+}
+
+extension OrderDetailsDataPaymentDetailsExtension on OrderDetailsDataPaymentDetails {
+  OrderDetailsDataPaymentDetails copyWith({
+    String? id,
+    String? regId,
+    String? dateOrder,
+    dynamic deliveryDate,
+    String? addressId,
+    String? totalprice,
+    String? isWalletUsed,
+    String? paidAmount,
+    String? usedWalletAmount,
+    String? paymentType,
+    String? transactionId,
+    String? transactionDetails,
+    String? billingStatus,
+    String? description,
+    String? paymentStatus,
+  }) {
+    return OrderDetailsDataPaymentDetails()
+      ..id = id ?? this.id
+      ..regId = regId ?? this.regId
+      ..dateOrder = dateOrder ?? this.dateOrder
+      ..deliveryDate = deliveryDate ?? this.deliveryDate
+      ..addressId = addressId ?? this.addressId
+      ..totalprice = totalprice ?? this.totalprice
+      ..isWalletUsed = isWalletUsed ?? this.isWalletUsed
+      ..paidAmount = paidAmount ?? this.paidAmount
+      ..usedWalletAmount = usedWalletAmount ?? this.usedWalletAmount
+      ..paymentType = paymentType ?? this.paymentType
+      ..transactionId = transactionId ?? this.transactionId
+      ..transactionDetails = transactionDetails ?? this.transactionDetails
+      ..billingStatus = billingStatus ?? this.billingStatus
+      ..description = description ?? this.description
+      ..paymentStatus = paymentStatus ?? this.paymentStatus;
   }
 }
 
@@ -740,7 +879,8 @@ OrderDetailsDataCartReturnRequests $OrderDetailsDataCartReturnRequestsFromJson(
   if (createdAt != null) {
     orderDetailsDataCartReturnRequests.createdAt = createdAt;
   }
-  final dynamic refundedDate = json['refunded_date'];
+  final String? refundedDate = jsonConvert.convert<String>(
+      json['refunded_date']);
   if (refundedDate != null) {
     orderDetailsDataCartReturnRequests.refundedDate = refundedDate;
   }
@@ -787,7 +927,7 @@ extension OrderDetailsDataCartReturnRequestsExtension on OrderDetailsDataCartRet
     String? userId,
     String? reason,
     String? createdAt,
-    dynamic refundedDate,
+    String? refundedDate,
     String? status,
     String? refundStatus,
   }) {

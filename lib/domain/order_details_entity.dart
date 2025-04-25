@@ -31,6 +31,8 @@ class OrderDetailsData {
 	OrderDetailsDataCartStock? cartStock=new OrderDetailsDataCartStock();
 	@JSONField(name: "cart_product")
 	OrderDetailsDataCartProduct? cartProduct=new OrderDetailsDataCartProduct();
+	@JSONField(name: "payment_details")
+	OrderDetailsDataPaymentDetails? paymentDetails=new OrderDetailsDataPaymentDetails();
 	@JSONField(name: "cart_return_requests")
 	OrderDetailsDataCartReturnRequests? cartReturnRequests=new OrderDetailsDataCartReturnRequests();
 
@@ -75,9 +77,9 @@ class OrderDetailsDataCartOrder {
 	@JSONField(name: "vendor_confirmation_updated_by")
 	String? vendorConfirmationUpdatedBy = '';
 	@JSONField(name: "vendor_confirmation_updated_at")
-	dynamic vendorConfirmationUpdatedAt;
+	String? vendorConfirmationUpdatedAt = '';
 	@JSONField(name: "packing_empoyee_id")
-	dynamic packingEmpoyeeId;
+	String? packingEmpoyeeId = '';
 	@JSONField(name: "packed_at")
 	String? packedAt = '';
 	@JSONField(name: "invoice_status")
@@ -85,7 +87,7 @@ class OrderDetailsDataCartOrder {
 	@JSONField(name: "shipped_emp_id")
 	dynamic shippedEmpId;
 	@JSONField(name: "shipped_at")
-	String? shippedAt = '';
+	dynamic shippedAt;
 	@JSONField(name: "delivering_agency_id")
 	dynamic deliveringAgencyId;
 	@JSONField(name: "pod_number")
@@ -93,11 +95,11 @@ class OrderDetailsDataCartOrder {
 	@JSONField(name: "delivery_status_from_agency")
 	String? deliveryStatusFromAgency = '';
 	@JSONField(name: "delivery_recved_date_from_agency")
-	String? deliveryRecvedDateFromAgency = '';
+	dynamic deliveryRecvedDateFromAgency;
 	@JSONField(name: "created_at")
 	String? createdAt = '';
 	@JSONField(name: "cancelled_at")
-	dynamic cancelledAt;
+	String? cancelledAt = '';
 
 	OrderDetailsDataCartOrder();
 
@@ -183,11 +185,11 @@ class OrderDetailsDataCartProduct {
 	@JSONField(name: "side_image1")
 	String? sideImage1 = '';
 	@JSONField(name: "side_image2")
-	dynamic sideImage2;
+	String? sideImage2 = '';
 	@JSONField(name: "side_image3")
-	dynamic sideImage3;
+	String? sideImage3 = '';
 	@JSONField(name: "side_image4")
-	dynamic sideImage4;
+	String? sideImage4 = '';
 	@JSONField(name: "unit_id")
 	String? unitId = '';
 	@JSONField(name: "size_enabled")
@@ -220,8 +222,49 @@ class OrderDetailsDataCartProduct {
 }
 
 @JsonSerializable()
+class OrderDetailsDataPaymentDetails {
+	String? id = '';
+	@JSONField(name: "reg_id")
+	String? regId = '';
+	@JSONField(name: "date_order")
+	String? dateOrder = '';
+	@JSONField(name: "delivery_date")
+	dynamic deliveryDate;
+	@JSONField(name: "address_id")
+	String? addressId = '';
+	String? totalprice = '';
+	String? isWalletUsed = '';
+	@JSONField(name: "paid_amount")
+	String? paidAmount = '';
+	@JSONField(name: "used_wallet_amount")
+	String? usedWalletAmount = '';
+	@JSONField(name: "payment_type")
+	String? paymentType = '';
+	@JSONField(name: "transaction_id")
+	String? transactionId = '';
+	@JSONField(name: "transaction_details")
+	String? transactionDetails = '';
+	@JSONField(name: "billing_status")
+	String? billingStatus = '';
+	String? description = '';
+	@JSONField(name: "payment_status")
+	String? paymentStatus = '';
+
+	OrderDetailsDataPaymentDetails();
+
+	factory OrderDetailsDataPaymentDetails.fromJson(Map<String, dynamic> json) => $OrderDetailsDataPaymentDetailsFromJson(json);
+
+	Map<String, dynamic> toJson() => $OrderDetailsDataPaymentDetailsToJson(this);
+
+	@override
+	String toString() {
+		return jsonEncode(this);
+	}
+}
+
+@JsonSerializable()
 class OrderDetailsDataCartReturnRequests {
-	String? id = '0';
+	String? id = '';
 	@JSONField(name: "product_id")
 	String? productId = '';
 	@JSONField(name: "product_return_policy_id")
@@ -237,7 +280,7 @@ class OrderDetailsDataCartReturnRequests {
 	@JSONField(name: "created_at")
 	String? createdAt = '';
 	@JSONField(name: "refunded_date")
-	dynamic refundedDate;
+	String? refundedDate = '';
 	String? status = '';
 	@JSONField(name: "refund_status")
 	String? refundStatus = '';
