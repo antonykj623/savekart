@@ -170,7 +170,7 @@ class _OrdersState extends State<Orders> {
                             if (order.status.toString() == "0" &&
                                 order.orderItemStatus.toString() == "3" &&
                                 isEligibleToShowAcceptReturn(item) &&
-                                returnRequest.id.toString() == "0")
+                                returnRequest.id.toString().isEmpty)
                               Padding(
                                 padding: EdgeInsets.all(5),
                                 child: Row(

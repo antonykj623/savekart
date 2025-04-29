@@ -264,7 +264,7 @@ class OrderDetailsDataPaymentDetails {
 
 @JsonSerializable()
 class OrderDetailsDataCartReturnRequests {
-	String? id = '0';
+	String? id = '';
 	@JSONField(name: "product_id")
 	String? productId = '';
 	@JSONField(name: "product_return_policy_id")

@@ -19,6 +19,7 @@ class AddressList extends StatefulWidget {
 class _AddressListState extends State<AddressList> {
 
 
+
   @override
   void initState() {
     // TODO: implement initState
@@ -71,7 +72,7 @@ class _AddressListState extends State<AddressList> {
               _addresses[0].housename.toString()+","+_addresses[0].place.toString() + "\n" +
               _addresses[0].landmark.toString()+"\n"+
               _addresses[0].phone.toString()+"\n"+
-              _addresses[0].phone.toString();
+              _addresses[0].state.toString();
         }
       });
     }
@@ -139,6 +140,7 @@ class _AddressListState extends State<AddressList> {
                String  district = result['district'] ?? '';
                String place=result['place'] ?? '';
                String pincode=result['pincode'] ??'';
+               String state=result['state']??'';
 
 
 
@@ -152,6 +154,7 @@ class _AddressListState extends State<AddressList> {
                mp['place']=place;
                mp['phone'] = phone;
                mp['pincode']=pincode;
+               mp['state']=state;
 
 
                EcommerceApiHelper apihelper = new EcommerceApiHelper();
@@ -263,6 +266,7 @@ class _AddressListState extends State<AddressList> {
                                 String place=result['place'] ?? '';
                                 String  phone = result['phone'] ?? '';
                                 String pincode=result['pincode'] ??'';
+                                String state=result['state']??'';
                                 Map<String, String> mp = new HashMap();
                                 mp['name'] = name;
                                 mp['house'] = house;
@@ -272,6 +276,8 @@ class _AddressListState extends State<AddressList> {
                                 mp['place']=place;
                                 mp['phone'] = phone;
                                 mp['pincode']=pincode;
+                                mp['state']=state;
+
 
                                 mp['id'] = _addresses[index].id.toString();
 
@@ -294,7 +300,7 @@ class _AddressListState extends State<AddressList> {
                           },
                         ),
 
-                        title: Text(""+_addresses[index].name.toString()+"\n"+_addresses[index].housename.toString()+"\n"+_addresses[index].flatno.toString()+"\n"+_addresses[index].landmark.toString()+"\n"+_addresses[index].district.toString()+"\n"+_addresses[index].phone.toString(),maxLines: 10,)) ,
+                        title: Text(""+_addresses[index].name.toString()+"\n"+_addresses[index].housename.toString()+"\n"+_addresses[index].flatno.toString()+"\n"+_addresses[index].landmark.toString()+"\n"+_addresses[index].district.toString()+"\n"+_addresses[index].phone.toString()+"\n"+_addresses[index].state.toString(),maxLines: 10,)) ,
                     elevation: 10,
                   )
                     
@@ -332,6 +338,45 @@ class _InputDialogState extends State<InputDialog> {
   final _phoneController = TextEditingController();
   final _pincodecontroller=TextEditingController();
 
+  final List<String> countries = [
+    'India'
+
+  ];
+
+  final List<String> states = [
+    'Andhra Pradesh',
+    'Arunachal Pradesh',
+    'Assam',
+    'Bihar',
+    'Chhattisgarh',
+    'Goa',
+    'Gujarat',
+    'Haryana',
+    'Himachal Pradesh',
+    'Jharkhand',
+    'Karnataka',
+    'Kerala',
+    'Madhya Pradesh',
+    'Maharashtra',
+    'Manipur',
+    'Meghalaya',
+    'Mizoram',
+    'Nagaland',
+    'Odisha',
+    'Punjab',
+    'Rajasthan',
+    'Sikkim',
+    'Tamil Nadu',
+    'Telangana',
+    'Tripura',
+    'Uttar Pradesh',
+    'Uttarakhand',
+    'West Bengal'
+  ];
+
+  String selectedCountry="India";
+  String selectedState="Kerala";
+
   UserAddressDataData userAddressDataData;
   _InputDialogState(this.userAddressDataData);
 
@@ -351,6 +396,7 @@ class _InputDialogState extends State<InputDialog> {
        _landmarkController.text=userAddressDataData.landmark.toString();
        _districtController.text=userAddressDataData.district.toString();
        _pincodecontroller.text=userAddressDataData.pincode.toString();
+       selectedState=userAddressDataData.state.toString();
 
 
     });
@@ -400,6 +446,7 @@ class _InputDialogState extends State<InputDialog> {
                     'landmark': _landmarkController.text,
                     'place':_placenameController.text,
                     'district':_districtController.text,
+                    'state':selectedState,
                     'phone':_phoneController.text,
                     'pincode':_pincodecontroller.text
                   });
@@ -445,11 +492,7 @@ class _InputDialogState extends State<InputDialog> {
 
   }
 
-  final List<String> countries = [
-    'India'
 
-  ];
-  String selectedCountry="India";
 
   @override
   Widget build(BuildContext context) {
@@ -496,6 +539,25 @@ class _InputDialogState extends State<InputDialog> {
               decoration: InputDecoration(labelText: "Pin Code"),
               keyboardType: TextInputType.number,
             ),
+
+        Container(
+          width: double.infinity,
+          height: ResponsiveInfo.isMobile(context)?50:70,
+          child:    DropdownButton<String>(
+              hint: Text('Choose a state'),
+              value: selectedState,
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedState = newValue!;
+                });
+              },
+              items: states.map<DropdownMenuItem<String>>((String state) {
+                return DropdownMenuItem<String>(
+                  value: state,
+                  child: Text(state),
+                );
+              }).toList(),
+            ) ),
 
             Container(
               width: double.infinity,

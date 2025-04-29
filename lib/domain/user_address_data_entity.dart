@@ -35,6 +35,7 @@ class UserAddressDataData {
 	String? phone = '';
 	String? pincode = '';
 	String? country = '';
+	String? state='';
 
 	UserAddressDataData();
 

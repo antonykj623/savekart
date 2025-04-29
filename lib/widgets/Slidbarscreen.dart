@@ -49,6 +49,7 @@ loadData();
             //  height: 200,
               enlargeCenterPage: true,
               aspectRatio: 2,
+
               onPageChanged: (index, reason) {
                 setState(() {
                   AdsCurrentIndex = index;

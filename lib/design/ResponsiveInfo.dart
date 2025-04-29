@@ -63,8 +63,10 @@ static int getRandomNumber()
 
    // set up the AlertDialog
    AlertDialog alert = AlertDialog(
-     title: Text(title),
-     content: Text(message),
+     title:(title.isNotEmpty)? Text(title):SizedBox.shrink(),
+     content: IntrinsicHeight(
+     // Set your desired height
+       child: Text(message)),
      actions: [
        okButton,
      ],

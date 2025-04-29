@@ -133,6 +133,7 @@ getProfile();
             SizedBox(height: 16),
             // Name field
             TextField(
+              readOnly: true,
               controller: nameController,
               decoration: InputDecoration(
                 labelText: 'Name',
@@ -143,6 +144,7 @@ getProfile();
 
             // Email field
             TextField(
+              readOnly: true,
               controller: emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
@@ -153,55 +155,54 @@ getProfile();
 
             // Phone number field (non-editable)
             TextField(
-              enabled: false, // Disable editing
+              readOnly: true, // Disable editing
               decoration: InputDecoration(
                 labelText: 'Phone Number',
                 border: OutlineInputBorder(),
-                filled: true,
-                fillColor: Colors.grey.shade200,
+
               ),
               controller: TextEditingController(text: phoneNumber),
             ),
             SizedBox(height: 16),
-            Padding(padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?10:15),
-
-              child: Container(
-                width: ResponsiveInfo.isMobile(context)?150:180,
-                height: ResponsiveInfo.isMobile(context)?60:70,
-                color: Colors.indigo,
-                child:    TextButton(
-                  onPressed: () async {
-
-                    if(nameController.text.toString().isNotEmpty)
-                      {
-                        if(emailController.text.toString().isNotEmpty)
-                        {
-
-                          updateProfileDetails();
-
-                        }
-                        else
-                        {
-
-                          ResponsiveInfo.showAlertDialog(context, "", "Enter email");
-                        }
-
-                      }
-                    else
-                      {
-
-                        ResponsiveInfo.showAlertDialog(context, "", "Enter name");
-                      }
-
-
-
-                  },
-                  child: Text("Update",style: TextStyle(color: Colors.white,fontSize: ResponsiveInfo.isMobile(context)?14:16),),
-
-                ) ,
-              ),
-
-            )
+            // Padding(padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?10:15),
+            //
+            //   child: Container(
+            //     width: ResponsiveInfo.isMobile(context)?150:180,
+            //     height: ResponsiveInfo.isMobile(context)?60:70,
+            //     color: Color(0xff0B7D97),
+            //     child:    TextButton(
+            //       onPressed: () async {
+            //
+            //         if(nameController.text.toString().isNotEmpty)
+            //           {
+            //             if(emailController.text.toString().isNotEmpty)
+            //             {
+            //
+            //               updateProfileDetails();
+            //
+            //             }
+            //             else
+            //             {
+            //
+            //               ResponsiveInfo.showAlertDialog(context, "", "Enter email");
+            //             }
+            //
+            //           }
+            //         else
+            //           {
+            //
+            //             ResponsiveInfo.showAlertDialog(context, "", "Enter name");
+            //           }
+            //
+            //
+            //
+            //       },
+            //       child: Text("Update",style: TextStyle(color: Colors.white,fontSize: ResponsiveInfo.isMobile(context)?14:16),),
+            //
+            //     ) ,
+            //   ),
+            //
+            // )
 
           ],
         ),
