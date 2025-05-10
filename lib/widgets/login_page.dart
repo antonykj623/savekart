@@ -175,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
 
                                            AppStorage.SaveToken(AppStorage.token, js['token'].toString());
 
-                                           Navigator.push(context,
+                                           Navigator.pushReplacement(context,
                                                MaterialPageRoute(builder:
                                                    (context) =>
                                                    HomeScreen()

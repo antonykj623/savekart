@@ -356,20 +356,10 @@ bool iswalletused=false;
 
                   if(selected_addressid?.compareTo("0")!=0) {
                     if (_totalAmount == 0) {
-                      // if( iswalletused)
-                      // {
-                      //
-                      // }
-                      //need to call in placeorder api.php   updateWalletBalance();
+
                       PlaceOrder(totalamount_to_paid.toString(), iswalletused,
                           _totalAmount.toString(), 3,
                           usedwalletamount.toString());
-
-
-                      // }
-                      // else{
-                      //   PlaceOrder(_totalAmount.toString(),"0",1,"Order Initiated");
-                      // }
 
 
                     }
@@ -430,8 +420,9 @@ bool iswalletused=false;
                       }
                     else{
                       Navigator.pop(context);
-                      PlaceOrder(totalamount_to_paid.toString(),iswalletused,_totalAmount.toString(),2,usedwalletamount.toString());
+                      // PlaceOrder(totalamount_to_paid.toString(),iswalletused,_totalAmount.toString(),2,usedwalletamount.toString());
 
+                      PlaceOrder(totalamount_to_paid.toString(),iswalletused,_totalAmount.toString(),2,usedwalletamount.toString());
 
 
                     }
@@ -608,7 +599,7 @@ bool iswalletused=false;
     mp['address_id']=selected_addressid.toString();
     mp['totalprice']=total;
     mp['isWalletUsed']=(iswalletsused?1:0).toString();
-     mp['paid_amount']=paidamount;
+     mp['paid_amount']=1.toString();
 
     mp['payment_type']=paymenttype.toString();
     mp['wallet_amount_used']=walletamountused;
@@ -639,7 +630,7 @@ bool iswalletused=false;
 
          String urldata=data['data'];
 
-         Completer c=new Completer();
+         Completer c=Completer();
 
 
          NativeBridge().redirectToNative(urldata,c);
