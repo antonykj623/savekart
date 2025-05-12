@@ -599,7 +599,7 @@ bool iswalletused=false;
     mp['address_id']=selected_addressid.toString();
     mp['totalprice']=total;
     mp['isWalletUsed']=(iswalletsused?1:0).toString();
-     mp['paid_amount']=1.toString();
+     mp['paid_amount']=paidamount;
 
     mp['payment_type']=paymenttype.toString();
     mp['wallet_amount_used']=walletamountused;

@@ -680,7 +680,8 @@ List<ProductByCategoryDataData>pcdata=[];
 
 
         ],
-      ):Container(width: double.infinity,
+      ):
+      Container(width: double.infinity,
       height: double.infinity,
         child: Stack(
 
@@ -880,7 +881,7 @@ List<ProductByCategoryDataData>pcdata=[];
                     .toString()
                     .isNotEmpty) {
               price_details = price_details +
-                  "Save Cart Price : " +
+                  "Save Kart Price : " +
                   productStockEntity.data!.savecartPrice.toString() + "\n\n";
             }
 
@@ -1208,39 +1209,15 @@ setState(() {
 
   Future<double> calculateWalletPoints() async
   {
-
     ResponsiveInfo.showLoaderDialog(context);
     double walletpoints = 0;
-
     EcommerceApiHelper apihelper = new EcommerceApiHelper();
-
-    var t = EcommerceApiHelper.getTimeStamp();
-
-    var response = await apihelper.get(
-        Apimethodes.getCartData + "?q=" + t.toString());
+    var t=EcommerceApiHelper.getTimeStamp();
+    var response1= await  apihelper.get(Apimethodes.getWalletPoints+"?q="+t.toString());
 
     Navigator.pop(context);
-
-   String? currentpoints=await  AppStorage.getString(
-        AppStorage.current_wallet_point);
-
-   double w= (currentpoints!=null)?  double.parse(currentpoints.toString().trim()):0;
-
-    var js = jsonDecode(response);
-    CartProductsEntity entity = CartProductsEntity.fromJson(js);
-    double pointsredeemed=0;
-    if (entity!.status == 1) {
-      for (int i = 0; i < entity!.data!.length; i++) {
-        if (entity!.data![i].pointsRedeemed.toString().compareTo("1") == 0) {
-
-          pointsredeemed=pointsredeemed+double.parse(entity!.data![i].ppredemption.toString());
-
-        }
-      }
-    }
-
-    walletpoints=w-pointsredeemed;
-
+    var js1= jsonDecode( response1) ;
+    walletpoints=double.parse(js1['data'].toString());
 
     return walletpoints;
   }
@@ -1294,7 +1271,7 @@ setState(() {
 
     getCartCount();
 
-        ResponsiveInfo.showAlertDialog(context, "Save Cart", "Product added to cart successfully");
+        ResponsiveInfo.showAlertDialog(context, "Save Kart", "Product added to cart successfully");
     //   }
     // else{
     //
@@ -1445,31 +1422,25 @@ setState(() {
   getCartCount()async
   {
     // ResponsiveInfo.ShowProgressDialog(context);
-    timer = Timer.periodic(Duration(seconds: 6), (Timer t) async {
-      EcommerceApiHelper apihelper = new EcommerceApiHelper();
+    EcommerceApiHelper apihelper = new EcommerceApiHelper();
 
-      var t=EcommerceApiHelper.getTimeStamp();
+    var t=EcommerceApiHelper.getTimeStamp();
 
-      var response= await  apihelper.get(Apimethodes.getCartDataCount+"?q="+t.toString());
+    var response= await  apihelper.get(Apimethodes.getCartDataCount+"?q="+t.toString());
 
-      var js= jsonDecode( response) ;
+    var js= jsonDecode( response) ;
 
-      if(js['status']==1)
-      {
+    if(js['status']==1)
+    {
 
-        String c=js['data'].toString();
+      String c=js['data'].toString();
 
-        setState(() {
-          cartcount=c;
+      setState(() {
+        cartcount=c;
 
-        });
+      });
 
-      }
-      // Your repeating task here
-    });
-
-
-
+    }
 
   }
 

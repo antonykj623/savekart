@@ -136,28 +136,28 @@ class _OrdersState extends State<Orders> {
                         // Order Status Messages
 
                         ...[
-                          if (paymentDetails.paymentStatus.toString() != "1")
+                          if (paymentDetails.paymentStatus.toString().compareTo("1")!=0)
                             _buildStatusText("Payment failed", Colors.red)
                           else ...[
-                            if (order.orderItemStatus.toString() == "0")
+                            if (order.orderItemStatus.toString().compareTo("0") == 0)
                               _buildStatusText("Order created. Please wait...", Colors.green),
-                            if (order.orderItemStatus.toString() == "1")
+                            if (order.orderItemStatus.toString().compareTo("1")==0)
                               _buildStatusText("Packing is in progress..", Colors.green),
-                            if (order.orderItemStatus.toString() == "2")
+                            if (order.orderItemStatus.toString().compareTo("2")==0)
                               _buildStatusText("Out for delivery", Colors.green),
-                            if (order.orderItemStatus.toString() == "3")
+                            if (order.orderItemStatus.toString().compareTo("3")==0)
                               _buildStatusText("Order delivered successfully", Colors.green),
-                            if (order.orderItemStatus.toString() == "4")
+                            if (order.orderItemStatus.toString().compareTo("4")==0)
                               _buildStatusText("You returned this product", Colors.redAccent),
-                            if (order.orderItemStatus.toString() == "5")
+                            if (order.orderItemStatus.toString().compareTo("5")==0)
                               _buildStatusText("You cancelled this order item", Colors.red),
-                            if (order.status.toString() == "1")
+                            if (order.status.toString().compareTo("1")==0)
                               _buildStatusText("You accepted this order item", Colors.green),
-                            if (order.status.toString() == "2")
+                            if (order.status.toString().compareTo("2")==0)
                               _buildStatusText("You rejected this order item", Colors.redAccent),
 
                             // Cancel Button
-                            if (order.status.toString() == "0" && order.orderItemStatus.toString() == "0")
+                            if (order.status.toString().compareTo("0")==0 && order.orderItemStatus.toString().compareTo("0") == 0)
                               _buildActionButton("Cancel", Colors.white, Color(0xff0B7D97), () {
                                 _showConfirmationDialog(
                                   context,
@@ -167,8 +167,8 @@ class _OrdersState extends State<Orders> {
                               }),
 
                             // Accept/Reject Buttons (on delivery)
-                            if (order.status.toString() == "0" &&
-                                order.orderItemStatus.toString() == "3" &&
+                            if (order.status.toString().compareTo("0") == 0 &&
+                                order.orderItemStatus.toString().compareTo("3") == 0 &&
                                 isEligibleToShowAcceptReturn(item) &&
                                 returnRequest.id.toString().isEmpty)
                               Padding(
@@ -194,8 +194,8 @@ class _OrdersState extends State<Orders> {
                               ),
 
                             // Return Request Status
-                            if (returnRequest.status.toString() == "0" &&
-                                returnRequest.refundStatus.toString() == "0")
+                            if (returnRequest.status.toString().compareTo("0") == 0 &&
+                                returnRequest.refundStatus.toString().compareTo("0") == 0)
                               _buildStatusText(
                                 "You have submitted a return request on ${getFormatedDate(returnRequest.createdAt.toString())}",
                                 Color(0xff0B7D97),
