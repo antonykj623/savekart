@@ -67,7 +67,21 @@ class _WalletTransactionState extends State<WalletTransaction> {
           
           Expanded(child: Padding(padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?10:15),
 
-            child: Text("Wallet Balance : "+walletbalance.toString(),style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:17,color: Colors.black),),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+
+              Icon(Icons.wallet,color: Color(0xff0B7D97),size: ResponsiveInfo.isMobile(context)?45:55,),
+              SizedBox(height: 5,),
+              Text("Wallet Balance : "+walletbalance.toString(),style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:17,color: Colors.black),),
+
+
+
+            ],
+            )
+
+
 
 
           ),flex: 1,),
@@ -152,12 +166,19 @@ class _WalletTransactionState extends State<WalletTransaction> {
   }
 
   getWalletTransactions() async{
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+
+   ResponsiveInfo.showLoaderDialog(context);
+    });
     EcommerceApiHelper apihelper = new EcommerceApiHelper();
 
     var t=EcommerceApiHelper.getTimeStamp();
 
     var response= await  apihelper.get(Apimethodes.getwalletTransactions+"?q="+t.toString());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
 
+      Navigator.pop(context);
+    });
     var js= jsonDecode( response) ;
 
     print(js);
@@ -171,7 +192,8 @@ class _WalletTransactionState extends State<WalletTransaction> {
           {
             setState(() {
               data!.clear();
-              data!.addAll(entity.data!);
+
+              data!.addAll(entity.data!.reversed);
             });
           }
 

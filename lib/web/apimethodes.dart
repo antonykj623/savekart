@@ -50,4 +50,5 @@ class Apimethodes{
     static String getSearchedProducts="getSearchedProducts.php";
     static String getCartUpdate="getCartUpdate.php";
     static String getProductCountByName="getProductCountByName.php";
+    static String updateWalletPoints="updateWalletPoints.php";
 }

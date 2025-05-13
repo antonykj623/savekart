@@ -100,13 +100,21 @@ class _DashboardState extends State<Dashboard> {
 
 
         actions: [
-          IconButton(onPressed: (){
-            Navigator.push(context,
-                MaterialPageRoute(builder:
-                    (context) =>
-                    ProductSearchScreen()
-                )
+          IconButton(onPressed: () async {
+
+
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProductSearchScreen()),
             );
+
+            if (result != null||result==null) {
+
+              getCartCount();
+              getWalletPoints();
+              getWalletBalanceAndPoints();
+
+            }
 
           }, icon: Icon(Icons.search_rounded,color: Color(0xff0B7D97),)),
 
@@ -123,14 +131,20 @@ class _DashboardState extends State<Dashboard> {
                     child: Icon(Icons.shopping_cart,color: Color(0xff0B7D97),size: ResponsiveInfo.isMobile(context)?20:25,),
 
                   ),
-                  onTap: (){
+                  onTap: () async {
 
-                    Navigator.push(context,
-                        MaterialPageRoute(builder:
-                            (context) =>
-                            CartScreen()
-                        )
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CartScreen()),
                     );
+
+                    if (result != null||result==null) {
+
+                      getCartCount();
+                      getWalletPoints();
+                      getWalletBalanceAndPoints();
+
+                    }
                   },
                 ) ,
               ),
@@ -151,14 +165,26 @@ class _DashboardState extends State<Dashboard> {
 
                       ,) ,
 
-                    onTap: (){
+                    onTap: () async {
 
-                      Navigator.push(context,
-                          MaterialPageRoute(builder:
-                              (context) =>
-                              CartScreen()
-                          )
+
+
+
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CartScreen()),
                       );
+
+                      if (result != null||result==null) {
+
+                        getCartCount();
+                        getWalletPoints();
+                        getWalletBalanceAndPoints();
+
+                      }
+
+
+
                     },
 
                   )
@@ -255,13 +281,29 @@ class _DashboardState extends State<Dashboard> {
               children: List.generate(categorydata!.length, (index) {
                 return GestureDetector(
 
-                    onTap: (){
-                      Navigator.push(
+                    onTap: () async {
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => ProductsByCategoryScreen(categoryId: categorydata[index].id.toString(),categoryname: categorydata[index].categoryName.toString(),),
+                      //   ),
+                      // );
+
+                      final result = await Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => ProductsByCategoryScreen(categoryId: categorydata[index].id.toString(),categoryname: categorydata[index].categoryName.toString(),),
-                        ),
+                        MaterialPageRoute(builder: (context) => ProductsByCategoryScreen(categoryId: categorydata[index].id.toString(),categoryname: categorydata[index].categoryName.toString(),)),
                       );
+
+                      if (result != null||result==null) {
+
+                        getCartCount();
+                        getWalletPoints();
+                        getWalletBalanceAndPoints();
+
+                      }
+
+
+
 
                     },
 
@@ -518,14 +560,25 @@ class _DashboardState extends State<Dashboard> {
 
                                   ),
                                 ) ,
-                                onTap: (){
+                                onTap: () async {
 
-                                  Navigator.push(context,
-                                      MaterialPageRoute(builder:
-                                          (context) =>
-                                          ProductDetails(data[i])
-                                      )
+
+
+
+                                  final result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => ProductDetails(data[i])),
                                   );
+
+                                  if (result != null||result==null) {
+
+                                    getCartCount();
+                                    getWalletPoints();
+                                    getWalletBalanceAndPoints();
+
+                                  }
+
+
                                 },
                               ),
                             ) ),

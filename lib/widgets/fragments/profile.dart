@@ -283,8 +283,9 @@ class _ProfileState extends State<Profile> {
                       ResponsiveInfo.showLoaderDialog(context);
 
                       EcommerceApiHelper apihelper=new EcommerceApiHelper();
+                      var t=EcommerceApiHelper.getTimeStamp();
 
-                      var response1= await  apihelper.get(Apimethodes.getCartUpdate);
+                      var response1= await  apihelper.get(Apimethodes.getCartUpdate+"?q="+t.toString());
 
                       Navigator.pop(context);
                       AppVersionEntity appversion=AppVersionEntity.fromJson(jsonDecode(response1));

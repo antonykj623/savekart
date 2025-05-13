@@ -43,6 +43,8 @@ class _PlaceOrderWidgetState extends State<PlaceOrderWidget> {
   final List<String> _options = ["Cash on Delivery", "Online Payment"];
 bool iswalletused=false;
 
+  final _enteredwalletamountcontroller = TextEditingController();
+
   _PlaceOrderWidgetState(this._totalAmount);
 
   @override
@@ -111,251 +113,25 @@ bool iswalletused=false;
     });
   }
 
-  void _placeOrder() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Order Confirmation'),
-        content: Text(
-            'Your order has been placed!\n\nDelivery to: $_selectedAddress\nTotal Amount: '+_totalAmount.toString()),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
         appBar: AppBar(title: Text('Place Order',style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:17,color: Colors.white)),
         backgroundColor: Color(0xff0B7D97),
+          actions: [
 
-        ),
-    body: SingleChildScrollView(
+            Padding(padding: EdgeInsets.all(10),
 
-      child:  Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Address Section
-            Text('Delivery Address', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-
-            (_addresses.length>0)?  Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
-
-              child: Row(
-
-                children: [
-                  Expanded(child: Text(_selectedAddress.toString(),style: TextStyle(color: Colors.black),),flex: 2,),
-
-                  Expanded(child: Padding(
-
-                    padding: EdgeInsets.all(4),
-                    child: ElevatedButton(
-                      onPressed: () async {
-
-                        final result = await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => AddressList(),
-                          ),
-                        );
-
-                        // Show the returned result in a dialog
-                        if (result != null) {
-                          String   added = result['added'] ?? '';
-                          String id=result['id']??'';
-                          if(added.compareTo("1")==0)
-                          {
-                            print("Selected address${id}");
-                            setState(() {
-                              selected=id;
-                              selected_addressid=id;
-                            });
-
-                            getAllAddress();
-
-
-
-                          }
-
-
-                        }
-
-
-                      },
-                      child: (_addresses.length>0)? Text('Change',style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?13:15),) : Text("Add",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?13:15)),
-                    ),
-                  )
-
-                    ,flex: 1,)
-
-                ],
-              ),
-
-            ) :
-            Container(width: double.infinity,
-            color: Colors.white54,
-
-            height: 200,
-              child:Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-
-                  Align(
-
-                    alignment: FractionalOffset.center,
-                    child: Text('No Delivery Address Found', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                  ),
-
-                  TextButton(onPressed: () async {
-
-                    final result = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => AddressList(),
-                      ),
-                    );
-
-                    // Show the returned result in a dialog
-                    if (result != null) {
-                      String   added = result['added'] ?? '';
-                      String id=result['id']??'';
-                      if(added.compareTo("1")==0)
-                      {
-                        print("Selected address${id}");
-                        setState(() {
-                          selected=id;
-                          selected_addressid=id;
-                        });
-
-                        getAllAddress();
-
-
-
-                      }
-
-
-                    }
-
-                  }, child: Text('Click here to create new', style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal)))
-
-
-                ],
-              )
-
-
-
-
-
-            ),
-
-
-            Divider(),
-
-            // Order Summary Section
-            (_cartItems.length>0)? Text('Order Summary', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)): Container() ,
-            ..._cartItems.map((item) {
-              return ListTile(
-                title: Text(item.productName.toString()),
-                subtitle: Text('Quantity: '+item.quantity.toString()),
-                trailing:(item.pointsRedeemed.toString().compareTo("1")==0)? Text(''+(double.parse(item.price.toString())   * int.parse(item.quantity.toString())).toString() ) :
-                Text(''+(double.parse(item.savekartprice.toString())   * int.parse(item.quantity.toString())).toString() ),
-              );
-            }).toList() ,
-            (_cartItems.length>0)?  Divider() :Container(),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Wallet Balance', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                Text(walletbalance.toString(), style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-              ],
-            ),
-            SizedBox(height: 20),
-
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Enter your wallet amount to redeem',
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey), // Default border color
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.green, width: 2.0), // Focused border color
-                ),
-              ),
-              onChanged: (txt){
-
-
-
-
-                if(txt.toString().isNotEmpty)
-                {
-                  iswalletused=false;
-                  double d=double.parse(txt.toString());
-                  usedwalletamount=d;
-
-                  if(d<=walletbalance) {
-                    setState(() {
-                      _totalAmount = EcommerceApiHelper.totalamount;
-                      _totalAmount = _totalAmount - d;
-                      iswalletused=true;
-                    });
-                  }
-                  else{
-                    usedwalletamount=0;
-
-                    setState(() {
-                      iswalletused=false;
-                      _totalAmount = EcommerceApiHelper.totalamount;
-                      ResponsiveInfo.showAlertDialog(context, "", "Entered amount is greater than wallet amount");
-                    });
-
-                  }
-
-                }
-                else{
-                  setState(() {
-                    usedwalletamount=0;
-                    iswalletused=false;
-                    _totalAmount=EcommerceApiHelper.totalamount;
-
-                  });
-
-                }
-
-
-              },
-            ),
-
-            SizedBox(height: 20),
-            // Total Amount
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Total Amount', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text(_totalAmount.toString(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ],
-            ),
-            SizedBox(height: 20),
-
-
-
-            // Place Order Button
-            Center(
+            child:      Center(
               child: ElevatedButton(
                 onPressed: () async {
-                   // PlaceOrder(_totalAmount.toString());
+                  // PlaceOrder(_totalAmount.toString());
 
                   if(selected_addressid?.compareTo("0")!=0) {
-                    if (_totalAmount == 0) {
+                    if (_totalAmount == 0 ) {
 
                       PlaceOrder(totalamount_to_paid.toString(), iswalletused,
                           _totalAmount.toString(), 3,
@@ -374,13 +150,278 @@ bool iswalletused=false;
 
                   // initiateTransaction();
                 },
-                child: Text('Place Order'),
+                child: Text('Confirm',style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:17),),
               ),
             ),
+
+            )
+
+          ],
+
+        ),
+    body:Column(
+
+      children: [
+
+        Expanded(child: SingleChildScrollView(
+
+          child:  Padding(
+            padding:  EdgeInsets.fromLTRB(16.0,16.0,16.0,0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Address Section
+                Text('Delivery Address', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+                (_addresses.length>0)?  Padding(padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+
+                  child: Row(
+
+                    children: [
+                      Expanded(child: Text(_selectedAddress.toString(),style: TextStyle(color: Colors.black),),flex: 2,),
+
+                      Expanded(child: Padding(
+
+                        padding: EdgeInsets.all(4),
+                        child: ElevatedButton(
+                          onPressed: () async {
+
+                            final result = await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => AddressList(),
+                              ),
+                            );
+
+                            // Show the returned result in a dialog
+                            if (result != null) {
+                              String   added = result['added'] ?? '';
+                              String id=result['id']??'';
+                              if(added.compareTo("1")==0)
+                              {
+                                print("Selected address${id}");
+                                setState(() {
+                                  selected=id;
+                                  selected_addressid=id;
+                                });
+
+                                getAllAddress();
+
+
+
+                              }
+
+
+                            }
+
+
+                          },
+                          child: (_addresses.length>0)? Text('Change',style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?13:15),) : Text("Add",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?13:15)),
+                        ),
+                      )
+
+                        ,flex: 1,)
+
+                    ],
+                  ),
+
+                ) :
+                Container(width: double.infinity,
+                    color: Colors.white54,
+
+                    height: 200,
+                    child:Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+
+                        Align(
+
+                          alignment: FractionalOffset.center,
+                          child: Text('No Delivery Address Found', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                        ),
+
+                        TextButton(onPressed: () async {
+
+                          final result = await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => AddressList(),
+                            ),
+                          );
+
+                          // Show the returned result in a dialog
+                          if (result != null) {
+                            String   added = result['added'] ?? '';
+                            String id=result['id']??'';
+                            if(added.compareTo("1")==0)
+                            {
+                              print("Selected address${id}");
+                              setState(() {
+                                selected=id;
+                                selected_addressid=id;
+                              });
+
+                              getAllAddress();
+
+
+
+                            }
+
+
+                          }
+
+                        }, child: Text('Click here to create new', style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal)))
+
+
+                      ],
+                    )
+
+
+
+
+
+                ),
+
+
+                Divider(),
+
+                // Order Summary Section
+                (_cartItems.length>0)? Text('Order Summary', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)): Container() ,
+                ..._cartItems.map((item) {
+                  return ListTile(
+                    leading: Image.network(EcommerceApiHelper.productimageurl+item.primeImage.toString(),width: ResponsiveInfo.isMobile(context)?50:60,
+                      height: ResponsiveInfo.isMobile(context)?50:60,fit: BoxFit.fill,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child; // Image loaded successfully
+                        return Center(child: CircularProgressIndicator()); // Show loader while loading
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
+                      },
+
+                    ),
+                    title: Text(item.productName.toString()),
+                    subtitle: Text('Quantity: '+item.quantity.toString()),
+                    trailing:(item.pointsRedeemed.toString().compareTo("1")==0)? Text(''+(double.parse(item.price.toString())   * int.parse(item.quantity.toString())).toString() ) :
+                    Text(''+(double.parse(item.savekartprice.toString())   * int.parse(item.quantity.toString())).toString() ),
+                  );
+                }).toList() ,
+                (_cartItems.length>0)?  Divider() :Container(),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Wallet Balance', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                    Text(walletbalance.toString(), style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                SizedBox(height: 20),
+
+                TextField(
+                  keyboardType: TextInputType.number,
+                  controller: _enteredwalletamountcontroller,
+                  decoration: InputDecoration(
+                    labelText: 'Enter your wallet amount to redeem',
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey), // Default border color
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.green, width: 2.0), // Focused border color
+                    ),
+                  ),
+                  onChanged: (txt){
+
+
+
+
+                    if(txt.toString().isNotEmpty)
+                    {
+                      iswalletused=false;
+                      double d=double.parse(txt.toString());
+                      usedwalletamount=d;
+
+                      if(d<=walletbalance) {
+                        setState(() {
+                          _totalAmount = EcommerceApiHelper.totalamount;
+                          _totalAmount = _totalAmount - d;
+                          iswalletused=true;
+                        });
+                      }
+                      else{
+                        usedwalletamount=0;
+
+                        setState(() {
+                          _enteredwalletamountcontroller.text="";
+                          iswalletused=false;
+                          _totalAmount = EcommerceApiHelper.totalamount;
+                          ResponsiveInfo.showAlertDialog(context, "SaveKart", "Entered amount is greater than wallet amount");
+                        });
+
+                      }
+
+                    }
+                    else{
+                      setState(() {
+                        usedwalletamount=0;
+                        iswalletused=false;
+                        _totalAmount=EcommerceApiHelper.totalamount;
+
+                      });
+
+                    }
+
+
+                  },
+                ),
+
+                SizedBox(height: 20),
+
+
+
+
+                // Total Amount
+              
+
+
+
+
+              ],
+            ),
+          ),
+        ),flex: 4,),
+
+        Expanded(child: Padding(
+    
+    padding: EdgeInsets.all(16),
+    child:Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Total Amount', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(_totalAmount.toString(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ],
         ),
-      ),
+        SizedBox(height: 20),
+      ],
+
+
+    ) ,
     )
+        
+        
+        
+        ,flex: 1,)
+
+      ],
+    )
+
+
+
+
+
+
 
 
 
@@ -412,15 +453,14 @@ bool iswalletused=false;
 
                     if(value.toString().compareTo("Cash on Delivery")==0)
                       {
-                        // PlaceOrder(_totalAmount.toString());
+
                          Navigator.pop(context);
 
                         ResponsiveInfo.showAlertDialog(context, "", "Sorry , this option is not applicable right now ");
-                       // PlaceOrder(_totalAmount.toString(),"0",1,"Successfully placed order");
+
                       }
                     else{
                       Navigator.pop(context);
-                      // PlaceOrder(totalamount_to_paid.toString(),iswalletused,_totalAmount.toString(),2,usedwalletamount.toString());
 
                       PlaceOrder(totalamount_to_paid.toString(),iswalletused,_totalAmount.toString(),2,usedwalletamount.toString());
 
@@ -473,6 +513,18 @@ bool iswalletused=false;
       print(js);
       // Navigator.pop(context);
     }
+  }
+
+  updateWalletPoints(String orderid)async
+  {
+    EcommerceApiHelper apihelper = new EcommerceApiHelper();
+
+    var t=EcommerceApiHelper.getTimeStamp();
+
+    var response= await  apihelper.get(Apimethodes.updateWalletPoints+"?q="+t.toString()+"&orderid="+orderid);
+
+    var js= jsonDecode( response) ;
+    print(js);
   }
 
 
@@ -603,9 +655,7 @@ bool iswalletused=false;
 
     mp['payment_type']=paymenttype.toString();
     mp['wallet_amount_used']=walletamountused;
-    // mp['transactionid']=transactionid;
-    // mp['status']=status.toString();
-    // mp['description']=description;
+
 
 
     var response= await  apihelper.post(Apimethodes.createOrder+"?q="+t.toString(),formDataPayload: mp);
@@ -664,6 +714,7 @@ bool iswalletused=false;
     // Access individual parameters
     String? message = queryParams['message'];
     String? transactionid = queryParams['transactionid'];
+    String? order_id=queryParams['order_id'];
 
 
 
@@ -671,11 +722,13 @@ bool iswalletused=false;
     if(message!=null)
     {
       String a=message;
+      String orderid=order_id!;
 
       if(a.contains("Your transaction is successful"))
       {
 
         updateWalletBalance();
+        updateWalletPoints(orderid);
 
         // For success
         showOrderDialog(context, true, "Your order  placed successfully!");

@@ -89,7 +89,7 @@ class _CounterScreenState extends State<CartScreen> {
                             },
 
                           ),
-                          title: Text(item.productName.toString()+"\n"+item.size.toString(),style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:16,color: Colors.black),),
+                          title: Text(item.productName.toString()+"\n"+item.size.toString(),style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:16,color: Colors.black,),maxLines: 3,),
                           subtitle: Text( (item.pointsRedeemed.toString().compareTo("1")==0) ? item.price.toString()   :   item.savekartprice.toString()+"\n"
                           ),
                           trailing: QuantitySelector(
@@ -196,7 +196,7 @@ class _CounterScreenState extends State<CartScreen> {
                   Align(
                     alignment: FractionalOffset.center,
                     child:
-                   CircularProgressIndicator()
+                  Text("No Data Found",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:17),)
                   )
 
 
@@ -278,13 +278,21 @@ class _CounterScreenState extends State<CartScreen> {
   getCartItems()async
   {
 
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+
+      ResponsiveInfo.showLoaderDialog(context);
+    });
+
 
     EcommerceApiHelper apihelper = new EcommerceApiHelper();
 
     var t=EcommerceApiHelper.getTimeStamp();
 
     var response= await  apihelper.get(Apimethodes.getCartData+"?q="+t.toString());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
 
+  Navigator.pop(context);
+    });
     var js= jsonDecode( response) ;
     CartProductsEntity entity=CartProductsEntity.fromJson(js);
     if(entity!.status==1)
@@ -430,7 +438,7 @@ class _QuantitySelectorState extends State<QuantitySelector> {
           icon: Icon(Icons.remove),
           onPressed: _decrementQuantity,
         ),
-        Text(_currentQuantity.toString()),
+        Text(_currentQuantity.toString(),style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:17),),
         IconButton(
           icon: Icon(Icons.add),
           onPressed: _incrementQuantity,

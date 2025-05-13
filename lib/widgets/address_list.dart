@@ -119,7 +119,7 @@ class _AddressListState extends State<AddressList> {
 
           child: GestureDetector(
 
-            child: Icon(Icons.add,color: Colors.black54,size: ResponsiveInfo.isMobile(context)?20:25,),
+            child: Text("Add New",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:17),),
 
             onTap: () async {
 
@@ -396,7 +396,13 @@ class _InputDialogState extends State<InputDialog> {
        _landmarkController.text=userAddressDataData.landmark.toString();
        _districtController.text=userAddressDataData.district.toString();
        _pincodecontroller.text=userAddressDataData.pincode.toString();
-       selectedState=userAddressDataData.state.toString();
+       if(userAddressDataData.state.toString().isEmpty)
+         {
+           selectedState = "Kerala";
+         }
+       else {
+         selectedState = userAddressDataData.state.toString();
+       }
 
 
     });

@@ -104,13 +104,18 @@ List<ProductByCategoryDataData>pcdata=[];
                       size: ResponsiveInfo.isMobile(context) ? 20 : 25,),
 
                   ),
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder:
-                            (context) =>
-                            CartScreen()
-                        )
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CartScreen()),
                     );
+
+                    if (result != null||result==null) {
+
+                      getCartCount();
+
+
+                    }
                   },
                 ),
               ),
@@ -900,7 +905,7 @@ List<ProductByCategoryDataData>pcdata=[];
                     .toString()
                     .isNotEmpty) {
               price_details = price_details + "Your Price : " +
-                  productStockEntity.data!.priceSales.toString() + "\n\n";
+                  productStockEntity.data!.priceSales.toString() + "(GST inclusive)\n\n";
             }
             // if(productStockEntity.data!.margin!=null && productStockEntity.data!.margin.toString().isNotEmpty)
             // {
@@ -1018,7 +1023,7 @@ setState(() {
     else{
 
       setState(() {
-        returnpolicies="\n\n\n \t\t\t No Data found";
+        returnpolicies="\n\n\n \t\t\t Non Returnable Product";
       });
 
       // ResponsiveInfo.showAlertDialog(context, "", "Error while fetching Return Policy of this product");
@@ -1271,12 +1276,8 @@ setState(() {
 
     getCartCount();
 
-        ResponsiveInfo.showAlertDialog(context, "Save Kart", "Product added to cart successfully");
-    //   }
-    // else{
-    //
-    //   ResponsiveInfo.showAlertDialog(context, "Save Cart", "Product cannot add to cart");
-    // }
+        ResponsiveInfo.showAlertDialog(context, "SaveKart", "Product added to cart successfully");
+
 
 
 
