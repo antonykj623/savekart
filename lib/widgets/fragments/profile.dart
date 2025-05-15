@@ -153,39 +153,51 @@ class _ProfileState extends State<Profile> {
 
 
                    ,flex: 1,),
-                  Expanded(child: Padding(
+                  Expanded(child: GestureDetector(
 
-                    padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?5:8),
-                    child:Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.black54,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                          color: Colors.transparent,
-                        ),
-                        width: double.infinity,
-                        height: ResponsiveInfo.isMobile(context)?50:60,
-                        child: Row(
-                          children: [
-                            Expanded(child: Icon(Icons.help_sharp,color: Colors.blueAccent,size: ResponsiveInfo.isMobile(context)?18:24,),flex: 1,),
-                            Expanded(child:     Text( "Help Desk",
-                              style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:17,color: Colors.blueAccent),
+    child:  Padding(
 
-
-
-
-                            ),flex: 2,)
-
-
-                          ],
-                        )
+      padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?5:8),
+      child:Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.black54,
+            ),
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            color: Colors.transparent,
+          ),
+          width: double.infinity,
+          height: ResponsiveInfo.isMobile(context)?50:60,
+          child: Row(
+            children: [
+              Expanded(child: Icon(Icons.help_sharp,color: Colors.blueAccent,size: ResponsiveInfo.isMobile(context)?18:24,),flex: 1,),
+              Expanded(child:     Text( "Help Desk",
+                style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:17,color: Colors.blueAccent),
 
 
 
 
-                    ) ,
-                  )
+              ),flex: 2,)
+
+
+            ],
+          )
+
+
+
+
+      ) ,
+    ),
+                    onTap: (){
+      ResponsiveInfo.showAlertDialog(context, "SaveKart", "Help Desk  No, : "+"9946109501");
+
+
+
+                    },
+    )
+
+
+
 
                     ,flex: 1,)
                 ],
