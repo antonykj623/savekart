@@ -445,9 +445,9 @@ class _QuantitySelectorState extends State<QuantitySelector> {
       widget.onQuantityChanged(_currentQuantity);
     }
     else{
-      setState(() {
-        _currentQuantity--;
-      });
+      // setState(() {
+      //   _currentQuantity--;
+      // });
       widget.onQuantityChanged(_currentQuantity);
       ResponsiveInfo.showAlertDialog(context, "SaveKart", "Out of stock");
     }

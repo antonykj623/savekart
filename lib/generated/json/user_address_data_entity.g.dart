@@ -87,15 +87,13 @@ UserAddressDataData $UserAddressDataDataFromJson(Map<String, dynamic> json) {
   if (pincode != null) {
     userAddressDataData.pincode = pincode;
   }
-  final String? state = jsonConvert.convert<String>(json['state']);
-  if (state != null) {
-    userAddressDataData.state = state;
-  }
-
-
   final String? country = jsonConvert.convert<String>(json['country']);
   if (country != null) {
     userAddressDataData.country = country;
+  }
+  final String? state = jsonConvert.convert<String>(json['state']);
+  if (state != null) {
+    userAddressDataData.state = state;
   }
   return userAddressDataData;
 }
@@ -113,7 +111,7 @@ Map<String, dynamic> $UserAddressDataDataToJson(UserAddressDataData entity) {
   data['phone'] = entity.phone;
   data['pincode'] = entity.pincode;
   data['country'] = entity.country;
-  data['state']=entity.state;
+  data['state'] = entity.state;
   return data;
 }
 
@@ -144,8 +142,6 @@ extension UserAddressDataDataExtension on UserAddressDataData {
       ..phone = phone ?? this.phone
       ..pincode = pincode ?? this.pincode
       ..country = country ?? this.country
-      ..state=state ?? this.state
-
-    ;
+      ..state = state ?? this.state;
   }
 }

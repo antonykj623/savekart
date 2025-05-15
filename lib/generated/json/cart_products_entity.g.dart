@@ -87,13 +87,10 @@ CartProductsData $CartProductsDataFromJson(Map<String, dynamic> json) {
   if (size != null) {
     cartProductsData.size = size;
   }
-
   final String? current_qty = jsonConvert.convert<String>(json['current_qty']);
   if (current_qty != null) {
     cartProductsData.current_qty = current_qty;
   }
-
-
   return cartProductsData;
 }
 
@@ -109,7 +106,7 @@ Map<String, dynamic> $CartProductsDataToJson(CartProductsData entity) {
   data['product_name'] = entity.productName;
   data['prime_image'] = entity.primeImage;
   data['size'] = entity.size;
-  data['current_qty']=entity.current_qty;
+  data['current_qty'] = entity.current_qty;
   return data;
 }
 
@@ -125,7 +122,7 @@ extension CartProductsDataExtension on CartProductsData {
     String? productName,
     String? primeImage,
     String? size,
-    String? current_qty
+    String? current_qty,
   }) {
     return CartProductsData()
       ..cartid = cartid ?? this.cartid
@@ -138,6 +135,6 @@ extension CartProductsDataExtension on CartProductsData {
       ..productName = productName ?? this.productName
       ..primeImage = primeImage ?? this.primeImage
       ..size = size ?? this.size
-    ..current_qty = size ?? this.current_qty;
+      ..current_qty = current_qty ?? this.current_qty;
   }
 }

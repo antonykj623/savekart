@@ -233,8 +233,8 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
     isActive: _statusValue >= 1,
     ),
     Step(
-    title: Text("Out for delivery"),
-    subtitle: Text("Out for delivery.You will get your product soon.\nDate : "+((orderDetailsData!.cartOrder!.shippedAt != null && orderDetailsData!.cartOrder!.shippedAt!.isNotEmpty)
+    title: Text("Shipped"),
+    subtitle: Text("Shipped.You will get your product soon."+((orderDetailsData!.cartOrder!.podNumber != null && orderDetailsData!.cartOrder!.podNumber!.isNotEmpty) ? "\nTracking Number : "+orderDetailsData!.cartOrder!.podNumber:"")+"\nDate : "+((orderDetailsData!.cartOrder!.shippedAt != null && orderDetailsData!.cartOrder!.shippedAt!.isNotEmpty)
     ? getFormatedDate(orderDetailsData!.cartOrder!.shippedAt!)
         : " No date available")),
     content: SizedBox.shrink(),
@@ -300,8 +300,8 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
     isActive: _statusValue >= 1,
     ),
     Step(
-    title: Text("Out for delivery"),
-    subtitle: Text("Out for delivery.You will get your product soon.\nDate : "+((orderDetailsData!.cartOrder!.shippedAt != null && orderDetailsData!.cartOrder!.shippedAt!.isNotEmpty)
+    title: Text("Shipped"),
+    subtitle: Text("Shipped.You will get your product soon."+((orderDetailsData!.cartOrder!.podNumber != null && orderDetailsData!.cartOrder!.podNumber!.isNotEmpty) ? "\nTracking Number : "+orderDetailsData!.cartOrder!.podNumber:"")+"\nDate : "+((orderDetailsData!.cartOrder!.shippedAt != null && orderDetailsData!.cartOrder!.shippedAt!.isNotEmpty)
     ? getFormatedDate(orderDetailsData!.cartOrder!.shippedAt!)
         : " No date available")),
     content: SizedBox.shrink(),

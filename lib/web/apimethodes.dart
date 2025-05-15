@@ -51,4 +51,5 @@ class Apimethodes{
     static String getCartUpdate="getCartUpdate.php";
     static String getProductCountByName="getProductCountByName.php";
     static String updateWalletPoints="updateWalletPoints.php";
+    static String getWalletPointsTransaction="getWalletPointsTransaction.php";
 }

@@ -15,6 +15,7 @@ import 'package:savekart/domain/country_list_entity.dart';
 import 'package:savekart/domain/order_details_entity.dart';
 import 'package:savekart/domain/order_entity.dart';
 import 'package:savekart/domain/order_item_by_i_d_entity.dart';
+import 'package:savekart/domain/points_entity.dart';
 import 'package:savekart/domain/product_by_category_entity.dart';
 import 'package:savekart/domain/product_count_entity.dart';
 import 'package:savekart/domain/product_stock_entity.dart';
@@ -288,6 +289,14 @@ class JsonConvert {
       return data.map<OrderItemByIDDataCartProduct>((Map<String, dynamic> e) =>
           OrderItemByIDDataCartProduct.fromJson(e)).toList() as M;
     }
+    if (<PointsEntity>[] is M) {
+      return data.map<PointsEntity>((Map<String, dynamic> e) =>
+          PointsEntity.fromJson(e)).toList() as M;
+    }
+    if (<PointsData>[] is M) {
+      return data.map<PointsData>((Map<String, dynamic> e) =>
+          PointsData.fromJson(e)).toList() as M;
+    }
     if (<ProductByCategoryEntity>[] is M) {
       return data.map<ProductByCategoryEntity>((Map<String, dynamic> e) =>
           ProductByCategoryEntity.fromJson(e)).toList() as M;
@@ -501,6 +510,8 @@ class JsonConvertClassCollection {
         .fromJson,
     (OrderItemByIDDataCartProduct).toString(): OrderItemByIDDataCartProduct
         .fromJson,
+    (PointsEntity).toString(): PointsEntity.fromJson,
+    (PointsData).toString(): PointsData.fromJson,
     (ProductByCategoryEntity).toString(): ProductByCategoryEntity.fromJson,
     (ProductByCategoryData).toString(): ProductByCategoryData.fromJson,
     (ProductByCategoryDataCategory).toString(): ProductByCategoryDataCategory

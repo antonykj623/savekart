@@ -35,6 +35,9 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Color(0xff0B7D97)),
         useMaterial3: true,
+        appBarTheme: AppBarTheme(
+          scrolledUnderElevation: 0.0,
+        ),
       ),
       home: const MyHomePage(title: ''),
     );

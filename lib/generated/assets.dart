@@ -2,6 +2,7 @@
 class Assets {
   Assets._();
 
+  static const String assetsAppbaricon = 'assets/appbaricon.jpeg';
   static const String assetsBox = 'assets/box.png';
   static const String assetsBricksnmixlogo = 'assets/bricksnmixlogo.jpg';
   static const String assetsBricksnmixlogoRemovebgPreview = 'assets/bricksnmixlogo-removebg-preview.png';
