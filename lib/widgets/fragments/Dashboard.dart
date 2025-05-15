@@ -422,7 +422,7 @@ class _DashboardState extends State<Dashboard> {
               List<ProductByCategoryDataData> data =
               productbycategorydata[index].data!;
 
-              return Container(
+              return (productbycategorydata[index].data!.length<=5)?Container(
                   width: double.infinity,
                   height: ResponsiveInfo.isMobile(context)? 250 :280,
                   child: Column(
@@ -476,31 +476,7 @@ class _DashboardState extends State<Dashboard> {
 
                                                 ),
 
-                                                //offer commented by antony
 
-                                                // Align(
-                                                //   alignment: FractionalOffset.topRight,
-                                                //   child: Padding(
-                                                //
-                                                //     padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?5:8),
-                                                //     child: Container(
-                                                //       width: ResponsiveInfo.isMobile(context)?40:50,
-                                                //       padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?3:5),
-                                                //       decoration: BoxDecoration(
-                                                //           color: Colors.red,
-                                                //           border: Border.all(
-                                                //             color: Colors.red,
-                                                //           ),
-                                                //           borderRadius: BorderRadius.all(Radius.circular(5))
-                                                //       ),
-                                                //
-                                                //       child:
-                                                //       Text("-11%",textAlign: TextAlign.center,style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?7:10,color: Colors.white),) ,
-                                                //     ),
-                                                //   )
-                                                //
-                                                //   ,
-                                                // )
                                               ],
                                             )
 
@@ -581,12 +557,140 @@ class _DashboardState extends State<Dashboard> {
 
                                 },
                               ),
-                            ) ),
+                            ) ) ,
                       )
 
                     ],
                   )
 
+
+
+
+              ) : Container(
+                width: double.infinity,
+                height: ResponsiveInfo.isMobile(context)? (180*(productbycategorydata[index].data!.length/5))+50 :(220*(productbycategorydata[index].data!.length/5))+70,
+
+
+                child: GridView.count(
+                  crossAxisCount: 4,
+                  scrollDirection: Axis.horizontal,
+                  childAspectRatio: 0.7,
+                  // ← Set number of columns here
+                  children: List.generate(productbycategorydata[index].data!.length, (i) {
+                    return GestureDetector(
+
+                      child:Padding(padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?5:10, 0, ResponsiveInfo.isMobile(context)?5:10, 0),
+
+                        child:  Container(
+
+                            width: ResponsiveInfo.isMobile(context)? 140:173,
+                            height: ResponsiveInfo.isMobile(context)? 170 :195,
+
+                            child: Card(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+
+                                  Expanded(child:Stack(
+
+                                    children: [
+                                      Align(
+                                        alignment: FractionalOffset.center,
+                                        child: Image.network(EcommerceApiHelper.productimageurl+data[i].primeImage.toString(),width: ResponsiveInfo.isMobile(context)?100:120,
+                                          height: ResponsiveInfo.isMobile(context)?100:120,fit: BoxFit.fill,loadingBuilder: (context, child, loadingProgress) {
+                                            if (loadingProgress == null) return child; // Image loaded successfully
+                                            return Center(child: CircularProgressIndicator()); // Show loader while loading
+                                          },
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
+                                          },) ,
+
+                                      ),
+
+
+                                    ],
+                                  )
+
+
+
+                                    ,flex: 2, )
+
+                                  ,
+
+                                  Expanded(child: Padding(
+                                    padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?5:8, 0, 0, 0),
+
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(data[i].productName.toString(),maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        // Text("200 x 100 x 150",maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 11:13,fontWeight: FontWeight.bold,color: Colors.black26),
+                                        //   textAlign: TextAlign.center,
+                                        //
+                                        // ),
+
+                                        //Price area commented by antony
+
+                                        // Row(
+                                        //   children: [
+                                        //     Expanded(child:     Text("150 Rs",maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
+                                        //       textAlign: TextAlign.center,
+                                        //     ),flex: 1,),
+                                        //     Expanded(child: Container(
+                                        //
+                                        //       child: Icon(Icons.add_box_rounded,color: Colors.green,size: ResponsiveInfo.isMobile(context)?18:23,),
+                                        //
+                                        //     ),flex: 1,)
+                                        //   ],
+                                        // )
+
+
+                                      ],
+                                    ) ,
+                                  )
+
+                                  )
+
+
+
+
+                                ],
+                              ),
+                              color: Colors.white,
+                              elevation: ResponsiveInfo.isMobile(context)?5:10,
+                            )
+
+
+
+                        ),
+                      ) ,
+                      onTap: () async {
+
+
+
+
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ProductDetails(data[i])),
+                        );
+
+                        if (result != null||result==null) {
+
+                          getCartCount();
+                          getWalletPoints();
+                          getWalletBalanceAndPoints();
+
+                        }
+
+
+                      },
+                    );
+                  }),
+                ),
 
 
 
