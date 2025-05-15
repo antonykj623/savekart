@@ -1015,7 +1015,7 @@ List<ProductByCategoryDataData>pcdata=[];
     {
 
 setState(() {
-  returnpolicies=entity.data!.policy.toString();
+  returnpolicies=entity.data!.policy.toString()+"\n Return Period : "+productByCategoryDataData.returnDays.toString()+" Days";
 });
 
 

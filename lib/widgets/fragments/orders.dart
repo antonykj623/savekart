@@ -112,7 +112,7 @@ class _OrdersState extends State<Orders> {
                           ),
                           title: Text(
                             product.productName.toString(),
-                            maxLines: 2,
+                            maxLines: 3,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
@@ -140,7 +140,7 @@ class _OrdersState extends State<Orders> {
                             _buildStatusText("Payment failed", Colors.red)
                           else ...[
                             if (order.orderItemStatus.toString().compareTo("0") == 0)
-                              _buildStatusText("Order created. Please wait...", Colors.green),
+                              _buildStatusText("Order created.", Colors.green),
                             if (order.orderItemStatus.toString().compareTo("1")==0)
                               _buildStatusText("Packing is in progress..", Colors.green),
                             if (order.orderItemStatus.toString().compareTo("2")==0)

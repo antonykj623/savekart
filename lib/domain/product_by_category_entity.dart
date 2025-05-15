@@ -92,6 +92,8 @@ class ProductByCategoryDataData {
 	@JSONField(name: "vendor_id")
 	String? vendorId = '';
 	String? status = '';
+	@JSONField(name: "return_days")
+	String? returnDays = '';
 
 	ProductByCategoryDataData();
 

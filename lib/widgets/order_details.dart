@@ -100,7 +100,8 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
                       child: Text(
                         "Item Name : "+orderDetailsData.cartProduct!.productName.toString()+"\n"+
                             "Pice : "+orderDetailsData.cartOrder!.price.toString()+"\n"
-                            "Quantity : "+orderDetailsData.cartOrder!.quantity.toString()+"\n",
+                            "Quantity : "+orderDetailsData.cartOrder!.quantity.toString()+"\n"+
+                        "Order ID : "+orderDetailsData.cartOrder!.orderId.toString() ,
 
 
 
@@ -168,7 +169,9 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
         w=Stepper(steps: [
           Step(
             title: Text("Order Initiated"),
-            subtitle: Text("You have initiated to create an order"),
+            subtitle: Text("You have initiated to create an order\nDate : "+  ((orderDetailsData!.cartOrder!.createdAt != null && orderDetailsData!.cartOrder!.createdAt!.isNotEmpty)
+                ? getFormatedDate(orderDetailsData!.cartOrder!.createdAt!)
+                : " No date available")),
             content: SizedBox.shrink(),
             isActive: true,
           ),
@@ -187,7 +190,9 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
       w=Stepper(steps: [
         Step(
           title: Text("Order Initiated"),
-          subtitle: Text("You have initiated to create an order"),
+          subtitle: Text("You have initiated to create an order\nDate : "+  ((orderDetailsData!.cartOrder!.createdAt != null && orderDetailsData!.cartOrder!.createdAt!.isNotEmpty)
+              ? getFormatedDate(orderDetailsData!.cartOrder!.createdAt!)
+              : " No date available")),
           content: SizedBox.shrink(),
           isActive: true,
         ),
