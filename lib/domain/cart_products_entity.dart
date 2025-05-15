@@ -36,6 +36,7 @@ class CartProductsData {
 	@JSONField(name: "prime_image")
 	String? primeImage = '';
 	String? size = '';
+	String? current_qty='';
 
 	CartProductsData();
 

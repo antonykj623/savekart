@@ -72,7 +72,7 @@ class _ReturnedOrderItemState extends State<ReturnedOrderItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?5:10),
-                    child: (ordata.status!=0)? ListTile(
+                    child: (ordata.status!=0&&ordata.data!=null)? ListTile(
                       leading: Image.network(EcommerceApiHelper.productimageurl+ordata.data!.cartProduct!.primeImage.toString(), width:ResponsiveInfo.isMobile(context)? 60:75, height: ResponsiveInfo.isMobile(context)? 60:75, fit: BoxFit.cover),
                       title: Text(ordata.data!.cartProduct!.productName.toString(), style: TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(ordata.data!.cartStock!.priceSales.toString()+"\nQty : "+ordata.data!.cartOrder!.quantity.toString(), style: TextStyle(color: Colors.green)),

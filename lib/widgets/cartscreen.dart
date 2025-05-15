@@ -94,9 +94,12 @@ class _CounterScreenState extends State<CartScreen> {
                           ),
                           trailing: QuantitySelector(
                             quantity: int.parse(item.quantity.toString()) ,
+                            cartProductsData: item,
                             onQuantityChanged: (newQuantity) {
 
-                              updateCartQuantity(item.cartid.toString(), newQuantity.toString());
+
+
+                              updateCartQuantity(item.cartid.toString(), newQuantity.toString(),index);
 
                               setState(() {
                                 item.quantity=newQuantity.toString();
@@ -312,7 +315,7 @@ class _CounterScreenState extends State<CartScreen> {
 
   }
 
-  updateCartQuantity(String id,String quantity)async{
+  updateCartQuantity(String id,String quantity,int index)async{
 
 
 
@@ -328,9 +331,21 @@ class _CounterScreenState extends State<CartScreen> {
 
     var response= await  apihelper.post(Apimethodes.updateQuantity+"?q="+t.toString(),formDataPayload: mp);
 
-    var js= jsonDecode( jsonEncode(response) ) ;
+    print(response);
 
-    _calculateSubtotal();
+    var js= jsonDecode( jsonDecode(response) ) ;
+
+    if(js['status']==1) {
+      _calculateSubtotal();
+    }
+    else{
+
+      setState(() {
+        cartItems[index].quantity=(int.parse(quantity)-1).toString();
+      });
+
+      ResponsiveInfo.showAlertDialog(context, "SaveKart", js['message']);
+    }
 
 
   }
@@ -397,8 +412,9 @@ _calculateSubtotal();
 class QuantitySelector extends StatefulWidget {
   final int quantity;
   final ValueChanged<int> onQuantityChanged;
+  final CartProductsData cartProductsData;
 
-  QuantitySelector({required this.quantity, required this.onQuantityChanged});
+  QuantitySelector({required this.quantity, required this.onQuantityChanged,required this.cartProductsData});
 
   @override
   _QuantitySelectorState createState() => _QuantitySelectorState();
@@ -406,18 +422,35 @@ class QuantitySelector extends StatefulWidget {
 
 class _QuantitySelectorState extends State<QuantitySelector> {
   late int _currentQuantity;
+  late CartProductsData _cartProductsData;
 
   @override
   void initState() {
     super.initState();
     _currentQuantity = widget.quantity;
+    _cartProductsData=widget.cartProductsData;
   }
 
   void _incrementQuantity() {
-    setState(() {
-      _currentQuantity++;
-    });
-    widget.onQuantityChanged(_currentQuantity);
+
+    int currentstock=int.parse(_cartProductsData.current_qty.toString());
+
+
+
+
+    if(currentstock>=_currentQuantity) {
+      setState(() {
+        _currentQuantity++;
+      });
+      widget.onQuantityChanged(_currentQuantity);
+    }
+    else{
+      setState(() {
+        _currentQuantity--;
+      });
+      widget.onQuantityChanged(_currentQuantity);
+      ResponsiveInfo.showAlertDialog(context, "SaveKart", "Out of stock");
+    }
   }
 
   void _decrementQuantity() {

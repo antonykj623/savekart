@@ -30,7 +30,7 @@ class EcommerceApiHelper  {
 
   static String getTimeStamp()
   {
-    var date = DateTime.now().toString();
+    var date = DateTime.now().toIso8601String();
     return date.toString();
   }
 
