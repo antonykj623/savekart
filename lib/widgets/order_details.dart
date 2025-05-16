@@ -98,10 +98,11 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
 
                       padding: EdgeInsets.only(left: 10),
                       child: Text(
-                        "Item Name : "+orderDetailsData.cartProduct!.productName.toString()+"\n"+
+                        orderDetailsData.cartProduct!.productName.toString()+"\n"+
                             "Pice : "+orderDetailsData.cartOrder!.price.toString()+"\n"
                             "Quantity : "+orderDetailsData.cartOrder!.quantity.toString()+"\n"+
-                        "Order ID : "+orderDetailsData.cartOrder!.orderId.toString() ,
+                        "Order ID : "+orderDetailsData.cartOrder!.orderId.toString()+"\n"+
+                        "Order Item ID : "+orderDetailsData.cartOrder!.id.toString(),
 
 
 

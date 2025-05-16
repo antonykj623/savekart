@@ -670,9 +670,10 @@ bool iswalletused=false;
     //print(js['data']);
 
      if(data['status']==1) {
-       if (_totalAmount == 0) {
+       if (_totalAmount == 0 && paymenttype==3 ) {
 
          updateWalletBalance();
+         updateWalletPoints(data['data']);
 
          showOrderDialog(context, true, "Your order placed successfully!");
        }
