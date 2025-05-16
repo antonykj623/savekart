@@ -62,6 +62,8 @@ class ProductCountData {
 	String? returnable = '';
 	@JSONField(name: "return_days")
 	String? returnDays = '';
+	@JSONField(name: "product_code")
+	String? productCode = '';
 
 	ProductCountData();
 

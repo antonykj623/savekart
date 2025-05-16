@@ -32,9 +32,9 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
 
 
-  List<String>arricons=['assets/icons/editprofile.png','assets/icons/house-location.png','assets/icons/wallet.png','assets/icons/product-return.png','assets/icons/update.png','assets/icons/logout.png','assets/icons/user.png'];
+  List<String>arricons=['assets/icons/editprofile.png','assets/icons/house-location.png','assets/icons/wallet.png','assets/icons/product-return.png','assets/icons/update.png','assets/icons/privacypolicy.png','assets/icons/logout.png','assets/icons/user.png'];
 
-  List<String>arrmenus=['Edit Profile','My Address','Savekart Wallet','Return Requests','App update','Logout','Delete Account'];
+  List<String>arrmenus=['Edit Profile','My Address','Savekart Wallet','Return Requests','App update','Privacy Policy','Logout','Delete Account'];
 
   String name="";
 
@@ -342,8 +342,17 @@ class _ProfileState extends State<Profile> {
 
                     }
 
-
                   else if(index==5)
+                    {
+                      final Uri url = Uri.parse('https://mysaving.in/IntegraAccount/privacypolicy.html?q='+EcommerceApiHelper.getTimeStamp());
+
+                      if (!await launchUrl(url)) {
+                        throw 'Could not launch $url';
+                      }
+                    }
+
+
+                  else if(index==6)
                   {
                     Widget okButton = TextButton(
                       child: Text("Yes"),
@@ -390,7 +399,7 @@ class _ProfileState extends State<Profile> {
                       },
                     );
                   }
-                  else if(index==6)
+                  else if(index==7)
                   {
                     Widget okButton = TextButton(
                       child: Text("Yes"),

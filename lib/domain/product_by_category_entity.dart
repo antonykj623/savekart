@@ -65,6 +65,9 @@ class ProductByCategoryDataData {
 	String? productName = '';
 	@JSONField(name: "category_id")
 	String? categoryId = '';
+
+	@JSONField(name: "product_code")
+	String? productCode = '';
 	@JSONField(name: "sub_category_id")
 	String? subCategoryId = '';
 	@JSONField(name: "product_description")

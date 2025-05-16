@@ -756,6 +756,8 @@ List<ProductByCategoryDataData>pcdata=[];
                       pbc.subCategoryId=pb.subCategoryId;
                       pbc.unitId=pb.unitId;
                       pbc.vendorId=pb.vendorId;
+                      pbc.returnDays=pb.returnDays;
+                      pbc.productCode=pb.productCode;
                       pcdata.add(pbc);
                     }
 
@@ -873,6 +875,16 @@ List<ProductByCategoryDataData>pcdata=[];
         if(productStockEntity.status==1&&productStockEntity.data!=null&&productStockEntity.data!.id!.isNotEmpty)
         {
           if (productStockEntity.status.toString().compareTo("0") != 0) {
+
+
+            if (productStockEntity.data!.mrp != null && productStockEntity.data!
+                .mrp
+                .toString()
+                .isNotEmpty) {
+              price_details = "\n" + price_details +
+                  "Product Code : " + productByCategoryDataData.productCode.toString() + "\n\n";
+            }
+
             if (productStockEntity.data!.mrp != null && productStockEntity.data!
                 .mrp
                 .toString()
@@ -905,7 +917,7 @@ List<ProductByCategoryDataData>pcdata=[];
                     .toString()
                     .isNotEmpty) {
               price_details = price_details + "Your Price : " +
-                  productStockEntity.data!.priceSales.toString() + "(GST inclusive)\n\n";
+                  productStockEntity.data!.priceSales.toString() + " (GST included)\n\n";
             }
             // if(productStockEntity.data!.margin!=null && productStockEntity.data!.margin.toString().isNotEmpty)
             // {
@@ -930,12 +942,12 @@ List<ProductByCategoryDataData>pcdata=[];
                     productStockEntity.data!.priceSales.toString());
                 double savedprice = mrp - savecartprice;
                 price_details = price_details +
-                    "You saved : " + savedprice.toString() + " Rs \n";
+                    "You saved : " + savedprice.toString() + "  \n";
               }
             }
             else {
               price_details = price_details +
-                  "You saved : 0.0 Rs \n";
+                  "You saved : 0.0  \n";
             }
 
 
@@ -1023,7 +1035,14 @@ setState(() {
     else{
 
       setState(() {
-        returnpolicies="\n\n\n \t\t\t Non Returnable Product";
+
+        if(productByCategoryDataData.returnDays!=null&&productByCategoryDataData.returnDays.toString().isNotEmpty)
+          {
+            returnpolicies = "\n\n\n \t\t\t Return Period : "+productByCategoryDataData.returnDays.toString()+" Days";
+          }
+        else {
+          returnpolicies = "\n\n\n \t\t\t Non Returnable Product";
+        }
       });
 
       // ResponsiveInfo.showAlertDialog(context, "", "Error while fetching Return Policy of this product");

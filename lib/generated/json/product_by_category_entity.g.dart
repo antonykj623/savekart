@@ -214,6 +214,12 @@ ProductByCategoryDataData $ProductByCategoryDataDataFromJson(
   if (returnDays != null) {
     productByCategoryDataData.returnDays = returnDays;
   }
+  final String? productCode = jsonConvert.convert<String>(json['product_code']);
+  if (productCode != null) {
+    productByCategoryDataData.productCode = productCode;
+  }
+
+
 
 
   return productByCategoryDataData;
@@ -241,6 +247,7 @@ Map<String, dynamic> $ProductByCategoryDataDataToJson(
   data['vendor_id'] = entity.vendorId;
   data['status'] = entity.status;
   data['return_days'] = entity.returnDays;
+  data['product_code']=entity.productCode;
 
   return data;
 }
@@ -266,6 +273,7 @@ extension ProductByCategoryDataDataExtension on ProductByCategoryDataData {
     String? vendorId,
     String? status,
     String? returnDays,
+    String? productCode
   }) {
     return ProductByCategoryDataData()
       ..id = id ?? this.id
@@ -287,6 +295,7 @@ extension ProductByCategoryDataDataExtension on ProductByCategoryDataData {
       ..vendorId = vendorId ?? this.vendorId
       ..status = status ?? this.status
       ..returnDays=returnDays ?? this.returnDays
+      ..productCode=productCode ?? this.productCode
 
     ;
   }

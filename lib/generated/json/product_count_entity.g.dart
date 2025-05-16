@@ -137,7 +137,12 @@ ProductCountData $ProductCountDataFromJson(Map<String, dynamic> json) {
   if (returnDays != null) {
     productCountData.returnDays = returnDays;
   }
-  return productCountData;
+  final String? productCode = jsonConvert.convert<String>(json['product_code']);
+  if (productCode != null) {
+    productCountData.productCode = productCode;
+  }
+return productCountData;
+
 }
 
 Map<String, dynamic> $ProductCountDataToJson(ProductCountData entity) {
@@ -164,6 +169,7 @@ Map<String, dynamic> $ProductCountDataToJson(ProductCountData entity) {
   data['status'] = entity.status;
   data['returnable'] = entity.returnable;
   data['return_days'] = entity.returnDays;
+  data['product_code']=entity.productCode;
   return data;
 }
 
@@ -191,6 +197,7 @@ extension ProductCountDataExtension on ProductCountData {
     String? status,
     String? returnable,
     String? returnDays,
+    String? productCode,
   }) {
     return ProductCountData()
       ..id = id ?? this.id
@@ -214,6 +221,7 @@ extension ProductCountDataExtension on ProductCountData {
       ..offeredItemStatus = offeredItemStatus ?? this.offeredItemStatus
       ..status = status ?? this.status
       ..returnable = returnable ?? this.returnable
-      ..returnDays = returnDays ?? this.returnDays;
+      ..returnDays = returnDays ?? this.returnDays
+      ..productCode=productCode ?? this.productCode;
   }
 }

@@ -61,6 +61,7 @@ class Assets {
   static const String iconsHome = 'assets/icons/home.png';
   static const String iconsHouseLocation = 'assets/icons/house-location.png';
   static const String iconsLogout = 'assets/icons/logout.png';
+  static const String iconsPrivacypolicy = 'assets/icons/privacypolicy.png';
   static const String iconsProductReturn = 'assets/icons/product-return.png';
   static const String iconsProfile = 'assets/icons/profile.png';
   static const String iconsSettings = 'assets/icons/settings.png';
