@@ -101,9 +101,8 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
                         orderDetailsData.cartProduct!.productName.toString()+"\n"+
                             "Pice : "+orderDetailsData.cartOrder!.price.toString()+"\n"
                             "Quantity : "+orderDetailsData.cartOrder!.quantity.toString()+"\n"+
-                        "Order ID : "+orderDetailsData.cartOrder!.orderId.toString()+"\n"+
-                        "Order Details ID : "+orderDetailsData.cartOrder!.id.toString()+"\n"+
-                        "Item Code : "+orderDetailsData.cartProduct!.productCode.toString()
+                        "Order No. : "+orderDetailsData.cartOrder!.orderId.toString()+"\n"+
+                        "Item Code : "+orderDetailsData.cartProduct!.productCode.toString()+"/"+orderDetailsData.cartOrder!.id.toString()
                         ,
 
 
