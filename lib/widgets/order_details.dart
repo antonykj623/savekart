@@ -154,7 +154,7 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
     DateTime dateTime = DateTime.parse(dateString);
 
     // Format DateTime into 12-hour format with AM/PM
-    String formattedDate = DateFormat('dd-MM-yyyy hh:mm:ss a').format(dateTime);
+    String formattedDate = DateFormat('dd-MMM-yyyy').format(dateTime);
 
     return formattedDate; // Output: 2025-03-26 09:39:05 PM
   }
