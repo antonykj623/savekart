@@ -786,7 +786,7 @@ class _DashboardState extends State<Dashboard> {
 
                     final result = await Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => ProductDetails(data[i])),
+                      MaterialPageRoute(builder: (context) => ProductDetails(sublist[i])),
                     );
 
                     if (result != null||result==null) {

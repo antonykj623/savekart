@@ -72,7 +72,7 @@ class ZoomableImageScreenState extends State<ZoomableImageScreen> {
 
 
 
-            Image.network(images[AdsCurrentIndex], fit: BoxFit.cover, loadingBuilder: (context, child, loadingProgress) {
+            Image.network(images[AdsCurrentIndex], loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child; // Image loaded successfully
               return Center(child: CircularProgressIndicator()); // Show loader while loading
             },
