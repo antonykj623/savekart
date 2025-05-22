@@ -54,7 +54,7 @@ class OrderDetailsDataCartOrder {
 	@JSONField(name: "product_id")
 	String? productId = '';
 	String? quantity = '';
-	String? price = '';
+	String? price = '0';
 	String? stockid = '';
 	String? netpayablecommission = '';
 	@JSONField(name: "sponsor_casback")
