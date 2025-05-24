@@ -686,14 +686,27 @@ bool iswalletused=false;
 
          NativeBridge().redirectToNative(urldata,c);
         var result= await c.future;
-        if(result!=null && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
+        if(result!=null&&result.toString().isNotEmpty && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
           showPaymentStatus(result);
         }
         else{
           ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch your payment details");
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+                (Route<
+                dynamic> route) => false, // Remove all previous routes
+          );
         }
 
        }
+     }
+     else{
+       ResponsiveInfo.showAlertDialog(context, "Savekart", "Something went wrong");
+       Navigator.of(context).pushAndRemoveUntil(
+         MaterialPageRoute(builder: (context) => HomeScreen()),
+             (Route<
+             dynamic> route) => false, // Remove all previous routes
+       );
      }
 
 

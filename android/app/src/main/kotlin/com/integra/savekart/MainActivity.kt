@@ -58,5 +58,8 @@ class MainActivity : FlutterActivity() {
             rslt?.success(resultData.toString())
         // if you send back anything
         }
+        else{
+            rslt?.success("")
+        }
     }
 }
