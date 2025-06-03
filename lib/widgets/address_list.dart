@@ -185,7 +185,10 @@ class _AddressListState extends State<AddressList> {
           Align(
             alignment: FractionalOffset.topCenter,
 
-            child: ListView.builder(
+            child:
+
+
+            (_addresses.length>0)?  ListView.builder(
                 itemCount: _addresses.length,
                 padding: EdgeInsets.all(5),
                 itemBuilder: (BuildContext context, int index) {
@@ -306,7 +309,17 @@ class _AddressListState extends State<AddressList> {
                     
                     
                     ;
-                }),
+                }) :Container(
+              width: double.infinity,
+              height: double.infinity,
+              child: Center(
+
+                child: Text("No Data Found"),
+              )
+
+
+
+            ),
           )
         ],
       ),
@@ -371,7 +384,17 @@ class _InputDialogState extends State<InputDialog> {
     'Tripura',
     'Uttar Pradesh',
     'Uttarakhand',
-    'West Bengal'
+    'West Bengal',
+    'Andaman and Nicobar Islands',
+    'Chandigarh',
+    'Dadra and Nagar Haveli and Daman and Diu',
+    'Delhi (National Capital Territory)',
+    'Jammu and Kashmir',
+    'Ladakh',
+    'Lakshadweep',
+    'Puducherry'
+
+
   ];
 
   String selectedCountry="India";
@@ -560,7 +583,13 @@ class _InputDialogState extends State<InputDialog> {
               items: states.map<DropdownMenuItem<String>>((String state) {
                 return DropdownMenuItem<String>(
                   value: state,
-                  child: Text(state),
+                  child:Container(width: 180,
+
+                  child:
+                  Text(state,style: TextStyle(fontSize: 14,color: Colors.black),maxLines: 2,overflow: TextOverflow.ellipsis,) ,
+                  )
+
+
                 );
               }).toList(),
             ) ),

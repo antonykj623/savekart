@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:savekart/domain/brand_entity.dart';
 import 'package:savekart/domain/cart_banners_entity.dart';
 import 'package:savekart/domain/category_entity.dart';
@@ -14,8 +15,10 @@ import 'package:savekart/web/ecommerce_api_helper.dart';
 import 'package:savekart/widgets/product_details.dart';
 import 'package:savekart/widgets/purchase_points.dart';
 import 'package:swipe_refresh/swipe_refresh.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../design/ResponsiveInfo.dart';
+import '../../domain/app_version_entity.dart';
 import '../../domain/wallet_balance_entity.dart';
 import '../../web/apimethodes.dart';
 
@@ -67,6 +70,7 @@ class _DashboardState extends State<Dashboard> {
     getWalletBalanceAndPoints();
     getWalletPoints();
     getCartCount();
+    getAppUpdates();
   }
 
   Future<void> _handleRefresh() async {
@@ -864,6 +868,58 @@ class _DashboardState extends State<Dashboard> {
 
       ,
     );
+  }
+
+
+  getAppUpdates()async{
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+
+    String version = packageInfo.version;
+
+
+    EcommerceApiHelper apihelper=new EcommerceApiHelper();
+    var t=EcommerceApiHelper.getTimeStamp();
+    var response1= await  apihelper.get(Apimethodes.getCartUpdate+"?q="+t.toString());
+    AppVersionEntity appversion=AppVersionEntity.fromJson(jsonDecode(response1));
+    if(appversion.status==1) {
+
+      double currentversion=double.parse(version);
+      String versionfromserver=appversion.data!.version.toString();
+      double appversionfromserver=double.parse(versionfromserver);
+
+     if (appversionfromserver>currentversion) {
+       showDialog(
+         context: context,
+         builder: (context) =>
+             AlertDialog(
+               title: Text("App Version"),
+               content: Text("Current Version: $version"),
+               actions: [
+                 (appversionfromserver > currentversion) ? TextButton(
+                   onPressed: () async {
+                     final Uri url = Uri.parse(
+                         "https://play.google.com/store/apps/details?id=com.integra.savekart"); // Change URL based on platform
+
+                     if (await canLaunchUrl(url)) {
+                       await launchUrl(
+                           url, mode: LaunchMode.externalApplication);
+                     } else {
+                       throw "Could not launch $url";
+                     }
+                   },
+                   child: Text("Update"),
+                 ) : Container(),
+                 TextButton(
+                   onPressed: () => Navigator.pop(context),
+                   child: Text("Close"),
+                 ),
+               ],
+             ),
+       );
+     }
+    }
+
   }
 
 

@@ -11,8 +11,8 @@ import 'package:savekart/domain/product_stock_entity.dart';
 import 'package:savekart/domain/wishlistcheck_entity.dart';
 import 'package:savekart/web/ecommerce_api_helper.dart';
 import 'package:savekart/widgets/cartscreen.dart';
-import 'package:savekart/widgets/zoomimage.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:savekart/widgets/zoomimage.dart';
 import '../domain/cart_data_exist_entity.dart';
 import '../domain/cart_products_entity.dart';
 import '../domain/product_by_category_entity.dart';
@@ -43,11 +43,11 @@ class _ProductDetailsState extends State<ProductDetails> with SingleTickerProvid
   String wishlist_id = "0";
   int selectedindex=0;
 
+  bool iswishlist = false;
+
   String description = "",price_details="",returnpolicies="No Data Found",
       cartcount = "0",
       product_stockid = "0";
-
-  bool iswishlist = false;
   bool ispointredeemeed = false;
   double tempwalletpoints = 0;
 
@@ -1008,8 +1008,7 @@ List<ProductByCategoryDataData>pcdata=[];
     }
   }
 
-  getReturnPolicies(String product_id)
-  async {
+  getReturnPolicies(String product_id) async {
 
     EcommerceApiHelper apihelper = new EcommerceApiHelper();
 
@@ -1231,8 +1230,7 @@ setState(() {
     }
   }
 
-  Future<double> calculateWalletPoints() async
-  {
+  Future<double> calculateWalletPoints() async {
     ResponsiveInfo.showLoaderDialog(context);
     double walletpoints = 0;
     EcommerceApiHelper apihelper = new EcommerceApiHelper();
@@ -1247,21 +1245,7 @@ setState(() {
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  addToCart()async
-  {
+  addToCart()async {
 
     ResponsiveInfo.ShowProgressDialog(context);
 
@@ -1331,8 +1315,7 @@ setState(() {
 
   }
 
-  addProductToWishlist()async
-  {
+  addProductToWishlist()async {
     ResponsiveInfo.ShowProgressDialog(context);
 
     EcommerceApiHelper apihelper = new EcommerceApiHelper();
@@ -1368,8 +1351,7 @@ setState(() {
 
   }
 
-  deleteProductFromWishlist()async
-  {
+  deleteProductFromWishlist()async {
     ResponsiveInfo.ShowProgressDialog(context);
 
     EcommerceApiHelper apihelper = new EcommerceApiHelper();
@@ -1439,8 +1421,7 @@ setState(() {
   }
 
 
-  getCartCount()async
-  {
+  getCartCount()async {
     // ResponsiveInfo.ShowProgressDialog(context);
     EcommerceApiHelper apihelper = new EcommerceApiHelper();
 
