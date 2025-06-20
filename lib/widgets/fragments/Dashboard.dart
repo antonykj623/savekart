@@ -83,6 +83,7 @@ class _DashboardState extends State<Dashboard> {
     getWalletBalanceAndPoints();
     getWalletPoints();
     getCartCount();
+    getAppUpdates();
   }
 
   @override
@@ -373,7 +374,7 @@ class _DashboardState extends State<Dashboard> {
                           ),
 
 
-                          Text(categorydata[index].categoryName.toString(),maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 10:13,fontWeight: FontWeight.bold),
+                          Text(categorydata[index].categoryName.toString(),maxLines: 3,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 10:13,fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
 
@@ -570,7 +571,7 @@ class _DashboardState extends State<Dashboard> {
                                                 mainAxisAlignment: MainAxisAlignment.start,
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(data[i].productName.toString(),maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
+                                                  Text(data[i].productName.toString(),maxLines: 3,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
                                                     textAlign: TextAlign.center,
                                                   ),
                                                   // Text("200 x 100 x 150",maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 11:13,fontWeight: FontWeight.bold,color: Colors.black26),
@@ -759,7 +760,7 @@ class _DashboardState extends State<Dashboard> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(sublist[i].productName.toString(),maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
+                                    Text(sublist[i].productName.toString(),maxLines: 3,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
                                       textAlign: TextAlign.center,
                                     ),
 

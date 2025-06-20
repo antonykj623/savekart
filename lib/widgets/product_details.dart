@@ -75,8 +75,9 @@ List<ProductByCategoryDataData>pcdata=[];
     return Scaffold(
 
       appBar: AppBar(title: Text(
-        productByCategoryDataData.productName.toString(), style: TextStyle(
+        productByCategoryDataData.productName.toString(),maxLines: 2 ,style: TextStyle(
           fontSize: ResponsiveInfo.isMobile(context) ? 15 : 17,
+
           color: Colors.white),),
         leading: GestureDetector(
 

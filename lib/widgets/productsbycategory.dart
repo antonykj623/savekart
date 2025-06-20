@@ -82,6 +82,7 @@ flex: 5,
                       ProductsData pb=product;
                       ProductByCategoryDataData pbc=new ProductByCategoryDataData();
                       pbc.id=pb.id;
+                      pbc.productCode=pb.productCode;
                       pbc.primeImage=pb.primeImage;
                       pbc.productName=pb.productName;
                       pbc.status=pb.status;
@@ -138,7 +139,7 @@ flex: 5,
                                 Text(
                                   product.productName.toString(),
                                   style: TextStyle(fontWeight: FontWeight.bold),
-                                  maxLines: 2,
+                                  maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.center,
                                 ),

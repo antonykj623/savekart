@@ -60,6 +60,8 @@ class ProductsData {
 	String? offeredItemStatus = '';
 	String? status = '0';
 	String? returnable = '';
+	@JSONField(name: "product_code")
+	String? productCode = '';
 
 	ProductsData();
 

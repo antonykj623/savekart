@@ -316,9 +316,6 @@ class _AddressListState extends State<AddressList> {
 
                 child: Text("No Data Found"),
               )
-
-
-
             ),
           )
         ],
