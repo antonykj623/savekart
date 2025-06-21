@@ -147,6 +147,10 @@ ProductByCategoryDataData $ProductByCategoryDataDataFromJson(
   if (categoryId != null) {
     productByCategoryDataData.categoryId = categoryId;
   }
+  final String? productCode = jsonConvert.convert<String>(json['product_code']);
+  if (productCode != null) {
+    productByCategoryDataData.productCode = productCode;
+  }
   final String? subCategoryId = jsonConvert.convert<String>(
       json['sub_category_id']);
   if (subCategoryId != null) {
@@ -214,14 +218,6 @@ ProductByCategoryDataData $ProductByCategoryDataDataFromJson(
   if (returnDays != null) {
     productByCategoryDataData.returnDays = returnDays;
   }
-  final String? productCode = jsonConvert.convert<String>(json['product_code']);
-  if (productCode != null) {
-    productByCategoryDataData.productCode = productCode;
-  }
-
-
-
-
   return productByCategoryDataData;
 }
 
@@ -231,6 +227,7 @@ Map<String, dynamic> $ProductByCategoryDataDataToJson(
   data['id'] = entity.id;
   data['product_name'] = entity.productName;
   data['category_id'] = entity.categoryId;
+  data['product_code'] = entity.productCode;
   data['sub_category_id'] = entity.subCategoryId;
   data['product_description'] = entity.productDescription;
   data['product_spec'] = entity.productSpec;
@@ -247,8 +244,6 @@ Map<String, dynamic> $ProductByCategoryDataDataToJson(
   data['vendor_id'] = entity.vendorId;
   data['status'] = entity.status;
   data['return_days'] = entity.returnDays;
-  data['product_code']=entity.productCode;
-
   return data;
 }
 
@@ -257,6 +252,7 @@ extension ProductByCategoryDataDataExtension on ProductByCategoryDataData {
     String? id,
     String? productName,
     String? categoryId,
+    String? productCode,
     String? subCategoryId,
     String? productDescription,
     String? productSpec,
@@ -273,12 +269,12 @@ extension ProductByCategoryDataDataExtension on ProductByCategoryDataData {
     String? vendorId,
     String? status,
     String? returnDays,
-    String? productCode
   }) {
     return ProductByCategoryDataData()
       ..id = id ?? this.id
       ..productName = productName ?? this.productName
       ..categoryId = categoryId ?? this.categoryId
+      ..productCode = productCode ?? this.productCode
       ..subCategoryId = subCategoryId ?? this.subCategoryId
       ..productDescription = productDescription ?? this.productDescription
       ..productSpec = productSpec ?? this.productSpec
@@ -294,9 +290,6 @@ extension ProductByCategoryDataDataExtension on ProductByCategoryDataData {
       ..size = size ?? this.size
       ..vendorId = vendorId ?? this.vendorId
       ..status = status ?? this.status
-      ..returnDays=returnDays ?? this.returnDays
-      ..productCode=productCode ?? this.productCode
-
-    ;
+      ..returnDays = returnDays ?? this.returnDays;
   }
 }

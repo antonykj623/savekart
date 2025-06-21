@@ -67,10 +67,9 @@ PointsData $PointsDataFromJson(Map<String, dynamic> json) {
     pointsData.insDate = insDate;
   }
   final String? description = jsonConvert.convert<String>(json['description']);
-  if (insDate != null) {
+  if (description != null) {
     pointsData.description = description;
   }
-
   return pointsData;
 }
 
@@ -82,7 +81,7 @@ Map<String, dynamic> $PointsDataToJson(PointsData entity) {
   data['debit'] = entity.debit;
   data['balance'] = entity.balance;
   data['ins_date'] = entity.insDate;
-  data['description']=entity.description;
+  data['description'] = entity.description;
   return data;
 }
 
@@ -94,7 +93,7 @@ extension PointsDataExtension on PointsData {
     String? debit,
     String? balance,
     String? insDate,
-    String? description
+    String? description,
   }) {
     return PointsData()
       ..id = id ?? this.id
@@ -103,8 +102,6 @@ extension PointsDataExtension on PointsData {
       ..debit = debit ?? this.debit
       ..balance = balance ?? this.balance
       ..insDate = insDate ?? this.insDate
-      ..description=description ?? this.description
-
-    ;
+      ..description = description ?? this.description;
   }
 }

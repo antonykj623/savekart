@@ -16,6 +16,7 @@ import 'package:savekart/widgets/zoomimage.dart';
 import '../domain/cart_data_exist_entity.dart';
 import '../domain/cart_products_entity.dart';
 import '../domain/product_by_category_entity.dart';
+import '../domain/product_sub_category_entity.dart';
 import '../domain/return_policy_entity.dart';
 import '../web/AppStorage.dart';
 import '../web/apimethodes.dart';
@@ -23,7 +24,7 @@ import 'Slidbarscreen.dart';
 
 class ProductDetails extends StatefulWidget {
 
-  ProductByCategoryDataData productByCategoryDataData;
+  ProductSubCategoryDataData productByCategoryDataData;
    ProductDetails(this.productByCategoryDataData) ;
 
   @override
@@ -32,7 +33,7 @@ class ProductDetails extends StatefulWidget {
 
 class _ProductDetailsState extends State<ProductDetails> with SingleTickerProviderStateMixin {
 
-  ProductByCategoryDataData productByCategoryDataData;
+  ProductSubCategoryDataData productByCategoryDataData;
   ProductStockEntity productStockEntity = new ProductStockEntity();
 
   _ProductDetailsState(this.productByCategoryDataData);
@@ -57,7 +58,7 @@ List<String>images=[];
 
 int count=0;
 
-List<ProductByCategoryDataData>pcdata=[];
+List<ProductSubCategoryDataData>pcdata=[];
 
  late Timer timer;
 
@@ -738,7 +739,7 @@ List<ProductByCategoryDataData>pcdata=[];
                   for(int i=0;i<entity.data!.length;i++)
                     {
                       ProductCountData pb=entity.data![i];
-                      ProductByCategoryDataData pbc=new ProductByCategoryDataData();
+                      ProductSubCategoryDataData pbc=new ProductSubCategoryDataData();
                       pbc.id=pb.id;
                       pbc.primeImage=pb.primeImage;
                       pbc.productName=pb.productName;

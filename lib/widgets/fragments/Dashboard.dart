@@ -19,11 +19,13 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../design/ResponsiveInfo.dart';
 import '../../domain/app_version_entity.dart';
+import '../../domain/product_sub_category_entity.dart';
 import '../../domain/wallet_balance_entity.dart';
 import '../../web/apimethodes.dart';
 
 import '../CategoryWidget.dart';
 import '../Slidbarscreen.dart';
+import '../all_products_by_category.dart';
 import '../cartscreen.dart';
 import '../fasting_moving_items.dart';
 import '../productsbycategory.dart';
@@ -50,7 +52,7 @@ class _DashboardState extends State<Dashboard> {
   List<BrandData> data = [];
 
   List<SubCategoryData> subcategorydata=[];
-  List<ProductByCategoryData> productbycategorydata = [];
+  List<ProductSubCategoryData> productbycategorydata = [];
   List<CartBannersData> bannersdata = [];
   double walletbalance=0.0;
   String cartcount="0";
@@ -306,7 +308,7 @@ class _DashboardState extends State<Dashboard> {
 
         (categorydata!.length>0)? Container(
           width: double.infinity,
-          height: 90*((categorydata.length/4)*2),
+          height: 75*((categorydata.length/4)*2),
           child: GridView.count(
               crossAxisCount: 4,
               crossAxisSpacing: 4.0,
@@ -328,7 +330,7 @@ class _DashboardState extends State<Dashboard> {
 
                       final result = await Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ProductsByCategoryScreen(categoryId: categorydata[index].id.toString(),categoryname: categorydata[index].categoryName.toString(),)),
+                        MaterialPageRoute(builder: (context) => AllProductsByCategory(categoryId: categorydata[index].id.toString(),categoryname: categorydata[index].categoryName.toString(),)),
                       );
 
                       if (result != null||result==null) {
@@ -456,10 +458,10 @@ class _DashboardState extends State<Dashboard> {
             primary: false,
             itemBuilder: (BuildContext context, int index) {
 
-              List<ProductByCategoryDataData> data =
+              List<ProductSubCategoryDataData> data =
               productbycategorydata[index].data!;
 
-              List<List<ProductByCategoryDataData>> chunkedList = [];
+              List<List<ProductSubCategoryDataData>> chunkedList = [];
               int chunkSize = 5;
 
               if(productbycategorydata[index].data!.length>5) {
@@ -485,13 +487,13 @@ class _DashboardState extends State<Dashboard> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
 
-                              Text( productbycategorydata[index].category!.categoryName.toString(),style: TextStyle(fontWeight: FontWeight.bold,fontSize: ResponsiveInfo.isMobile(context)?15:17),),
+                              Text( productbycategorydata[index].category!.subCategoryName.toString(),style: TextStyle(fontWeight: FontWeight.bold,fontSize: ResponsiveInfo.isMobile(context)?15:17),),
 
                               TextButton(onPressed: () async {
 
                                 final result = await Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => ProductsByCategoryScreen(categoryId: productbycategorydata[index].category!.id.toString(),categoryname: productbycategorydata[index].category!.categoryName.toString(),)),
+                                  MaterialPageRoute(builder: (context) => ProductsByCategoryScreen(categoryId: productbycategorydata[index].category!.subCategoryId.toString(),categoryname: productbycategorydata[index].category!.subCategoryName.toString(),)),
                                 );
 
                                 if (result != null||result==null) {
@@ -661,13 +663,13 @@ class _DashboardState extends State<Dashboard> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
 
-                          Text( productbycategorydata[index].category!.categoryName.toString(),style: TextStyle(fontWeight: FontWeight.bold,fontSize: ResponsiveInfo.isMobile(context)?15:17),),
+                          Text( productbycategorydata[index].category!.subCategoryName.toString(),style: TextStyle(fontWeight: FontWeight.bold,fontSize: ResponsiveInfo.isMobile(context)?15:17),),
 
                           TextButton(onPressed: () async {
 
                             final result = await Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => ProductsByCategoryScreen(categoryId: productbycategorydata[index].category!.id.toString(),categoryname: productbycategorydata[index].category!.categoryName.toString(),)),
+                              MaterialPageRoute(builder: (context) => ProductsByCategoryScreen(categoryId: productbycategorydata[index].category!.subCategoryId.toString(),categoryname: productbycategorydata[index].category!.subCategoryName.toString(),)),
                             );
 
                             if (result != null||result==null) {
@@ -699,7 +701,7 @@ class _DashboardState extends State<Dashboard> {
 
 
               itemBuilder: (context, chunkIndex) {
-              List<ProductByCategoryDataData> sublist = chunkedList[chunkIndex];
+              List<ProductSubCategoryDataData> sublist = chunkedList[chunkIndex];
 
               return Padding(padding: EdgeInsets.only(left: 10,top: 5),
                   child:Container(
@@ -1125,7 +1127,7 @@ class _DashboardState extends State<Dashboard> {
 
     var js= jsonDecode(response) ;
 
-    ProductByCategoryEntity brandEntity=ProductByCategoryEntity.fromJson(js);
+    ProductSubCategoryEntity brandEntity=ProductSubCategoryEntity.fromJson(js);
 
     if(brandEntity.data!.length>0)
     {

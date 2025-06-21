@@ -7,6 +7,7 @@ import '../../web/apimethodes.dart';
 import '../../web/ecommerce_api_helper.dart';
 import '../../domain/products_entity.dart';
 import '../domain/product_by_category_entity.dart';
+import '../domain/product_sub_category_entity.dart';
 
 class ProductsByCategoryScreen extends StatefulWidget {
   final String categoryId;
@@ -32,7 +33,7 @@ class _ProductsByCategoryScreenState extends State<ProductsByCategoryScreen> {
     setState(() => isLoading = true);
 
     EcommerceApiHelper apiHelper = EcommerceApiHelper();
-    var response = await apiHelper.get("${Apimethodes.getProductsByCategory}?id=$categoryId"+"&q="+EcommerceApiHelper.getTimeStamp());
+    var response = await apiHelper.get("${Apimethodes.getProductListBySubcategory}?id=$categoryId"+"&q="+EcommerceApiHelper.getTimeStamp());
     var js = jsonDecode(response);
     ProductsEntity productEntity = ProductsEntity.fromJson(js);
 
@@ -80,7 +81,7 @@ flex: 5,
                 return GestureDetector(
                     onTap: (){
                       ProductsData pb=product;
-                      ProductByCategoryDataData pbc=new ProductByCategoryDataData();
+                      ProductSubCategoryDataData pbc=new ProductSubCategoryDataData();
                       pbc.id=pb.id;
                       pbc.productCode=pb.productCode;
                       pbc.primeImage=pb.primeImage;

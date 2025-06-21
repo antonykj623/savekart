@@ -19,6 +19,7 @@ import 'package:savekart/domain/points_entity.dart';
 import 'package:savekart/domain/product_by_category_entity.dart';
 import 'package:savekart/domain/product_count_entity.dart';
 import 'package:savekart/domain/product_stock_entity.dart';
+import 'package:savekart/domain/product_sub_category_entity.dart';
 import 'package:savekart/domain/products_entity.dart';
 import 'package:savekart/domain/profile_data_entity.dart';
 import 'package:savekart/domain/return_policy_entity.dart';
@@ -26,6 +27,7 @@ import 'package:savekart/domain/return_request_entity.dart';
 import 'package:savekart/domain/searched_products_entity.dart';
 import 'package:savekart/domain/state_list_entity.dart';
 import 'package:savekart/domain/sub_category_entity.dart';
+import 'package:savekart/domain/subcategory_entity.dart';
 import 'package:savekart/domain/token_data_entity.dart';
 import 'package:savekart/domain/user_address_data_entity.dart';
 import 'package:savekart/domain/user_address_entity.dart';
@@ -329,6 +331,23 @@ class JsonConvert {
       return data.map<ProductStockData>((Map<String, dynamic> e) =>
           ProductStockData.fromJson(e)).toList() as M;
     }
+    if (<ProductSubCategoryEntity>[] is M) {
+      return data.map<ProductSubCategoryEntity>((Map<String, dynamic> e) =>
+          ProductSubCategoryEntity.fromJson(e)).toList() as M;
+    }
+    if (<ProductSubCategoryData>[] is M) {
+      return data.map<ProductSubCategoryData>((Map<String, dynamic> e) =>
+          ProductSubCategoryData.fromJson(e)).toList() as M;
+    }
+    if (<ProductSubCategoryDataCategory>[] is M) {
+      return data.map<ProductSubCategoryDataCategory>((
+          Map<String, dynamic> e) => ProductSubCategoryDataCategory.fromJson(e))
+          .toList() as M;
+    }
+    if (<ProductSubCategoryDataData>[] is M) {
+      return data.map<ProductSubCategoryDataData>((Map<String, dynamic> e) =>
+          ProductSubCategoryDataData.fromJson(e)).toList() as M;
+    }
     if (<ProductsEntity>[] is M) {
       return data.map<ProductsEntity>((Map<String, dynamic> e) =>
           ProductsEntity.fromJson(e)).toList() as M;
@@ -384,6 +403,14 @@ class JsonConvert {
     if (<SubCategoryData>[] is M) {
       return data.map<SubCategoryData>((Map<String, dynamic> e) =>
           SubCategoryData.fromJson(e)).toList() as M;
+    }
+    if (<SubcategoryEntity>[] is M) {
+      return data.map<SubcategoryEntity>((Map<String, dynamic> e) =>
+          SubcategoryEntity.fromJson(e)).toList() as M;
+    }
+    if (<SubcategoryData>[] is M) {
+      return data.map<SubcategoryData>((Map<String, dynamic> e) =>
+          SubcategoryData.fromJson(e)).toList() as M;
     }
     if (<TokenDataEntity>[] is M) {
       return data.map<TokenDataEntity>((Map<String, dynamic> e) =>
@@ -521,6 +548,12 @@ class JsonConvertClassCollection {
     (ProductCountData).toString(): ProductCountData.fromJson,
     (ProductStockEntity).toString(): ProductStockEntity.fromJson,
     (ProductStockData).toString(): ProductStockData.fromJson,
+    (ProductSubCategoryEntity).toString(): ProductSubCategoryEntity.fromJson,
+    (ProductSubCategoryData).toString(): ProductSubCategoryData.fromJson,
+    (ProductSubCategoryDataCategory).toString(): ProductSubCategoryDataCategory
+        .fromJson,
+    (ProductSubCategoryDataData).toString(): ProductSubCategoryDataData
+        .fromJson,
     (ProductsEntity).toString(): ProductsEntity.fromJson,
     (ProductsData).toString(): ProductsData.fromJson,
     (ProfileDataEntity).toString(): ProfileDataEntity.fromJson,
@@ -535,6 +568,8 @@ class JsonConvertClassCollection {
     (StateListData).toString(): StateListData.fromJson,
     (SubCategoryEntity).toString(): SubCategoryEntity.fromJson,
     (SubCategoryData).toString(): SubCategoryData.fromJson,
+    (SubcategoryEntity).toString(): SubcategoryEntity.fromJson,
+    (SubcategoryData).toString(): SubcategoryData.fromJson,
     (TokenDataEntity).toString(): TokenDataEntity.fromJson,
     (UserAddressDataEntity).toString(): UserAddressDataEntity.fromJson,
     (UserAddressDataData).toString(): UserAddressDataData.fromJson,

@@ -537,14 +537,6 @@ OrderDetailsDataCartProduct $OrderDetailsDataCartProductFromJson(
   if (productName != null) {
     orderDetailsDataCartProduct.productName = productName;
   }
-
-  final String? productCode = jsonConvert.convert<String>(json['product_code']);
-  if (productCode != null) {
-    orderDetailsDataCartProduct.productCode = productCode;
-  }
-
-
-
   final String? categoryId = jsonConvert.convert<String>(json['category_id']);
   if (categoryId != null) {
     orderDetailsDataCartProduct.categoryId = categoryId;
@@ -630,6 +622,10 @@ OrderDetailsDataCartProduct $OrderDetailsDataCartProductFromJson(
   if (returnDays != null) {
     orderDetailsDataCartProduct.returnDays = returnDays;
   }
+  final String? productCode = jsonConvert.convert<String>(json['product_code']);
+  if (productCode != null) {
+    orderDetailsDataCartProduct.productCode = productCode;
+  }
   return orderDetailsDataCartProduct;
 }
 
@@ -658,9 +654,7 @@ Map<String, dynamic> $OrderDetailsDataCartProductToJson(
   data['status'] = entity.status;
   data['returnable'] = entity.returnable;
   data['return_days'] = entity.returnDays;
-  data['product_code']=entity.productCode;
-
-
+  data['product_code'] = entity.productCode;
   return data;
 }
 
@@ -713,7 +707,7 @@ extension OrderDetailsDataCartProductExtension on OrderDetailsDataCartProduct {
       ..status = status ?? this.status
       ..returnable = returnable ?? this.returnable
       ..returnDays = returnDays ?? this.returnDays
-      ..productCode=productCode ?? this.productCode;
+      ..productCode = productCode ?? this.productCode;
   }
 }
 

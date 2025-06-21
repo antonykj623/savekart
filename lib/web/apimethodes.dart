@@ -4,9 +4,13 @@ class Apimethodes{
    static String getCategories="getCategories.php";
    static String getBanners="getBanners.php";
    static String getProductsByCategory="getProductsByCategory.php";
+   static String getProductListBySubcategory="getProductListBySubcategory.php";
+   static String getAllSubcategories="getAllSubcategories.php";
+
+
    static String getBrands="getBrands.php";
    static String getSubCategories="getSubCategories.php";
-   static String getProductWithCategories="getProductWithCategories.php";
+   static String getProductWithCategories="getProductsBySubcategory.php";
    static String getProductStock="getProductStock.php";
    static String addProductToCart="addProductToCart.php";
    static String checkProductExistsCart="checkProductExistsCart.php";

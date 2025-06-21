@@ -4,6 +4,7 @@ import 'package:savekart/design/ResponsiveInfo.dart';
 import '../../domain/category_entity.dart';
 
 import '../../domain/product_by_category_entity.dart';
+import '../../domain/product_sub_category_entity.dart';
 import '../../domain/products_entity.dart';
 import '../../web/apimethodes.dart';
 import '../../web/ecommerce_api_helper.dart';
@@ -139,7 +140,7 @@ class ProductCard extends StatelessWidget {
       onTap: (){
 
         ProductsData pb=product;
-        ProductByCategoryDataData pbc=new ProductByCategoryDataData();
+        ProductSubCategoryDataData pbc=new ProductSubCategoryDataData();
         pbc.id=pb.id;
         pbc.primeImage=pb.primeImage;
         pbc.productName=pb.productName;

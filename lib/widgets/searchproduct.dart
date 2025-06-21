@@ -6,6 +6,7 @@ import 'package:savekart/domain/searched_products_entity.dart';
 import 'package:savekart/widgets/product_details.dart';
 
 import '../domain/product_by_category_entity.dart';
+import '../domain/product_sub_category_entity.dart';
 import '../web/apimethodes.dart';
 import '../web/ecommerce_api_helper.dart';
 
@@ -68,7 +69,7 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
                      child: Image.network(EcommerceApiHelper.productimageurl+data![index].primeImage.toString(),width: ResponsiveInfo.isMobile(context)?70:100,height: ResponsiveInfo.isMobile(context)?90:120,fit: BoxFit.fill,),
                   ), onTap: () {
 
-                      ProductByCategoryDataData pbc=new ProductByCategoryDataData();
+                      ProductSubCategoryDataData pbc=new ProductSubCategoryDataData();
                       pbc.id=data![index]!.id;
                       pbc.primeImage=data![index].primeImage;
                       pbc.productName=data![index].productName;
