@@ -14,19 +14,19 @@ if (localPropertiesFile.exists()) {
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
-    flutterVersionCode = '30'
+    flutterVersionCode = '32'
 }
 else{
-    flutterVersionCode = '30'
+    flutterVersionCode = '32'
 
 }
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    flutterVersionName = '3.9'
+    flutterVersionName = '4.1'
 }
 else{
-    flutterVersionName = '3.9'
+    flutterVersionName = '4.1'
 }
 
 android {

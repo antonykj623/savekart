@@ -487,9 +487,9 @@ class _DashboardState extends State<Dashboard> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
 
-                              Text( productbycategorydata[index].category!.subCategoryName.toString(),style: TextStyle(fontWeight: FontWeight.bold,fontSize: ResponsiveInfo.isMobile(context)?15:17),),
+                          Expanded(child:  Text( productbycategorydata[index].category!.subCategoryName.toString(),maxLines: 2,overflow: TextOverflow.ellipsis,style: TextStyle(fontWeight: FontWeight.bold,fontSize: ResponsiveInfo.isMobile(context)?15:17),),flex: 3,),
 
-                              TextButton(onPressed: () async {
+              Expanded(child:    TextButton(onPressed: () async {
 
                                 final result = await Navigator.push(
                                   context,
@@ -505,7 +505,7 @@ class _DashboardState extends State<Dashboard> {
                                 }
 
 
-                              }, child: Text("View All",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:18,color: Color(0xff0B7D97)),))
+                              }, child: Text("View All",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:18,color: Color(0xff0B7D97)),)),flex: 1,)
 
                             ],
 
@@ -663,9 +663,11 @@ class _DashboardState extends State<Dashboard> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
 
-                          Text( productbycategorydata[index].category!.subCategoryName.toString(),style: TextStyle(fontWeight: FontWeight.bold,fontSize: ResponsiveInfo.isMobile(context)?15:17),),
+                          Expanded(child: Text( productbycategorydata[index].category!.subCategoryName.toString(),overflow: TextOverflow.ellipsis,maxLines: 2,style: TextStyle(fontWeight: FontWeight.bold,fontSize: ResponsiveInfo.isMobile(context)?15:17),),flex: 3,)
 
-                          TextButton(onPressed: () async {
+                          ,
+
+              Expanded(child:  TextButton(onPressed: () async {
 
                             final result = await Navigator.push(
                               context,
@@ -681,7 +683,7 @@ class _DashboardState extends State<Dashboard> {
                             }
 
 
-                          }, child: Text("View All",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:18,color: Color(0xff0B7D97)),))
+                          }, child: Text("View All",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:18,color: Color(0xff0B7D97)),)),flex: 1,)
 
                         ],
 

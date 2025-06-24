@@ -456,13 +456,13 @@ bool iswalletused=false;
 
                          Navigator.pop(context);
 
-                        ResponsiveInfo.showAlertDialog(context, "", "Sorry , this option is not applicable right now ");
+                       ResponsiveInfo.showAlertDialog(context, "", "Sorry , this option is not applicable right now ");
 
                       }
                     else{
                       Navigator.pop(context);
 
-                      PlaceOrder(totalamount_to_paid.toString(),iswalletused,_totalAmount.toString(),2,usedwalletamount.toString());
+                       PlaceOrder(totalamount_to_paid.toString(),iswalletused,_totalAmount.toString(),2,usedwalletamount.toString());
 
 
                     }
@@ -667,13 +667,18 @@ bool iswalletused=false;
 
      Map<String, dynamic> data=  jsonDecode(d)  ;
 
-    //print(js['data']);
-
      if(data['status']==1) {
        if (_totalAmount == 0 && paymenttype==3 ) {
 
          updateWalletBalance();
-         updateWalletPoints(data['data']);
+
+         Uri uri = Uri.parse(data['data']);
+
+         String? idTransaction = uri.queryParameters["id_transaction"];
+
+
+
+         updateWalletPoints(idTransaction.toString());
 
          showOrderDialog(context, true, "Your order placed successfully!");
        }
@@ -685,18 +690,18 @@ bool iswalletused=false;
 
 
          NativeBridge().redirectToNative(urldata,c);
-        var result= await c.future;
-        if(result!=null&&result.toString().isNotEmpty && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
-          showPaymentStatus(result);
-        }
-        else{
-          ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch your payment details");
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => HomeScreen()),
-                (Route<
-                dynamic> route) => false, // Remove all previous routes
-          );
-        }
+         var result= await c.future;
+         if(result!=null&&result.toString().isNotEmpty && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
+           showPaymentStatus(result);
+         }
+         else{
+           ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch your payment details");
+           Navigator.of(context).pushAndRemoveUntil(
+             MaterialPageRoute(builder: (context) => HomeScreen()),
+                 (Route<
+                 dynamic> route) => false, // Remove all previous routes
+           );
+         }
 
        }
      }
@@ -708,6 +713,51 @@ bool iswalletused=false;
              dynamic> route) => false, // Remove all previous routes
        );
      }
+
+
+
+
+
+     //real one
+     // if(data['status']==1) {
+     //   if (_totalAmount == 0 && paymenttype==3 ) {
+     //
+     //     updateWalletBalance();
+     //     updateWalletPoints(data['data']);
+     //
+     //     showOrderDialog(context, true, "Your order placed successfully!");
+     //   }
+     //   else{
+     //
+     //     String urldata=data['data'];
+     //
+     //     Completer c=Completer();
+     //
+     //
+     //     NativeBridge().redirectToNative(urldata,c);
+     //    var result= await c.future;
+     //    if(result!=null&&result.toString().isNotEmpty && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
+     //      showPaymentStatus(result);
+     //    }
+     //    else{
+     //      ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch your payment details");
+     //      Navigator.of(context).pushAndRemoveUntil(
+     //        MaterialPageRoute(builder: (context) => HomeScreen()),
+     //            (Route<
+     //            dynamic> route) => false, // Remove all previous routes
+     //      );
+     //    }
+     //
+     //   }
+     // }
+     // else{
+     //   ResponsiveInfo.showAlertDialog(context, "Savekart", "Something went wrong");
+     //   Navigator.of(context).pushAndRemoveUntil(
+     //     MaterialPageRoute(builder: (context) => HomeScreen()),
+     //         (Route<
+     //         dynamic> route) => false, // Remove all previous routes
+     //   );
+     // }
 
 
 
