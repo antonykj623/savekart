@@ -23,6 +23,7 @@ class Apimethodes{
    static String deleteAddress="deleteAddress.php";
    static String deleteFromCart="deleteFromCart.php";
    static String createOrder="createOrder.php";
+
    static String getOrders="getOrders.php";
     static String getUserDetails="getUserDetails.php";
    static String getOrderdetails="getOrderdetails.php";
@@ -57,4 +58,6 @@ class Apimethodes{
     static String updateWalletPoints="updateWalletPoints.php";
     static String getWalletPointsTransaction="getWalletPointsTransaction.php";
     static String retryNewOrder="retryNewOrder.php";
+   static String getPaymentCredentials="getPaymentCredentials.php";
+   static String generateHash="generateHash.php";
 }

@@ -9,8 +9,8 @@ import 'package:savekart/domain/profile_data_entity.dart';
 import 'package:savekart/domain/wallet_balance_entity.dart';
 import 'package:savekart/widgets/Home.dart';
 import 'package:savekart/widgets/address_list.dart';
-import 'package:upi_india/upi_india.dart';
-import 'package:upi_india/upi_response.dart';
+
+import 'package:weipl_checkout_flutter/weipl_checkout_flutter.dart';
 
 import '../domain/address_data_entity.dart';
 import '../domain/cart_products_entity.dart';
@@ -684,24 +684,126 @@ bool iswalletused=false;
        }
        else{
 
-         String urldata=data['data'];
+         Uri uri = Uri.parse(data['data']);
 
-         Completer c=Completer();
+         String? idTransaction = uri.queryParameters["id_transaction"];
 
 
-         NativeBridge().redirectToNative(urldata,c);
-         var result= await c.future;
-         if(result!=null&&result.toString().isNotEmpty && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
-           showPaymentStatus(result);
-         }
-         else{
-           ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch your payment details");
-           Navigator.of(context).pushAndRemoveUntil(
-             MaterialPageRoute(builder: (context) => HomeScreen()),
-                 (Route<
-                 dynamic> route) => false, // Remove all previous routes
-           );
-         }
+         // String urldata=data['data'];
+
+         //Completer c=Completer();
+         //
+         //
+         // NativeBridge().redirectToNative(urldata,c);
+         // var result= await c.future;
+         // if(result!=null&&result.toString().isNotEmpty && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
+         //   showPaymentStatus(result);
+         // }
+         // else{
+         //   ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch your payment details");
+         //   Navigator.of(context).pushAndRemoveUntil(
+         //     MaterialPageRoute(builder: (context) => HomeScreen()),
+         //         (Route<
+         //         dynamic> route) => false, // Remove all previous routes
+         //   );
+         // }
+
+
+         //fetching transaction credentials
+
+         ResponsiveInfo.ShowProgressDialog(context);
+
+
+         EcommerceApiHelper apihelper = new EcommerceApiHelper();
+
+         var t=EcommerceApiHelper.getTimeStamp();
+
+         var response= await  apihelper.get(Apimethodes.getPaymentCredentials+"?q="+t.toString());
+
+         print(response);
+
+         Navigator.pop(context);
+
+         var data1 = jsonDecode(response);
+
+
+
+
+
+         String customerid=data1['customerid'];
+         String merchantcode=data1['merchantcode'];
+         String salt=data1['saltkey'];
+         String txnid=idTransaction.toString();
+
+         String a=    merchantcode+"|"+txnid+"|"+paidamount+"||"+customerid+"||||||||||||"+salt;
+
+
+
+         //fetching hash methode
+
+         ResponsiveInfo.ShowProgressDialog(context);
+
+         Map<String,String> mp=new HashMap();
+         mp['data']=a;
+
+         EcommerceApiHelper apihelper1= new EcommerceApiHelper();
+
+         var t1=EcommerceApiHelper.getTimeStamp();
+
+         var response1= await  apihelper1.post(Apimethodes.generateHash+"?q="+t1.toString(),formDataPayload:mp );
+
+         print(response1);
+
+         Navigator.pop(context);
+
+         String d1 = jsonDecode(response1);
+
+         Map<String, dynamic> data2=  jsonDecode(d1)  ;
+
+         String value = data2["value"];
+         print(value);
+
+         WeiplCheckoutFlutter wlCheckoutFlutter = WeiplCheckoutFlutter();
+
+         var reqJson = {
+           "features": {
+             "enableAbortResponse": true,
+             "enableExpressPay": true,
+             "enableInstrumentDeRegistration": true,
+             "enableMerTxnDetails": true
+           },
+           "consumerData": {
+             "deviceId": "AndroidSH2",
+             "token":value,
+             "paymentMode": "all",
+             "merchantLogoUrl":
+             "https://mysaveapp.com/ic_launcher.png",
+             "merchantId": merchantcode,
+             "currency": "INR",
+             "consumerId": customerid,
+             "consumerMobileNo": "",
+             "consumerEmailId": "",
+             "txnId":txnid, //Unique merchant transaction ID
+             "items": [
+               {"itemId": "first", "amount": paidamount, "comAmt": "0"}
+             ],
+             "customStyle": {
+               "PRIMARY_COLOR_CODE":
+               "#0B7D97", //merchant primary color code
+               "SECONDARY_COLOR_CODE":
+               "#FFFFFF", //provide merchant's suitable color code
+               "BUTTON_COLOR_CODE_1":
+               "#0B7D97", //merchant"s button background color code
+               "BUTTON_COLOR_CODE_2":
+               "#FFFFFF" //provide merchant's suitable color code for button text
+             }
+           }
+         };
+
+         wlCheckoutFlutter.on(
+             WeiplCheckoutFlutter.wlResponse, handleResponse);
+         wlCheckoutFlutter.open(reqJson);
+
 
        }
      }
@@ -760,6 +862,55 @@ bool iswalletused=false;
      // }
 
 
+
+
+  }
+
+  void handleResponse(Map<dynamic, dynamic> response) {
+ //  ResponsiveInfo.showAlertDialog(context, "Response", response.toString());
+    List<String> parts = response['msg']!.split('|');
+    String statusCode = parts[0];              // 0300
+    String statusMessage = parts[1];           // SUCCESS
+    String description = parts[2];             // Verification SUCCESS Transaction
+    String transactionId = parts[3];           // 1234567
+    String orderId = parts[4];                 // 33570
+    String customerId = parts[5];              // 669013977
+    String amount = parts[6];                  // 1.00
+    String txnDateTime = parts[8];             // 27-06-2025 12:50:34
+    String uuid = parts[14];                   // 607369e3-68fe-4f9b-b3a4-fe0a2e7fd5a3
+    String hashValue = parts[15];              // Long hash string
+
+    String merchantCode = response['merchant_code'] ?? '';
+
+
+    if(statusCode.compareTo("0300")==0)
+      {
+
+        if(statusMessage.compareTo("SUCCESS")==0)
+          {
+
+
+
+          }
+        else{
+          ResponsiveInfo.showAlertDialog(context, "Savekart", "Payment failed");
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+                (Route<
+                dynamic> route) => false, // Remove all previous routes
+          );
+        }
+
+      }
+    else{
+
+      ResponsiveInfo.showAlertDialog(context, "Savekart", "Payment failed");
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+            (Route<
+            dynamic> route) => false, // Remove all previous routes
+      );
+    }
 
 
   }

@@ -14,24 +14,24 @@ if (localPropertiesFile.exists()) {
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
-    flutterVersionCode = '32'
+    flutterVersionCode = '33'
 }
 else{
-    flutterVersionCode = '32'
+    flutterVersionCode = '33'
 
 }
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    flutterVersionName = '4.1'
+    flutterVersionName = '4.2'
 }
 else{
-    flutterVersionName = '4.1'
+    flutterVersionName = '4.2'
 }
 
 android {
     namespace "com.integra.savekart"
-    compileSdk flutter.compileSdkVersion
+    compileSdk 35
     ndkVersion flutter.ndkVersion
     buildFeatures {
         viewBinding true
