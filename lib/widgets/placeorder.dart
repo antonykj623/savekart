@@ -45,6 +45,8 @@ bool iswalletused=false;
 
   final _enteredwalletamountcontroller = TextEditingController();
 
+  String orderid="0";
+
   _PlaceOrderWidgetState(this._totalAmount);
 
   @override
@@ -675,6 +677,7 @@ bool iswalletused=false;
          Uri uri = Uri.parse(data['data']);
 
          String? idTransaction = uri.queryParameters["id_transaction"];
+         orderid=idTransaction.toString();
 
 
 
@@ -687,7 +690,7 @@ bool iswalletused=false;
          Uri uri = Uri.parse(data['data']);
 
          String? idTransaction = uri.queryParameters["id_transaction"];
-
+         orderid=idTransaction.toString();
 
          // String urldata=data['data'];
 
@@ -763,6 +766,8 @@ bool iswalletused=false;
          String value = data2["value"];
          print(value);
 
+
+
          WeiplCheckoutFlutter wlCheckoutFlutter = WeiplCheckoutFlutter();
 
          var reqJson = {
@@ -808,7 +813,7 @@ bool iswalletused=false;
        }
      }
      else{
-       ResponsiveInfo.showAlertDialog(context, "Savekart", "Something went wrong");
+     //  ResponsiveInfo.showAlertDialog(context, "Savekart", "Something went wrong");
        Navigator.of(context).pushAndRemoveUntil(
          MaterialPageRoute(builder: (context) => HomeScreen()),
              (Route<
@@ -882,38 +887,101 @@ bool iswalletused=false;
 
     String merchantCode = response['merchant_code'] ?? '';
 
+    String transactiondetails="Transaction ID : "+
+transactionId+"\n"+"Order ID : "+orderId+"Customer ID : "+customerId+"\n"+
+    "Transaction Date : "+txnDateTime+"\nmessage : "+statusMessage;
+
+    String paymentstatus="0";
 
     if(statusCode.compareTo("0300")==0)
       {
 
         if(statusMessage.compareTo("SUCCESS")==0)
           {
+            updateWalletBalance();
+            updateWalletPoints(orderid);
+            paymentstatus="1";
 
 
 
+updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
+
+
+            // For success
+            // showOrderDialog(context, true, "Your order  placed successfully!");
           }
         else{
-          ResponsiveInfo.showAlertDialog(context, "Savekart", "Payment failed");
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => HomeScreen()),
-                (Route<
-                dynamic> route) => false, // Remove all previous routes
-          );
+
+          paymentstatus="0";
+
+          updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
+
+          // ResponsiveInfo.showAlertDialog(context, "Savekart", "Payment failed");
+          // Navigator.of(context).pushAndRemoveUntil(
+          //   MaterialPageRoute(builder: (context) => HomeScreen()),
+          //       (Route<
+          //       dynamic> route) => false, // Remove all previous routes
+          // );
         }
 
       }
     else{
+      paymentstatus="0";
+      updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
 
-      ResponsiveInfo.showAlertDialog(context, "Savekart", "Payment failed");
+    }
+
+
+  }
+
+  updatePaymentStatus(String transactiondetails,String transactionid,String paymentstatus) async {
+
+    EcommerceApiHelper apihelper = new EcommerceApiHelper();
+
+    var t = EcommerceApiHelper.getTimeStamp();
+    Map<String, String> mp = new HashMap();
+    mp['orderid'] = orderid;
+    mp['transactiondetails'] = transactiondetails;
+    mp['transactionid'] = transactionid;
+    mp['payment_status'] = paymentstatus;
+
+    if(paymentstatus.compareTo("1")==0)
+      {
+
+        mp['description'] = "Transaction completed successfully";
+      }
+    else{
+      mp['description'] = "Transaction failed";
+
+    }
+
+
+    var response = await apihelper.post(
+        Apimethodes.updateOrderStaus + "?q=" + t.toString(),
+        formDataPayload: mp);
+    print(response);
+    var js = jsonDecode(response);
+
+
+
+    if(paymentstatus.compareTo("1")==0)
+      {
+        showOrderDialog(context, true, "Your order  placed successfully!");
+      }
+    else{
+    //  ResponsiveInfo.showAlertDialog(context, "Savekart", "Payment failed");
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => HomeScreen()),
             (Route<
             dynamic> route) => false, // Remove all previous routes
       );
+
     }
-
-
   }
+
+
+
+
   showPaymentStatus(String url)
   {
     Uri uri = Uri.parse(url);

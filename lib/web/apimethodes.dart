@@ -60,4 +60,5 @@ class Apimethodes{
     static String retryNewOrder="retryNewOrder.php";
    static String getPaymentCredentials="getPaymentCredentials.php";
    static String generateHash="generateHash.php";
+   static String updateOrderStaus="updateOrderStaus.php";
 }
