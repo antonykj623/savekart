@@ -47,6 +47,8 @@ bool iswalletused=false;
 
   String orderid="0";
 
+  WeiplCheckoutFlutter wlCheckoutFlutter = WeiplCheckoutFlutter();
+
   _PlaceOrderWidgetState(this._totalAmount);
 
   @override
@@ -59,7 +61,15 @@ bool iswalletused=false;
     calculateWalletBalance();
     EcommerceApiHelper.totalamount=_totalAmount;
     totalamount_to_paid=_totalAmount;
+    wlCheckoutFlutter.on(WeiplCheckoutFlutter.wlResponse, handleResponse);
   }
+
+  //
+  // @override
+  // void dispose() {
+  //   wlCheckoutFlutter.clear();
+  //   super.dispose();
+  // }
 
   getCartItems()async
   {
@@ -672,7 +682,7 @@ bool iswalletused=false;
      if(data['status']==1) {
        if (_totalAmount == 0 && paymenttype==3 ) {
 
-         updateWalletBalance();
+
 
          Uri uri = Uri.parse(data['data']);
 
@@ -681,9 +691,12 @@ bool iswalletused=false;
 
 
 
-         updateWalletPoints(idTransaction.toString());
+
 
          showOrderDialog(context, true, "Your order placed successfully!");
+
+         updateWalletPoints(idTransaction.toString());
+         updateWalletBalance();
        }
        else{
 
@@ -768,7 +781,7 @@ bool iswalletused=false;
 
 
 
-         WeiplCheckoutFlutter wlCheckoutFlutter = WeiplCheckoutFlutter();
+
 
          var reqJson = {
            "features": {
@@ -805,8 +818,7 @@ bool iswalletused=false;
            }
          };
 
-         wlCheckoutFlutter.on(
-             WeiplCheckoutFlutter.wlResponse, handleResponse);
+
          wlCheckoutFlutter.open(reqJson);
 
 
@@ -871,8 +883,9 @@ bool iswalletused=false;
 
   }
 
-  void handleResponse(Map<dynamic, dynamic> response) {
+  void handleResponse(dynamic response) {
  //  ResponsiveInfo.showAlertDialog(context, "Response", response.toString());
+    print(response);
     List<String> parts = response['msg']!.split('|');
     String statusCode = parts[0];              // 0300
     String statusMessage = parts[1];           // SUCCESS
