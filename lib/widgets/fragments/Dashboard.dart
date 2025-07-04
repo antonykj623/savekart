@@ -899,7 +899,7 @@ class _DashboardState extends State<Dashboard> {
          builder: (context) =>
              AlertDialog(
                title: Text("App Version"),
-               content: Text("Current Version: $version"),
+               content: Text("New version: $versionfromserver is available"),
                actions: [
                  (appversionfromserver > currentversion) ? TextButton(
                    onPressed: () async {

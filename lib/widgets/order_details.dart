@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:savekart/widgets/placeorder.dart';
+import 'package:weipl_checkout_flutter/weipl_checkout_flutter.dart';
 
 import '../design/ResponsiveInfo.dart';
 import '../domain/order_details_entity.dart';
@@ -45,7 +46,10 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
 
   ];
 
+  String orderid="0";
+
   OrderDetailsData orderDetailsData;
+  WeiplCheckoutFlutter wlCheckoutFlutter = WeiplCheckoutFlutter();
 
   _OrderItemDetailsScreenState(this.orderDetailsData);
 
@@ -86,6 +90,145 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
       _statusValue=3;
     }
     });
+
+    wlCheckoutFlutter.on(WeiplCheckoutFlutter.wlResponse, handleResponse);
+  }
+
+  void handleResponse(dynamic response) {
+    //  ResponsiveInfo.showAlertDialog(context, "Response", response.toString());
+    print(response);
+    List<String> parts = response['msg']!.split('|');
+    String statusCode = parts[0];              // 0300
+    String statusMessage = parts[1];           // SUCCESS
+    String description = parts[2];             // Verification SUCCESS Transaction
+    String transactionId = parts[3];           // 1234567
+    String orderId = parts[4];                 // 33570
+    String customerId = parts[5];              // 669013977
+    String amount = parts[6];                  // 1.00
+    String txnDateTime = parts[8];             // 27-06-2025 12:50:34
+    String uuid = parts[14];                   // 607369e3-68fe-4f9b-b3a4-fe0a2e7fd5a3
+    String hashValue = parts[15];              // Long hash string
+
+    String merchantCode = response['merchant_code'] ?? '';
+
+    String transactiondetails="Transaction ID : "+
+        transactionId+"\n"+"Order ID : "+orderId+"Customer ID : "+customerId+"\n"+
+        "Transaction Date : "+txnDateTime+"\nmessage : "+statusMessage;
+
+    String paymentstatus="0";
+
+    if(statusCode.compareTo("0300")==0)
+    {
+
+      if(statusMessage.compareTo("SUCCESS")==0)
+      {
+        updateWalletBalance();
+        updateWalletPoints(orderid);
+        paymentstatus="1";
+
+
+
+        updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
+
+
+        // For success
+        // showOrderDialog(context, true, "Your order  placed successfully!");
+      }
+      else{
+
+        paymentstatus="0";
+
+        updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
+
+        // ResponsiveInfo.showAlertDialog(context, "Savekart", "Payment failed");
+        // Navigator.of(context).pushAndRemoveUntil(
+        //   MaterialPageRoute(builder: (context) => HomeScreen()),
+        //       (Route<
+        //       dynamic> route) => false, // Remove all previous routes
+        // );
+      }
+
+    }
+    else{
+      paymentstatus="0";
+      updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
+
+    }
+
+
+  }
+
+  getWalletBalanceAndPoints()
+  async {
+    EcommerceApiHelper apihelper = new EcommerceApiHelper();
+
+    var t=EcommerceApiHelper.getTimeStamp();
+
+    var response= await  apihelper.get(Apimethodes.calculateWalletBallence+"?q="+t.toString());
+
+    var js= jsonDecode( response) ;
+    print(js);
+
+    WalletBalanceEntity entity=WalletBalanceEntity.fromJson(js);
+
+    if(entity!=null)
+    {
+
+      setState(() {
+
+        walletbalance=double.parse(entity.data!.balance.toString());
+      });
+
+
+    }
+
+
+
+  }
+
+  updatePaymentStatus(String transactiondetails,String transactionid,String paymentstatus) async {
+
+    EcommerceApiHelper apihelper = new EcommerceApiHelper();
+
+    var t = EcommerceApiHelper.getTimeStamp();
+    Map<String, String> mp = new HashMap();
+    mp['orderid'] = orderid;
+    mp['transactiondetails'] = transactiondetails;
+    mp['transactionid'] = transactionid;
+    mp['payment_status'] = paymentstatus;
+
+    if(paymentstatus.compareTo("1")==0)
+    {
+
+      mp['description'] = "Transaction completed successfully";
+    }
+    else{
+      mp['description'] = "Transaction failed";
+
+    }
+
+
+    var response = await apihelper.post(
+        Apimethodes.updateOrderStaus + "?q=" + t.toString(),
+        formDataPayload: mp);
+    print(response);
+    var js = jsonDecode(response);
+
+
+
+    if(paymentstatus.compareTo("1")==0)
+    {
+      showOrderDialog(context, true, "Your order  placed successfully!");
+    }
+    else{
+      //  ResponsiveInfo.showAlertDialog(context, "Savekart", "Payment failed");
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+            (Route<
+            dynamic> route) => false, // Remove all previous routes
+      );
+
+    }
   }
 
   @override
@@ -330,6 +473,9 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
       },
     );
   }
+
+
+
   PlaceOrder(String total,bool iswalletsused,String paidamount,int paymenttype,String walletamountused)async {
     ResponsiveInfo.ShowProgressDialog(context);
 
@@ -370,19 +516,118 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
       }
       else{
 
-        String urldata=data['data'];
+        // String urldata=data['data'];
+        Uri uri = Uri.parse(data['data']);
 
-        Completer c=Completer();
+        String? idTransaction = uri.queryParameters["id_transaction"];
+        orderid=idTransaction.toString();
+
+        ResponsiveInfo.ShowProgressDialog(context);
 
 
-        NativeBridge().redirectToNative(urldata,c);
-        var result= await c.future;
-        if(result!=null && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
-          showPaymentStatus(result);
-        }
-        else{
-          ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch your payment details");
-        }
+        EcommerceApiHelper apihelper = new EcommerceApiHelper();
+
+        var t=EcommerceApiHelper.getTimeStamp();
+
+        var response= await  apihelper.get(Apimethodes.getPaymentCredentials+"?q="+t.toString());
+
+        print(response);
+
+        Navigator.pop(context);
+
+        var data1 = jsonDecode(response);
+
+
+
+
+
+        String customerid=data1['customerid'];
+        String merchantcode=data1['merchantcode'];
+        String salt=data1['saltkey'];
+        String txnid=idTransaction.toString();
+
+        String a=    merchantcode+"|"+txnid+"|"+paidamount+"||"+customerid+"||||||||||||"+salt;
+
+
+
+        //fetching hash methode
+
+        ResponsiveInfo.ShowProgressDialog(context);
+
+        Map<String,String> mp=new HashMap();
+        mp['data']=a;
+
+        EcommerceApiHelper apihelper1= new EcommerceApiHelper();
+
+        var t1=EcommerceApiHelper.getTimeStamp();
+
+        var response1= await  apihelper1.post(Apimethodes.generateHash+"?q="+t1.toString(),formDataPayload:mp );
+
+        print(response1);
+
+        Navigator.pop(context);
+
+        String d1 = jsonDecode(response1);
+
+        Map<String, dynamic> data2=  jsonDecode(d1)  ;
+
+        String value = data2["value"];
+        print(value);
+
+
+
+
+
+        var reqJson = {
+          "features": {
+            "enableAbortResponse": true,
+            "enableExpressPay": true,
+            "enableInstrumentDeRegistration": true,
+            "enableMerTxnDetails": true
+          },
+          "consumerData": {
+            "deviceId": "AndroidSH2",
+            "token":value,
+            "paymentMode": "all",
+            "merchantLogoUrl":
+            "https://mysaveapp.com/ic_launcher.png",
+            "merchantId": merchantcode,
+            "currency": "INR",
+            "consumerId": customerid,
+            "consumerMobileNo": "",
+            "consumerEmailId": "",
+            "txnId":txnid, //Unique merchant transaction ID
+            "items": [
+              {"itemId": "first", "amount": paidamount, "comAmt": "0"}
+            ],
+            "customStyle": {
+              "PRIMARY_COLOR_CODE":
+              "#0B7D97", //merchant primary color code
+              "SECONDARY_COLOR_CODE":
+              "#FFFFFF", //provide merchant's suitable color code
+              "BUTTON_COLOR_CODE_1":
+              "#0B7D97", //merchant"s button background color code
+              "BUTTON_COLOR_CODE_2":
+              "#FFFFFF" //provide merchant's suitable color code for button text
+            }
+          }
+        };
+
+
+        wlCheckoutFlutter.open(reqJson);
+
+
+       // Completer c=Completer();
+
+
+        // NativeBridge().redirectToNative(urldata,c);
+        // var result= await c.future;
+        // if(result!=null && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
+        //   showPaymentStatus(result);
+        // }
+        // else{
+        //   ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch your payment details");
+        // }
 
       }
     }
@@ -390,6 +635,9 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
 
 
   }
+
+
+
   updateWalletBalance()async
   {
     if(iswalletused) {
