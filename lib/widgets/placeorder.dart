@@ -651,6 +651,23 @@ bool iswalletused=false;
 
   PlaceOrder(String total,bool iswalletsused,String paidamount,int paymenttype,String walletamountused)async{
 
+    String email="",phone="";
+    ResponsiveInfo.ShowProgressDialog(context);
+    Map<String,String> m=new HashMap();
+    ApiHelper apihelper1 = new ApiHelper();
+
+    var response2= await  apihelper1.post(Apimethodes.getUserDetails,formDataPayload: m);
+    var js= jsonDecode(jsonDecode(response2)) ;
+    ProfileDataEntity entity=ProfileDataEntity.fromJson(js);
+    email=entity.data!.emailId.toString();
+    phone=entity.data!.mobile.toString();
+
+    Navigator.pop(context);
+
+
+
+
+
 
      ResponsiveInfo.ShowProgressDialog(context);
 
@@ -751,8 +768,9 @@ bool iswalletused=false;
          String salt=data1['saltkey'];
          String txnid=idTransaction.toString();
 
-         String a=    merchantcode+"|"+txnid+"|"+paidamount+"||"+customerid+"||||||||||||"+salt;
+         String a=    merchantcode+"|"+txnid+"|"+paidamount+"||"+customerid+"|"+phone+"|"+email+"||||||||||"+salt;
 
+        // String a=    merchantId+"|"+randomNumber+"|1||"+consumerId+"|"+consumerMobileNo+"|"+consumerEmailId+"||||||||||1178920237UGKJGI";
 
 
          //fetching hash methode
@@ -799,8 +817,8 @@ bool iswalletused=false;
              "merchantId": merchantcode,
              "currency": "INR",
              "consumerId": customerid,
-             "consumerMobileNo": "",
-             "consumerEmailId": "",
+             "consumerMobileNo": phone,
+             "consumerEmailId": email,
              "txnId":txnid, //Unique merchant transaction ID
              "items": [
                {"itemId": "first", "amount": paidamount, "comAmt": "0"}

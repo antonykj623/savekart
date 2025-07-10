@@ -896,9 +896,11 @@ class _DashboardState extends State<Dashboard> {
      if (appversionfromserver>currentversion) {
        showDialog(
          context: context,
+         barrierDismissible: false,
          builder: (context) =>
              AlertDialog(
                title: Text("App Version"),
+
                content: Text("New version: $versionfromserver is available"),
                actions: [
                  (appversionfromserver > currentversion) ? TextButton(
@@ -915,10 +917,7 @@ class _DashboardState extends State<Dashboard> {
                    },
                    child: Text("Update"),
                  ) : Container(),
-                 TextButton(
-                   onPressed: () => Navigator.pop(context),
-                   child: Text("Close"),
-                 ),
+
                ],
              ),
        );

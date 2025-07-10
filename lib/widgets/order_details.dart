@@ -10,7 +10,9 @@ import 'package:weipl_checkout_flutter/weipl_checkout_flutter.dart';
 
 import '../design/ResponsiveInfo.dart';
 import '../domain/order_details_entity.dart';
+import '../domain/profile_data_entity.dart';
 import '../domain/wallet_balance_entity.dart';
+import '../web/api_helper.dart';
 import '../web/apimethodes.dart';
 import '../web/ecommerce_api_helper.dart';
 import 'Home.dart';
@@ -516,6 +518,20 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
       }
       else{
 
+        String email="",phone="";
+        ResponsiveInfo.ShowProgressDialog(context);
+        Map<String,String> m=new HashMap();
+        ApiHelper apihelper3 = new ApiHelper();
+
+        var response2= await  apihelper3.post(Apimethodes.getUserDetails,formDataPayload: m);
+        var js= jsonDecode(jsonDecode(response2)) ;
+        ProfileDataEntity entity=ProfileDataEntity.fromJson(js);
+        email=entity.data!.emailId.toString();
+        phone=entity.data!.mobile.toString();
+
+        Navigator.pop(context);
+
+
         // String urldata=data['data'];
         Uri uri = Uri.parse(data['data']);
 
@@ -546,7 +562,7 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
         String salt=data1['saltkey'];
         String txnid=idTransaction.toString();
 
-        String a=    merchantcode+"|"+txnid+"|"+paidamount+"||"+customerid+"||||||||||||"+salt;
+        String a=    merchantcode+"|"+txnid+"|"+paidamount+"||"+customerid+"|"+phone+"|"+email+"||||||||||"+salt;
 
 
 
@@ -594,8 +610,8 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
             "merchantId": merchantcode,
             "currency": "INR",
             "consumerId": customerid,
-            "consumerMobileNo": "",
-            "consumerEmailId": "",
+            "consumerMobileNo": phone,
+            "consumerEmailId": email,
             "txnId":txnid, //Unique merchant transaction ID
             "items": [
               {"itemId": "first", "amount": paidamount, "comAmt": "0"}

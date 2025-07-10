@@ -43,7 +43,60 @@ class _ProfileState extends State<Profile> {
     // TODO: implement initState
     super.initState();
     getProfile();
+    getAppUpdates();
   }
+
+
+  getAppUpdates()async{
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+
+    String version = packageInfo.version;
+
+
+    EcommerceApiHelper apihelper=new EcommerceApiHelper();
+    var t=EcommerceApiHelper.getTimeStamp();
+    var response1= await  apihelper.get(Apimethodes.getCartUpdate+"?q="+t.toString());
+    AppVersionEntity appversion=AppVersionEntity.fromJson(jsonDecode(response1));
+    if(appversion.status==1) {
+
+      double currentversion=double.parse(version);
+      String versionfromserver=appversion.data!.version.toString();
+      double appversionfromserver=double.parse(versionfromserver);
+
+      if (appversionfromserver>currentversion) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) =>
+              AlertDialog(
+                title: Text("App Version"),
+
+                content: Text("New version: $versionfromserver is available"),
+                actions: [
+                  (appversionfromserver > currentversion) ? TextButton(
+                    onPressed: () async {
+                      final Uri url = Uri.parse(
+                          "https://play.google.com/store/apps/details?id=com.integra.savekart"); // Change URL based on platform
+
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(
+                            url, mode: LaunchMode.externalApplication);
+                      } else {
+                        throw "Could not launch $url";
+                      }
+                    },
+                    child: Text("Update"),
+                  ) : Container(),
+
+                ],
+              ),
+        );
+      }
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
