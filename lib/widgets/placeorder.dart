@@ -687,169 +687,175 @@ bool iswalletused=false;
 
 
 
-    var response= await  apihelper.post(Apimethodes.createOrder+"?q="+t.toString(),formDataPayload: mp);
+    var response4= await  apihelper.post(Apimethodes.createOrder+"?q="+t.toString(),formDataPayload: mp);
  Navigator.pop(context);
 
- print(response);
-
-     String d = jsonDecode(response);
-
-     Map<String, dynamic> data=  jsonDecode(d)  ;
-
-     if(data['status']==1) {
-       if (_totalAmount == 0 && paymenttype==3 ) {
+ print(response4);
 
 
 
-         Uri uri = Uri.parse(data['data']);
+    if (_totalAmount == 0 && paymenttype==3 ) {
+      String d = jsonDecode(response4);
 
-         String? idTransaction = uri.queryParameters["id_transaction"];
-         orderid=idTransaction.toString();
+      Map<String, dynamic> data=  jsonDecode(d)  ;
 
+      if(data['status']==1) {
+        String idTransaction = data['data'].toString();
+        orderid=idTransaction.toString();
 
-
-
-
-         showOrderDialog(context, true, "Your order placed successfully!");
-
-         updateWalletPoints(idTransaction.toString());
-         updateWalletBalance();
-       }
-       else{
-
-         Uri uri = Uri.parse(data['data']);
-
-         String? idTransaction = uri.queryParameters["id_transaction"];
-         orderid=idTransaction.toString();
-
-         // String urldata=data['data'];
-
-         //Completer c=Completer();
-         //
-         //
-         // NativeBridge().redirectToNative(urldata,c);
-         // var result= await c.future;
-         // if(result!=null&&result.toString().isNotEmpty && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
-         //   showPaymentStatus(result);
-         // }
-         // else{
-         //   ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch your payment details");
-         //   Navigator.of(context).pushAndRemoveUntil(
-         //     MaterialPageRoute(builder: (context) => HomeScreen()),
-         //         (Route<
-         //         dynamic> route) => false, // Remove all previous routes
-         //   );
-         // }
-
-
-         //fetching transaction credentials
-
-         ResponsiveInfo.ShowProgressDialog(context);
-
-
-         EcommerceApiHelper apihelper = new EcommerceApiHelper();
-
-         var t=EcommerceApiHelper.getTimeStamp();
-
-         var response= await  apihelper.get(Apimethodes.getPaymentCredentials+"?q="+t.toString());
-
-         print(response);
-
-         Navigator.pop(context);
-
-         var data1 = jsonDecode(response);
+        updateWalletPoints(idTransaction.toString());
+        updateWalletBalance();
 
 
 
+        showOrderDialog(context, true, "Your order placed successfully!");
+
+      }
+      else{
+        //  ResponsiveInfo.showAlertDialog(context, "Savekart", "Something went wrong");
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+              (Route<
+              dynamic> route) => false, // Remove all previous routes
+        );
+      }
+
+    }
+    else{
+
+      String d = jsonDecode(response4);
+
+      Map<String, dynamic> data=  jsonDecode(d)  ;
+
+      if(data['status']==1) {
+        String d = jsonDecode(response4);
+
+        Map<String, dynamic> data = jsonDecode(d);
+        Uri uri = Uri.parse(data['data']);
+
+        String? idTransaction = uri.queryParameters["id_transaction"];
+        orderid = idTransaction.toString();
+
+        // String urldata=data['data'];
+
+        //Completer c=Completer();
+        //
+        //
+        // NativeBridge().redirectToNative(urldata,c);
+        // var result= await c.future;
+        // if(result!=null&&result.toString().isNotEmpty && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
+        //   showPaymentStatus(result);
+        // }
+        // else{
+        //   ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch your payment details");
+        //   Navigator.of(context).pushAndRemoveUntil(
+        //     MaterialPageRoute(builder: (context) => HomeScreen()),
+        //         (Route<
+        //         dynamic> route) => false, // Remove all previous routes
+        //   );
+        // }
 
 
-         String customerid=data1['customerid'];
-         String merchantcode=data1['merchantcode'];
-         String salt=data1['saltkey'];
-         String txnid=idTransaction.toString();
+        //fetching transaction credentials
 
-         String a=    merchantcode+"|"+txnid+"|"+paidamount+"||"+customerid+"|"+phone+"|"+email+"||||||||||"+salt;
+        ResponsiveInfo.ShowProgressDialog(context);
+
+
+        EcommerceApiHelper apihelper = new EcommerceApiHelper();
+
+        var t = EcommerceApiHelper.getTimeStamp();
+
+        var response = await apihelper.get(
+            Apimethodes.getPaymentCredentials + "?q=" + t.toString());
+
+        print(response);
+
+        Navigator.pop(context);
+
+        var data1 = jsonDecode(response);
+
+
+        String customerid = data1['customerid'];
+        String merchantcode = data1['merchantcode'];
+        String salt = data1['saltkey'];
+        String txnid = idTransaction.toString();
+
+        String a = merchantcode + "|" + txnid + "|" + paidamount + "||" +
+            customerid + "|" + phone + "|" + email + "||||||||||" + salt;
 
         // String a=    merchantId+"|"+randomNumber+"|1||"+consumerId+"|"+consumerMobileNo+"|"+consumerEmailId+"||||||||||1178920237UGKJGI";
 
 
-         //fetching hash methode
+        //fetching hash methode
 
-         ResponsiveInfo.ShowProgressDialog(context);
+        ResponsiveInfo.ShowProgressDialog(context);
 
-         Map<String,String> mp=new HashMap();
-         mp['data']=a;
+        Map<String, String> mp = new HashMap();
+        mp['data'] = a;
 
-         EcommerceApiHelper apihelper1= new EcommerceApiHelper();
+        EcommerceApiHelper apihelper1 = new EcommerceApiHelper();
 
-         var t1=EcommerceApiHelper.getTimeStamp();
+        var t1 = EcommerceApiHelper.getTimeStamp();
 
-         var response1= await  apihelper1.post(Apimethodes.generateHash+"?q="+t1.toString(),formDataPayload:mp );
+        var response1 = await apihelper1.post(
+            Apimethodes.generateHash + "?q=" + t1.toString(),
+            formDataPayload: mp);
 
-         print(response1);
+        print(response1);
 
-         Navigator.pop(context);
+        Navigator.pop(context);
 
-         String d1 = jsonDecode(response1);
+        String d1 = jsonDecode(response1);
 
-         Map<String, dynamic> data2=  jsonDecode(d1)  ;
+        Map<String, dynamic> data2 = jsonDecode(d1);
 
-         String value = data2["value"];
-         print(value);
-
-
-
-
-
-         var reqJson = {
-           "features": {
-             "enableAbortResponse": true,
-             "enableExpressPay": true,
-             "enableInstrumentDeRegistration": true,
-             "enableMerTxnDetails": true
-           },
-           "consumerData": {
-             "deviceId": "AndroidSH2",
-             "token":value,
-             "paymentMode": "all",
-             "merchantLogoUrl":
-             "https://mysaveapp.com/ic_launcher.png",
-             "merchantId": merchantcode,
-             "currency": "INR",
-             "consumerId": customerid,
-             "consumerMobileNo": phone,
-             "consumerEmailId": email,
-             "txnId":txnid, //Unique merchant transaction ID
-             "items": [
-               {"itemId": "first", "amount": paidamount, "comAmt": "0"}
-             ],
-             "customStyle": {
-               "PRIMARY_COLOR_CODE":
-               "#0B7D97", //merchant primary color code
-               "SECONDARY_COLOR_CODE":
-               "#FFFFFF", //provide merchant's suitable color code
-               "BUTTON_COLOR_CODE_1":
-               "#0B7D97", //merchant"s button background color code
-               "BUTTON_COLOR_CODE_2":
-               "#FFFFFF" //provide merchant's suitable color code for button text
-             }
-           }
-         };
+        String value = data2["value"];
+        print(value);
 
 
-         wlCheckoutFlutter.open(reqJson);
+        var reqJson = {
+          "features": {
+            "enableAbortResponse": true,
+            "enableExpressPay": true,
+            "enableInstrumentDeRegistration": true,
+            "enableMerTxnDetails": true
+          },
+          "consumerData": {
+            "deviceId": "AndroidSH2",
+            "token": value,
+            "paymentMode": "all",
+            "merchantLogoUrl":
+            "https://mysaveapp.com/ic_launcher.png",
+            "merchantId": merchantcode,
+            "currency": "INR",
+            "consumerId": customerid,
+            "consumerMobileNo": phone,
+            "consumerEmailId": email,
+            "txnId": txnid, //Unique merchant transaction ID
+            "items": [
+              {"itemId": "first", "amount": paidamount, "comAmt": "0"}
+            ],
+            "customStyle": {
+              "PRIMARY_COLOR_CODE":
+              "#0B7D97", //merchant primary color code
+              "SECONDARY_COLOR_CODE":
+              "#FFFFFF", //provide merchant's suitable color code
+              "BUTTON_COLOR_CODE_1":
+              "#0B7D97", //merchant"s button background color code
+              "BUTTON_COLOR_CODE_2":
+              "#FFFFFF" //provide merchant's suitable color code for button text
+            }
+          }
+        };
 
 
-       }
-     }
-     else{
-     //  ResponsiveInfo.showAlertDialog(context, "Savekart", "Something went wrong");
-       Navigator.of(context).pushAndRemoveUntil(
-         MaterialPageRoute(builder: (context) => HomeScreen()),
-             (Route<
-             dynamic> route) => false, // Remove all previous routes
-       );
-     }
+        wlCheckoutFlutter.open(reqJson);
+      }
+
+
+    }
+
+
 
 
 
@@ -919,7 +925,7 @@ bool iswalletused=false;
     String merchantCode = response['merchant_code'] ?? '';
 
     String transactiondetails="Transaction ID : "+
-transactionId+"\n"+"Order ID : "+orderId+"Customer ID : "+customerId+"\n"+
+transactionId+"\n"+"Order ID : "+orderId+"\nCustomer ID : "+customerId+"\n"+
     "Transaction Date : "+txnDateTime+"\nmessage : "+statusMessage;
 
     String paymentstatus="0";
@@ -959,6 +965,12 @@ updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
     else{
       paymentstatus="0";
       updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+            (Route<
+            dynamic> route) => false, // Remove all previous routes
+      );
 
     }
 

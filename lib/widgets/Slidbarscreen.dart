@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:savekart/web/api_helper.dart';
@@ -22,14 +24,28 @@ class _SlidbarrState extends State<Slidbar> {
   List<CartBannersData> bannersdata = [];
 
   List<Widget>w=[];
-
+  Timer? _timer;
   _SlidbarrState(this.bannersdata);
-
+  PageController _pageController = PageController();
+  int _currentPage = 0;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 loadData();
+    _timer = Timer.periodic(Duration(seconds: 2), (Timer timer) {
+      if (AdsCurrentIndex < w.length - 1) {
+        AdsCurrentIndex++;
+      } else {
+        AdsCurrentIndex = 0;
+      }
+      _pageController.animateToPage(
+        AdsCurrentIndex,
+        duration: Duration(milliseconds: 600),
+        curve: Curves.easeInOut,
+      );
+    });
+
 
   }
 
@@ -38,40 +54,45 @@ loadData();
 
 
 
-    return
-       Column(
-        children: [
-             CarouselSlider( options: CarouselOptions(
-              autoPlayCurve: Curves.fastOutSlowIn,
-              autoPlayAnimationDuration: Duration(microseconds: 800),
-              autoPlayInterval: Duration(seconds: 2),
-              autoPlay: true,
-            //  height: 200,
-              enlargeCenterPage: true,
-              aspectRatio: 2,
 
-              onPageChanged: (index, reason) {
-                setState(() {
-                  AdsCurrentIndex = index;
-                });
-              },
-             ),
-             items: w,
-             ),
-             AnimatedSmoothIndicator(activeIndex: AdsCurrentIndex,
-              count: bannersdata.length,
-              effect: 
-              WormEffect(
-                dotWidth: 12,
-                dotHeight: 12,
-                dotColor: Colors.grey,
-               // spacing: 2,
-                activeDotColor: Colors.black,
-                paintStyle: PaintingStyle.fill
-                ),
-              )
-        ],
-      )
+
+    return (w.length>0)? Column(
+      children: [
+        SizedBox(
+          height: 200, // Adjust height as needed
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: bannersdata.length,
+            onPageChanged: (index) {
+              setState(() {
+                AdsCurrentIndex = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return Transform.scale(
+                scale: AdsCurrentIndex == index ? 1.0 : 0.9,
+                child: w[index],  // Assuming `w` contains the widgets/images
+              );
+            },
+          ),
+        ),
+        SizedBox(height: 10),
+        AnimatedSmoothIndicator(
+          activeIndex: AdsCurrentIndex,
+          count: bannersdata.length,
+          effect: WormEffect(
+            dotWidth: 12,
+            dotHeight: 12,
+            dotColor: Colors.grey,
+            activeDotColor: Colors.black,
+            paintStyle: PaintingStyle.fill,
+          ),
+        ),
+      ],
+    ):Container();
+
+
+
     ;
   }
 
@@ -93,14 +114,21 @@ loadData();
 
           print("Slider url : "+ApiHelper.bannerimageurl+ cbd.imageFile.toString());
 
-          w.add(Image.network(ApiHelper.bannerimageurl+ cbd.imageFile.toString()+"?q="+t,width: screenWidth,
-            height: screenWidth/2, loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child; // Image loaded successfully
-              return Center(child: CircularProgressIndicator()); // Show loader while loading
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return Icon(Icons.image,size: 60,color: Colors.black26,); // Show a local placeholder on error
-            },fit: BoxFit.fill) );
+          w.add(Card(
+            elevation: 10,
+
+            child: Image.network(ApiHelper.bannerimageurl+ cbd.imageFile.toString()+"?q="+t,width: screenWidth,
+                height: screenWidth/2, loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child; // Image loaded successfully
+                  return Center(child: CircularProgressIndicator()); // Show loader while loading
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.image,size: 60,color: Colors.black26,); // Show a local placeholder on error
+                },fit: BoxFit.fill) ,
+          )
+
+
+              );
         }
       });
       // Safe to use context here

@@ -241,10 +241,15 @@ class _ProfileState extends State<Profile> {
 
       ) ,
     ),
-                    onTap: (){
-      ResponsiveInfo.showAlertDialog(context, "SaveKart", "Help Desk  No, : "+"9946109501");
+                    onTap: () async {
+      ////ResponsiveInfo.showAlertDialog(context, "SaveKart", "Help Desk  No, : "+"9946109501");
 
 
+      final Uri url = Uri.parse('https://wa.me/919946109501');
+
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                      throw 'Could not launch $url';
+                      }
 
                     },
     )

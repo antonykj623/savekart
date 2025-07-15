@@ -16,6 +16,18 @@ class ZoomableImageScreen extends StatefulWidget {
 }
 
 class ZoomableImageScreenState extends State<ZoomableImageScreen> {
+
+  double _rotateX = 0;
+  double _rotateY = 0;
+
+  void _onPanUpdate(DragUpdateDetails details) {
+    setState(() {
+      _rotateY += details.delta.dx * 0.01;
+      _rotateX -= details.delta.dy * 0.01;
+    });
+  }
+
+
    String imageUrl ;
    List<String>images=[];
    List<Widget>w=[];
@@ -68,6 +80,16 @@ class ZoomableImageScreenState extends State<ZoomableImageScreen> {
             maxScale: 5.0,
             // Maximum zoom level
             child:
+            //
+            // GestureDetector(
+            //   onPanUpdate: _onPanUpdate,
+            //   child: Transform(
+            //     transform: Matrix4.identity()
+            //       ..setEntry(3, 2, 0.001) // perspective
+            //       ..rotateX(_rotateX)
+            //       ..rotateY(_rotateY),
+            //     alignment: FractionalOffset.center,
+            //     child:
 
 
 
@@ -78,7 +100,7 @@ class ZoomableImageScreenState extends State<ZoomableImageScreen> {
             },
               errorBuilder: (context, error, stackTrace) {
                 return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-              },),
+              },) ,
           ),flex: 4, ),
 
           Expanded(child:   Padding(padding: EdgeInsets.all(5),
