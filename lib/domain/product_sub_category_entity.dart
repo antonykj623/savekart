@@ -1,3 +1,4 @@
+import 'package:savekart/domain/product_details_entity.dart';
 import 'package:savekart/generated/json/base/json_field.dart';
 import 'package:savekart/generated/json/product_sub_category_entity.g.dart';
 import 'dart:convert';
@@ -106,6 +107,10 @@ class ProductSubCategoryDataData {
 	ProductSubCategoryDataData();
 
 	factory ProductSubCategoryDataData.fromJson(Map<String, dynamic> json) => $ProductSubCategoryDataDataFromJson(json);
+
+  ProductDetailsData get data => data;
+
+
 
 	Map<String, dynamic> toJson() => $ProductSubCategoryDataDataToJson(this);
 

@@ -37,6 +37,7 @@ class CartProductsData {
 	String? primeImage = '';
 	String? size = '';
 	String? current_qty='';
+	String? product_id='';
 
 	CartProductsData();
 

@@ -23,6 +23,7 @@ class Apimethodes{
    static String deleteAddress="deleteAddress.php";
    static String deleteFromCart="deleteFromCart.php";
    static String createOrder="createOrder.php";
+   static String getProductDetails="getProductDetails.php";
 
    static String getOrders="getOrders.php";
     static String getUserDetails="getUserDetails.php";

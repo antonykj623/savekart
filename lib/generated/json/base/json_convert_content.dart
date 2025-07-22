@@ -19,6 +19,7 @@ import 'package:savekart/domain/pg_response_entity.dart';
 import 'package:savekart/domain/points_entity.dart';
 import 'package:savekart/domain/product_by_category_entity.dart';
 import 'package:savekart/domain/product_count_entity.dart';
+import 'package:savekart/domain/product_details_entity.dart';
 import 'package:savekart/domain/product_stock_entity.dart';
 import 'package:savekart/domain/product_sub_category_entity.dart';
 import 'package:savekart/domain/products_entity.dart';
@@ -328,6 +329,14 @@ class JsonConvert {
       return data.map<ProductCountData>((Map<String, dynamic> e) =>
           ProductCountData.fromJson(e)).toList() as M;
     }
+    if (<ProductDetailsEntity>[] is M) {
+      return data.map<ProductDetailsEntity>((Map<String, dynamic> e) =>
+          ProductDetailsEntity.fromJson(e)).toList() as M;
+    }
+    if (<ProductDetailsData>[] is M) {
+      return data.map<ProductDetailsData>((Map<String, dynamic> e) =>
+          ProductDetailsData.fromJson(e)).toList() as M;
+    }
     if (<ProductStockEntity>[] is M) {
       return data.map<ProductStockEntity>((Map<String, dynamic> e) =>
           ProductStockEntity.fromJson(e)).toList() as M;
@@ -552,6 +561,8 @@ class JsonConvertClassCollection {
     (ProductByCategoryDataData).toString(): ProductByCategoryDataData.fromJson,
     (ProductCountEntity).toString(): ProductCountEntity.fromJson,
     (ProductCountData).toString(): ProductCountData.fromJson,
+    (ProductDetailsEntity).toString(): ProductDetailsEntity.fromJson,
+    (ProductDetailsData).toString(): ProductDetailsData.fromJson,
     (ProductStockEntity).toString(): ProductStockEntity.fromJson,
     (ProductStockData).toString(): ProductStockData.fromJson,
     (ProductSubCategoryEntity).toString(): ProductSubCategoryEntity.fromJson,

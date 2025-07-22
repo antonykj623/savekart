@@ -3,9 +3,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:savekart/widgets/placeorder.dart';
+import 'package:savekart/widgets/product_details.dart';
 
 import '../design/ResponsiveInfo.dart';
 import '../domain/cart_products_entity.dart';
+import '../domain/product_details_entity.dart';
+import '../domain/product_sub_category_entity.dart';
 import '../web/AppStorage.dart';
 import '../web/apimethodes.dart';
 import '../web/ecommerce_api_helper.dart';
@@ -75,20 +78,82 @@ class _CounterScreenState extends State<CartScreen> {
                     height: ResponsiveInfo.isMobile(context)?180:230,
                     color: Colors.white60,
                     child:Column(
-                      
+
                       children: [
                         Expanded(child: ListTile(
-                          leading: Image.network(EcommerceApiHelper.productimageurl+cartItems[index].primeImage.toString(),width: ResponsiveInfo.isMobile(context)?50:60,
-                            height: ResponsiveInfo.isMobile(context)?50:60,fit: BoxFit.fill,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child; // Image loaded successfully
-                              return Center(child: CircularProgressIndicator()); // Show loader while loading
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-                            },
+                          leading: GestureDetector(
 
-                          ),
+                        child:Image.network(EcommerceApiHelper.productimageurl+cartItems[index].primeImage.toString(),width: ResponsiveInfo.isMobile(context)?50:60,
+                          height: ResponsiveInfo.isMobile(context)?50:60,fit: BoxFit.fill,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child; // Image loaded successfully
+                            return Center(child: CircularProgressIndicator()); // Show loader while loading
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
+                          },
+
+                        ),
+                            onTap: () async {
+
+                          ResponsiveInfo.showLoaderDialog(context);
+
+                              EcommerceApiHelper apihelper = new EcommerceApiHelper();
+
+                              var t = EcommerceApiHelper.getTimeStamp();
+
+                              var response = await apihelper.get(
+                                  Apimethodes.getProductDetails + "?id=" +
+                                      item.product_id.toString() + "&q=" + t.toString());
+
+                              Navigator.pop(context);
+
+                              print(response);
+
+                              var js = jsonDecode(response);
+
+                              ProductDetailsEntity pbc1=ProductDetailsEntity.fromJson(js);
+
+                              if(pbc1.status==1)
+                                {
+                                  ProductDetailsData pb=pbc1!.data![0];
+
+                                  ProductSubCategoryDataData pbc=new ProductSubCategoryDataData();
+                                  pbc.id=pb.id;
+                                  pbc.productCode=pb.productCode;
+                                  pbc.primeImage=pb.primeImage;
+                                  pbc.productName=pb.productName;
+                                  pbc.status=pb.status;
+                                  pbc.productSpec=pb.productSpec;
+                                  pbc.productDescription=pb.productDescription;
+                                  pbc.sideImage4=pb.sideImage4;
+                                  pbc.sideImage3=pb.sideImage3;
+                                  pbc.sideImage2=pb.sideImage2;
+                                  pbc.sideImage1=pb.sideImage1;
+                                  pbc.categoryId=pb.categoryId;
+                                  pbc.color=pb.color;
+                                  pbc.colorEnabled=pb.colorEnabled;
+                                  pbc.size=pb.size;
+                                  pbc.sizeEnabled=pb.sizeEnabled;
+                                  pbc.subCategoryId=pb.subCategoryId;
+                                  pbc.unitId=pb.unitId;
+                                  pbc.vendorId=pb.vendorId;
+
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder:
+                                          (context) =>
+                                          ProductDetails(pbc)
+                                      )
+                                  );
+
+                                }
+
+
+
+                            },
+                    )
+
+                          ,
                           title: Text(item.productName.toString()+"\n"+item.size.toString(),style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:16,color: Colors.black,),maxLines: 3,),
                           subtitle: Text( (item.pointsRedeemed.toString().compareTo("1")==0) ? item.price.toString()   :   item.savekartprice.toString()+"\n"
                           ),
@@ -112,7 +177,7 @@ class _CounterScreenState extends State<CartScreen> {
                             },
                           ),
                         ),flex: 1,),
-                        
+
                         Expanded(child: Stack(
 
                           children: [
@@ -175,15 +240,15 @@ class _CounterScreenState extends State<CartScreen> {
                           ],
 
                         ),flex: 1,)
-                        
-                        
+
+
                       ],
                     ) ,
-                    
+
                   )
-                  
-                  
-                  
+
+
+
                 );
               },
             ),
