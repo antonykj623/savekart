@@ -398,73 +398,26 @@ class _DashboardState extends State<Dashboard> {
 
 
 
-        // (data.length>0)?  Trendingbrands(data):Container(),
-        //
-        //
-        // (subcategorydata!.length>0)? Padding(padding: EdgeInsets.all(10),
-        //
-        // child: Text("Your Favourites",style: TextStyle(color: Colors.black,fontSize: 15,fontWeight: FontWeight.bold),),
-        // ) : Container(),
-        //
-        // (subcategorydata!.length>0)? Container(
-        //   width: double.infinity,
-        //   height: MediaQuery.of(context).size.width/1.6,
-        //   child: GridView.count(
-        //       crossAxisCount: 4,
-        //       crossAxisSpacing: 4.0,
-        //       mainAxisSpacing: 8.0,
-        //       childAspectRatio: 0.7,
-        //       shrinkWrap: true,
-        //       primary: false,
-        //       children: List.generate(subcategorydata!.length, (index) {
-        //         return Container(
-        //
-        //
-        //           child: Column(
-        //             mainAxisAlignment: MainAxisAlignment.center,
-        //             crossAxisAlignment: CrossAxisAlignment.center,
-        //             children: [
-        //
-        //               Container(
-        //                 width: ResponsiveInfo.isMobile(context)? 50:70,
-        //                 height: ResponsiveInfo.isMobile(context)? 50:70,
-        //                 child: Center(
-        //                   child:Image.network(EcommerceApiHelper.categoryimageurl+ subcategorydata[index].image.toString(),width: ResponsiveInfo.isMobile(context)?50:60,
-        //                     height: ResponsiveInfo.isMobile(context)?50:60,) ,
-        //                 ),
-        //                 decoration: BoxDecoration(
-        //                   shape: BoxShape.circle,
-        //                   color: Colors.transparent,
-        //                 ),
-        //               ),
-        //
-        //
-        //               Text(subcategorydata[index].subCategoryName.toString(),maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 10:13,fontWeight: FontWeight.bold),
-        //                 textAlign: TextAlign.center,
-        //               ),
-        //
-        //             ],
-        //           ),
-        //         );
-        //       }
-        //       )
-        //   ),
-        // ) : Container(),
-
 
         (productbycategorydata.length>0)? ListView.builder(
             itemCount: productbycategorydata.length,
             shrinkWrap: true,
             primary: false,
             itemBuilder: (BuildContext context, int index) {
+              //
+              // List<ProductSubCategoryDataData> data =
+              // productbycategorydata[index].data!
 
               List<ProductSubCategoryDataData> data =
-              productbycategorydata[index].data!;
+              productbycategorydata[index].data!.length > 15
+                  ? productbycategorydata[index].data!.sublist(0, 15)
+                  : productbycategorydata[index].data!;
+
 
               List<List<ProductSubCategoryDataData>> chunkedList = [];
               int chunkSize = 5;
 
-              if(productbycategorydata[index].data!.length>5) {
+              if(data.length>5) {
                 for (int i = 0; i < data.length; i += chunkSize) {
                   int end = (i + chunkSize < data.length) ? i + chunkSize : data
                       .length;
@@ -472,16 +425,16 @@ class _DashboardState extends State<Dashboard> {
                 }
               }
 
-              return (productbycategorydata[index].data!.length<=5)?Container(
+              return (data.length<=5)?Container(
                   width: double.infinity,
-                  height: ResponsiveInfo.isMobile(context)? 270 :320,
+                  height: ResponsiveInfo.isMobile(context)? 260 :320,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
 
-                      Padding(padding: EdgeInsets.all(10),
+                      Padding(padding: EdgeInsets.all(5),
                           child:Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -515,7 +468,7 @@ class _DashboardState extends State<Dashboard> {
 
                       ),
 
-                      Padding(padding: EdgeInsets.all(10),
+                      Padding(padding: EdgeInsets.all(5),
 
                         child: Container(
                             width: double.infinity,
@@ -524,7 +477,7 @@ class _DashboardState extends State<Dashboard> {
                               shrinkWrap: true,
                               primary: false,
                               scrollDirection: Axis.horizontal,
-                              itemCount: productbycategorydata[index].data!.length,
+                              itemCount: data.length,
                               itemBuilder: (BuildContext context, int i) => GestureDetector(
 
                                 child:Padding(padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?5:10, 0, ResponsiveInfo.isMobile(context)?5:10, 0),
@@ -649,7 +602,7 @@ class _DashboardState extends State<Dashboard> {
               ) :
               Container(
                 width: double.infinity,
-                height: ResponsiveInfo.isMobile(context)? (220*(productbycategorydata[index].data!.length / 5).ceil())+10 :(250*(productbycategorydata[index].data!.length / 5).ceil())+20,
+                height: ResponsiveInfo.isMobile(context)? (255*(data.length / 5).ceil())+10 :(275*(data.length / 5).ceil())+10,
 
 
                 child: Column(
@@ -683,19 +636,20 @@ class _DashboardState extends State<Dashboard> {
                             }
 
 
-                          }, child: Text("View All",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:18,color: Color(0xff0B7D97)),)),flex: 1,)
+                          }, child: Text("View All",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:18,color: Color(0xff0B7D97)),))
+
+
+                ,flex: 1,)
 
                         ],
 
                       )
-
-
-
                                          ),
                     Padding(padding: EdgeInsets.only(left: 10),
                       child: Container(
                           width: double.infinity,
-                          height: ResponsiveInfo.isMobile(context)? (190.0*(productbycategorydata[index].data!.length / 5).ceil()) :(220.0*(productbycategorydata[index].data!.length / 5).ceil()),
+                          height: ResponsiveInfo.isMobile(context)? (190.0*(data.length / 5).ceil()) :
+                          (220.0*(data.length / 5).ceil()),
 
                           child: ListView.builder(
                           itemCount: chunkedList.length,
@@ -824,6 +778,35 @@ class _DashboardState extends State<Dashboard> {
                       ) ,
                     ),
 
+                    Stack(
+                      children: [
+                        Align(
+                          alignment: FractionalOffset.center,
+                          child: Padding(padding: EdgeInsets.all(3),
+                          child: TextButton(onPressed: () async {
+
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ProductsByCategoryScreen(categoryId: productbycategorydata[index].category!.subCategoryId.toString(),categoryname: productbycategorydata[index].category!.subCategoryName.toString(),)),
+                            );
+
+                            if (result != null||result==null) {
+
+                              getCartCount();
+                              getWalletPoints();
+                              getWalletBalanceAndPoints();
+
+                            }
+
+
+                          }, child: Text("View More",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:18,color: Color(0xff0B7D97)),))
+                            ,
+
+                          )
+                        )
+                      ],
+                    )
+
 
                   ],
                 )
@@ -831,7 +814,8 @@ class _DashboardState extends State<Dashboard> {
 
 
               );
-            }) : Container(
+            }) :
+        Container(
           width: double.infinity,
           height: ResponsiveInfo.isMobile(context)?150:200,
           child: Center(
@@ -842,15 +826,7 @@ class _DashboardState extends State<Dashboard> {
         )
 
 
-        // Trendingproducts(),
-        // Todaysbulkdetails(),
-        // Image.asset("assets/homecategory/hirenow.png",width: double.infinity,height: MediaQuery.of(context).size.width/1.75,),
-        // TodaysSpecialOffer(),
-        // Image.asset("assets/homecategory/rewardpoints.png",width: double.infinity,height: MediaQuery.of(context).size.width/1.75,),
-        //
-        // FastingMovingItems(),
-        // Image.asset("assets/homecategory/lastposter.png",width: double.infinity,height: MediaQuery.of(context).size.width/1.75,),
-        //
+
 
 
 
