@@ -602,7 +602,7 @@ class _DashboardState extends State<Dashboard> {
               ) :
               Container(
                 width: double.infinity,
-                height: ResponsiveInfo.isMobile(context)? (255*(data.length / 5).ceil())+10 :(275*(data.length / 5).ceil())+10,
+                height: ResponsiveInfo.isMobile(context)? (245*(data.length / 5).ceil())+10 :(275*(data.length / 5).ceil())+10,
 
 
                 child: Column(
@@ -778,34 +778,40 @@ class _DashboardState extends State<Dashboard> {
                       ) ,
                     ),
 
-                    Stack(
-                      children: [
-                        Align(
-                          alignment: FractionalOffset.center,
-                          child: Padding(padding: EdgeInsets.all(3),
-                          child: TextButton(onPressed: () async {
+                    Container(
+                      width: double.infinity,
+                      height: ResponsiveInfo.isMobile(context)?40:50,
 
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ProductsByCategoryScreen(categoryId: productbycategorydata[index].category!.subCategoryId.toString(),categoryname: productbycategorydata[index].category!.subCategoryName.toString(),)),
-                            );
+                      child:  Stack(
+                        children: [
+                          Align(
+                              alignment: FractionalOffset.center,
+                              child: Padding(padding: EdgeInsets.all(3),
+                                child: TextButton(onPressed: () async {
 
-                            if (result != null||result==null) {
+                                  final result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => ProductsByCategoryScreen(categoryId: productbycategorydata[index].category!.subCategoryId.toString(),categoryname: productbycategorydata[index].category!.subCategoryName.toString(),)),
+                                  );
 
-                              getCartCount();
-                              getWalletPoints();
-                              getWalletBalanceAndPoints();
+                                  if (result != null||result==null) {
 
-                            }
+                                    getCartCount();
+                                    getWalletPoints();
+                                    getWalletBalanceAndPoints();
+
+                                  }
 
 
-                          }, child: Text("View More",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:18,color: Color(0xff0B7D97)),))
-                            ,
+                                }, child: Text("View More",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:18,color: Color(0xff0B7D97)),))
+                                ,
 
+                              )
                           )
-                        )
-                      ],
+                        ],
+                      ) ,
                     )
+
 
 
                   ],
