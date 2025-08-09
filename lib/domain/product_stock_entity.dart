@@ -29,7 +29,7 @@ class ProductStockData {
 	@JSONField(name: "vendor_id")
 	String? vendorId = '';
 	@JSONField(name: "current_qty")
-	String? currentQty = '';
+	String? currentQty = '0';
 	@JSONField(name: "price_stock")
 	String? priceStock = '';
 	String? mrp = '';

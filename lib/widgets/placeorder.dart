@@ -743,7 +743,9 @@ bool iswalletused=false;
         //
         // NativeBridge().redirectToNative(urldata,c);
         // var result= await c.future;
-        // if(result!=null&&result.toString().isNotEmpty && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
+        // if(result!=null&&result.toString().isNotEmpty && result.toString().contains("
+        // https://mysaveapp.com/ecommercepayment/paymentgateway/result.php
+        // ")) {
         //   showPaymentStatus(result);
         // }
         // else{
@@ -921,9 +923,7 @@ bool iswalletused=false;
     String txnDateTime = parts[8];             // 27-06-2025 12:50:34
     String uuid = parts[14];                   // 607369e3-68fe-4f9b-b3a4-fe0a2e7fd5a3
     String hashValue = parts[15];              // Long hash string
-
     String merchantCode = response['merchant_code'] ?? '';
-
     String transactiondetails="Transaction ID : "+
 transactionId+"\n"+"Order ID : "+orderId+"\nCustomer ID : "+customerId+"\n"+
     "Transaction Date : "+txnDateTime+"\nmessage : "+statusMessage;
@@ -932,7 +932,6 @@ transactionId+"\n"+"Order ID : "+orderId+"\nCustomer ID : "+customerId+"\n"+
 
     if(statusCode.compareTo("0300")==0)
       {
-
         if(statusMessage.compareTo("SUCCESS")==0)
           {
             updateWalletBalance();
@@ -960,8 +959,10 @@ updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
           //       dynamic> route) => false, // Remove all previous routes
           // );
         }
-
       }
+
+
+
     else{
       paymentstatus="0";
       updatePaymentStatus(transactiondetails,transactionId,paymentstatus);

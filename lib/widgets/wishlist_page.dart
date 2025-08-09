@@ -82,7 +82,12 @@ removeItem(index);
         itemBuilder: (context, index) {
           final item = wishlistItems[index];
 
-          return Card(
+          return
+
+
+
+
+            Card(
             margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             elevation: 3,
             child: ListTile(
@@ -125,6 +130,11 @@ removeItem(index);
 
 
   }
+
+
+
+
+
 }
 
 

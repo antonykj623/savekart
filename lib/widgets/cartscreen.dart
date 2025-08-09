@@ -23,6 +23,7 @@ class _CounterScreenState extends State<CartScreen> {
 
   List<CartProductsData> cartItems = [];
   double fulltotal=0;
+  bool isoutofStock=false;
 
    _calculateSubtotal() {
 
@@ -298,7 +299,7 @@ class _CounterScreenState extends State<CartScreen> {
                    ],
                  ),
                  SizedBox(height: 25),
-                 ElevatedButton(
+                 (!isoutofStock)?  ElevatedButton(
 
                    onPressed: () {
                      // Handle checkout
@@ -320,7 +321,7 @@ class _CounterScreenState extends State<CartScreen> {
                      ,
                    ),
                    child: Text("Proceed to Checkout",  style: TextStyle(fontSize: 16,color: Colors.white)),
-                 ),
+                 ) : Container(),
                ],
              ),
            ),
@@ -401,11 +402,17 @@ class _CounterScreenState extends State<CartScreen> {
     var js= jsonDecode( jsonDecode(response) ) ;
 
     if(js['status']==1) {
+      setState(() {
+        isoutofStock=false;
+
+      });
+
       _calculateSubtotal();
     }
     else{
 
       setState(() {
+        isoutofStock=true;
         cartItems[index].quantity=(int.parse(quantity)-1).toString();
       });
 
@@ -497,12 +504,7 @@ class _QuantitySelectorState extends State<QuantitySelector> {
   }
 
   void _incrementQuantity() {
-
     int currentstock=int.parse(_cartProductsData.current_qty.toString());
-
-
-
-
     if(currentstock>=_currentQuantity) {
       setState(() {
         _currentQuantity++;
@@ -510,9 +512,9 @@ class _QuantitySelectorState extends State<QuantitySelector> {
       widget.onQuantityChanged(_currentQuantity);
     }
     else{
-      // setState(() {
-      //   _currentQuantity--;
-      // });
+      setState(() {
+        _currentQuantity--;
+      });
       widget.onQuantityChanged(_currentQuantity);
       ResponsiveInfo.showAlertDialog(context, "SaveKart", "Out of stock");
     }
