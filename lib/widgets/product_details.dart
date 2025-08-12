@@ -51,6 +51,7 @@ class _ProductDetailsState extends State<ProductDetails> with SingleTickerProvid
       product_stockid = "0";
   bool ispointredeemeed = false;
   double tempwalletpoints = 0;
+  int stockquantity=0;
 
 late TabController   _tabController ;
 
@@ -276,7 +277,7 @@ List<ProductSubCategoryDataData>pcdata=[];
               Expanded(child: Stack(
 
                 children: [
-                  (productStockEntity.status==1) ?  Align(
+                  (stockquantity>0) ?  Align(
                     alignment: FractionalOffset.center,
                     child:
                     (productStockEntity.data!.currentQty.toString().isNotEmpty &&
@@ -874,6 +875,7 @@ List<ProductSubCategoryDataData>pcdata=[];
       setState(() {
         price_details="";
         description="";
+        stockquantity=int.parse(productStockEntity.data!.currentQty.toString());
         if(productStockEntity.status==1&&productStockEntity.data!=null&&productStockEntity.data!.id!.isNotEmpty)
         {
           if (productStockEntity.status.toString().compareTo("0") != 0) {
