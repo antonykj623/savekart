@@ -314,14 +314,34 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
                     ),
                     onPressed: () async {
 
+                      if(orderDetailsData.cartStock!.currentQty.toString().isNotEmpty) {
 
-                      showRetryDialog();
+                        int qty=int.parse(orderDetailsData.cartStock!.currentQty.toString());
+
+                        if(qty>0) {
+                          showRetryDialog();
+                        }
+                        else{
+
+                          ResponsiveInfo.showAlertDialog(context, "Savekart", "Product is out of stock");
+                        }
+                      }
+                      else{
+
+                        ResponsiveInfo.showAlertDialog(context, "Savekart", "Product is out of stock");
+
+                      }
 
 
                     },
                     child: Text('Retry',style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:17),),
                   ),
-                ),)  :Container()
+                )
+
+
+
+
+                ,)  :Container()
 
             ],
           ),
