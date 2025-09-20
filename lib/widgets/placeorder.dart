@@ -748,6 +748,7 @@ bool iswalletused=false;
         // ")) {
         //   showPaymentStatus(result);
         // }
+        
         // else{
         //   ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch your payment details");
         //   Navigator.of(context).pushAndRemoveUntil(
@@ -932,7 +933,7 @@ transactionId+"\n"+"Order ID : "+orderId+"\nCustomer ID : "+customerId+"\n"+
 
     if(statusCode.compareTo("0300")==0)
       {
-        if(statusMessage.compareTo("SUCCESS")==0)
+        if(statusMessage.toLowerCase().compareTo("success")==0)
           {
             updateWalletBalance();
             updateWalletPoints(orderid);
