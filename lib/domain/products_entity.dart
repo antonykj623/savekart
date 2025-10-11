@@ -62,7 +62,8 @@ class ProductsData {
 	String? returnable = '';
 	@JSONField(name: "product_code")
 	String? productCode = '';
-
+	@JSONField(name: "current_qty")
+	String? currentQty='';
 	ProductsData();
 
 	factory ProductsData.fromJson(Map<String, dynamic> json) => $ProductsDataFromJson(json);

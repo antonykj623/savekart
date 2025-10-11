@@ -482,92 +482,129 @@ class _DashboardState extends State<Dashboard> {
 
                                 child:Padding(padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?5:10, 0, ResponsiveInfo.isMobile(context)?5:10, 0),
 
-                                  child:  Container(
+                                  child: Stack(
+                                    children: [
 
-                                      width: ResponsiveInfo.isMobile(context)? 140:173,
-                                      height: ResponsiveInfo.isMobile(context)? 170 :195,
+                                      Align(
+                                        alignment: FractionalOffset.center,
 
-                                      child: Card(
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
+                                        child:  Container(
 
-                                            Expanded(child:Stack(
+                                            width: ResponsiveInfo.isMobile(context)? 140:173,
+                                            height: ResponsiveInfo.isMobile(context)? 170 :195,
 
-                                              children: [
-                                                Align(
-                                                  alignment: FractionalOffset.center,
-                                                  child: Image.network(EcommerceApiHelper.productimageurl+data[i].primeImage.toString(),width: ResponsiveInfo.isMobile(context)?100:120,
-                                                    height: ResponsiveInfo.isMobile(context)?100:120,fit: BoxFit.fill,loadingBuilder: (context, child, loadingProgress) {
-                                                      if (loadingProgress == null) return child; // Image loaded successfully
-                                                      return Center(child: CircularProgressIndicator()); // Show loader while loading
-                                                    },
-                                                    errorBuilder: (context, error, stackTrace) {
-                                                      return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-                                                    },) ,
-
-                                                ),
-
-
-                                              ],
-                                            )
-
-
-
-                                              ,flex: 2, )
-
-                                            ,
-
-                                            Expanded(child: Padding(
-                                              padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?5:8, 0, 0, 0),
-
+                                            child: Card(
                                               child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
-                                                  Text(data[i].productName.toString(),maxLines: 3,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                  // Text("200 x 100 x 150",maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 11:13,fontWeight: FontWeight.bold,color: Colors.black26),
-                                                  //   textAlign: TextAlign.center,
-                                                  //
-                                                  // ),
 
-                                                  //Price area commented by antony
+                                                  Expanded(child:Stack(
 
-                                                  // Row(
-                                                  //   children: [
-                                                  //     Expanded(child:     Text("150 Rs",maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
-                                                  //       textAlign: TextAlign.center,
-                                                  //     ),flex: 1,),
-                                                  //     Expanded(child: Container(
-                                                  //
-                                                  //       child: Icon(Icons.add_box_rounded,color: Colors.green,size: ResponsiveInfo.isMobile(context)?18:23,),
-                                                  //
-                                                  //     ),flex: 1,)
-                                                  //   ],
-                                                  // )
+                                                    children: [
+                                                      Align(
+                                                        alignment: FractionalOffset.center,
+                                                        child: Image.network(EcommerceApiHelper.productimageurl+data[i].primeImage.toString(),width: ResponsiveInfo.isMobile(context)?100:120,
+                                                          height: ResponsiveInfo.isMobile(context)?100:120,fit: BoxFit.fill,loadingBuilder: (context, child, loadingProgress) {
+                                                            if (loadingProgress == null) return child; // Image loaded successfully
+                                                            return Center(child: CircularProgressIndicator()); // Show loader while loading
+                                                          },
+                                                          errorBuilder: (context, error, stackTrace) {
+                                                            return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
+                                                          },) ,
+
+                                                      ),
+
+
+                                                    ],
+                                                  )
+
+
+
+                                                    ,flex: 2, )
+
+                                                  ,
+
+                                                  Expanded(child: Padding(
+                                                    padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?5:8, 0, 0, 0),
+
+                                                    child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text(data[i].productName.toString(),maxLines: 3,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
+                                                          textAlign: TextAlign.center,
+                                                        ),
+                                                        // Text("200 x 100 x 150",maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 11:13,fontWeight: FontWeight.bold,color: Colors.black26),
+                                                        //   textAlign: TextAlign.center,
+                                                        //
+                                                        // ),
+
+                                                        //Price area commented by antony
+
+                                                        // Row(
+                                                        //   children: [
+                                                        //     Expanded(child:     Text("150 Rs",maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
+                                                        //       textAlign: TextAlign.center,
+                                                        //     ),flex: 1,),
+                                                        //     Expanded(child: Container(
+                                                        //
+                                                        //       child: Icon(Icons.add_box_rounded,color: Colors.green,size: ResponsiveInfo.isMobile(context)?18:23,),
+                                                        //
+                                                        //     ),flex: 1,)
+                                                        //   ],
+                                                        // )
+
+
+                                                      ],
+                                                    ) ,
+                                                  )
+
+                                                  )
+
+
 
 
                                                 ],
-                                              ) ,
+                                              ),
+                                              color: Colors.white,
+                                              elevation: ResponsiveInfo.isMobile(context)?5:10,
                                             )
 
-                                            )
 
 
-
-
-                                          ],
                                         ),
-                                        color: Colors.white,
-                                        elevation: ResponsiveInfo.isMobile(context)?5:10,
+
                                       )
 
+                                      ,
+
+                                      Align(
+                                        alignment: FractionalOffset.topRight,
+                                        child: Padding(padding: EdgeInsets.all(5),
+
+                                          child:(data[i].currentQty.toString().compareTo("0")==0)? Container(
+                                              color: Colors.red,
+                                              child: Padding(padding: EdgeInsets.all(0),
+
+                                                child: Text(" out of stock ",style: TextStyle(color: Colors.white)),
 
 
+                                              )
+
+                                          ) :Container(),
+
+                                        ),
+                                      )
+                                    ],
                                   ),
+
+
+
+
+
+
+
                                 ) ,
                                 onTap: () async {
 
@@ -600,6 +637,8 @@ class _DashboardState extends State<Dashboard> {
 
 
               ) :
+
+
               Container(
                 width: double.infinity,
                 height: ResponsiveInfo.isMobile(context)? (245*(data.length / 5).ceil())+10 :(275*(data.length / 5).ceil())+10,
@@ -674,73 +713,106 @@ class _DashboardState extends State<Dashboard> {
 
                   child:Padding(padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?5:10, 0, ResponsiveInfo.isMobile(context)?5:10, 0),
 
-                    child:  Container(
+                    child: Stack(
 
-                        width: ResponsiveInfo.isMobile(context)? 140:173,
-                        height: ResponsiveInfo.isMobile(context)? 170 :195,
+                      children: [
 
-                        child: Card(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
+                        Align(
+                          alignment: FractionalOffset.center,
+                          child:   Container(
 
-                              Expanded(child:Stack(
+                              width: ResponsiveInfo.isMobile(context)? 145:180,
+                              height: ResponsiveInfo.isMobile(context)? 178 :200,
 
-                                children: [
-                                  Align(
-                                    alignment: FractionalOffset.center,
-                                    child: Image.network(EcommerceApiHelper.productimageurl+sublist[i].primeImage.toString(),width: ResponsiveInfo.isMobile(context)?100:120,
-                                      height: ResponsiveInfo.isMobile(context)?100:120,fit: BoxFit.fill,loadingBuilder: (context, child, loadingProgress) {
-                                        if (loadingProgress == null) return child; // Image loaded successfully
-                                        return Center(child: CircularProgressIndicator()); // Show loader while loading
-                                      },
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-                                      },) ,
-
-                                  ),
-
-
-                                ],
-                              )
-
-
-
-                                ,flex: 2, )
-
-                              ,
-
-                              Expanded(child: Padding(
-                                padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?5:8, 0, 0, 0),
-
+                              child: Card(
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Text(sublist[i].productName.toString(),maxLines: 3,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center,
-                                    ),
+
+                                    Expanded(child:Stack(
+
+                                      children: [
+                                        Align(
+                                          alignment: FractionalOffset.center,
+                                          child: Image.network(EcommerceApiHelper.productimageurl+sublist[i].primeImage.toString(),width: ResponsiveInfo.isMobile(context)?100:120,
+                                            height: ResponsiveInfo.isMobile(context)?100:120,fit: BoxFit.fill,loadingBuilder: (context, child, loadingProgress) {
+                                              if (loadingProgress == null) return child; // Image loaded successfully
+                                              return Center(child: CircularProgressIndicator()); // Show loader while loading
+                                            },
+                                            errorBuilder: (context, error, stackTrace) {
+                                              return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
+                                            },) ,
+
+                                        ),
+
+
+                                      ],
+                                    )
+
+
+
+                                      ,flex: 2, )
+
+                                    ,
+
+                                    Expanded(child: Padding(
+                                      padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?5:8, 0, 0, 0),
+
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(sublist[i].productName.toString(),maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
+                                            textAlign: TextAlign.center,
+                                          ),
+
+
+                                        ],
+                                      ) ,
+                                    )
+
+                                    )
+
+
 
 
                                   ],
-                                ) ,
+                                ),
+                                color: Colors.white,
+                                elevation: ResponsiveInfo.isMobile(context)?5:10,
                               )
 
-                              )
 
 
+                          ) ,
+                        )
+                        ,
+
+                        Align(
+                          alignment: FractionalOffset.topRight,
+                          child: Padding(padding: EdgeInsets.all(5),
+
+                          child:(sublist[i].currentQty.toString().compareTo("0")==0)? Container(
+                            color: Colors.red,
+                            child: Padding(padding: EdgeInsets.all(0),
+
+                            child: Text(" out of stock ",style: TextStyle(color: Colors.white)),
 
 
-                            ],
+                            )
+
+                          ) :Container(),
+
                           ),
-                          color: Colors.white,
-                          elevation: ResponsiveInfo.isMobile(context)?5:10,
                         )
 
+                      ],
+                    )
 
 
-                    ),
+
+                 ,
                   ) ,
                   onTap: () async {
 

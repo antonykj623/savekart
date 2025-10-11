@@ -14,25 +14,26 @@ if (localPropertiesFile.exists()) {
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
-    flutterVersionCode = '47'
+    flutterVersionCode = '50'
 }
 else{
-    flutterVersionCode = '47'
+    flutterVersionCode = '50'
 
 }
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    flutterVersionName = '5.6'
+    flutterVersionName = '5.9'
 }
 else{
-    flutterVersionName = '5.6'
+    flutterVersionName = '5.9'
 }
 
 android {
     namespace "com.integra.savekart"
-    compileSdk 35
-    ndkVersion flutter.ndkVersion
+    compileSdk 36
+    //ndkVersion flutter.ndkVersion
+    ndkVersion "25.2.9519653"
     buildFeatures {
         viewBinding true
     }
@@ -50,8 +51,13 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled false
             shrinkResources false
+
+
         }
+
     }
+
+
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -71,7 +77,7 @@ android {
         applicationId "com.integra.savekart"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 21
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

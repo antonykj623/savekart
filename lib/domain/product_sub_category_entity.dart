@@ -103,6 +103,9 @@ class ProductSubCategoryDataData {
 	@JSONField(name: "return_days")
 	String? returnDays = '';
 	String? upd = '';
+	@JSONField(name: "current_qty")
+	String? currentQty = '';
+
 
 	ProductSubCategoryDataData();
 

@@ -1,5 +1,7 @@
 import 'package:savekart/generated/json/base/json_convert_content.dart';
 import 'package:savekart/domain/product_sub_category_entity.dart';
+import 'package:savekart/domain/product_details_entity.dart';
+
 
 ProductSubCategoryEntity $ProductSubCategoryEntityFromJson(
     Map<String, dynamic> json) {
@@ -226,6 +228,11 @@ ProductSubCategoryDataData $ProductSubCategoryDataDataFromJson(
   if (upd != null) {
     productSubCategoryDataData.upd = upd;
   }
+  final String? current_qty = jsonConvert.convert<String>(json['current_qty']);
+  if (upd != null) {
+    productSubCategoryDataData.currentQty = current_qty;
+  }
+
   return productSubCategoryDataData;
 }
 
@@ -257,6 +264,7 @@ Map<String, dynamic> $ProductSubCategoryDataDataToJson(
   data['returnable'] = entity.returnable;
   data['return_days'] = entity.returnDays;
   data['upd'] = entity.upd;
+  data['current_qty']=entity.currentQty;
   return data;
 }
 
@@ -287,6 +295,7 @@ extension ProductSubCategoryDataDataExtension on ProductSubCategoryDataData {
     String? returnable,
     String? returnDays,
     String? upd,
+    String? currentQty
   }) {
     return ProductSubCategoryDataData()
       ..id = id ?? this.id
@@ -313,6 +322,7 @@ extension ProductSubCategoryDataDataExtension on ProductSubCategoryDataData {
       ..status = status ?? this.status
       ..returnable = returnable ?? this.returnable
       ..returnDays = returnDays ?? this.returnDays
-      ..upd = upd ?? this.upd;
+      ..upd = upd ?? this.upd
+      ..currentQty=currentQty?? this.currentQty;
   }
 }

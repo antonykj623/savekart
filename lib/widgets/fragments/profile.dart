@@ -1,20 +1,26 @@
 
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:savekart/domain/app_version_entity.dart';
+import 'package:savekart/domain/network_data_entity.dart';
 import 'package:savekart/web/ecommerce_api_helper.dart';
 import 'package:savekart/widgets/address_list.dart';
 import 'package:savekart/widgets/edit_profile.dart';
 import 'package:savekart/widgets/returnrequests.dart';
 import 'package:savekart/widgets/wallet_transaction.dart';
 import 'package:savekart/widgets/wishlist_page.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:path_provider/path_provider.dart';
 import '../../design/ResponsiveInfo.dart';
 import '../../domain/profile_data_entity.dart';
+import '../../domain/sliderShareImage.dart';
 import '../../web/AppStorage.dart';
 import '../../web/api_helper.dart';
 import '../../web/apimethodes.dart';
@@ -32,9 +38,9 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
 
 
-  List<String>arricons=['assets/icons/editprofile.png','assets/icons/house-location.png','assets/icons/wallet.png','assets/icons/product-return.png','assets/icons/update.png','assets/icons/privacypolicy.png','assets/icons/logout.png','assets/icons/user.png'];
+  List<String>arricons=['assets/icons/editprofile.png','assets/icons/house-location.png','assets/icons/wallet.png','assets/icons/product-return.png','assets/icons/update.png','assets/icons/privacypolicy.png','assets/icons/refer.png','assets/icons/logout.png','assets/icons/user.png'];
 
-  List<String>arrmenus=['Edit Profile','My Address','Savekart Wallet','Return Requests','App update','Privacy Policy','Logout','Delete Account'];
+  List<String>arrmenus=['Edit Profile','My Address','Savekart Wallet','Return Requests','App update','Privacy Policy','Refer now','Logout','Delete Account'];
 
   String name="";
 
@@ -118,10 +124,9 @@ class _ProfileState extends State<Profile> {
         title: const Text('Profile',style: TextStyle(fontWeight: FontWeight.w600),),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.home),
           onPressed: () {
             // handle back button press
-            Navigator.pop(context);
           },
 
         ),
@@ -408,8 +413,76 @@ class _ProfileState extends State<Profile> {
                       }
                     }
 
-
                   else if(index==6)
+                    {
+
+                      ResponsiveInfo.showLoaderDialog(context);
+
+                      Map<String,String> m=new HashMap();
+
+
+                      ApiHelper apihelper = new ApiHelper();
+
+                      var response= await  apihelper.post(Apimethodes.getUserDetails,formDataPayload: m);
+
+                      Navigator.pop(context);
+
+
+                      var js= jsonDecode(jsonDecode(response)) ;
+
+                      print(js);
+
+                      ProfileDataEntity entity=ProfileDataEntity.fromJson(js);
+
+                   String   phoneNumber=entity.data!.mobile.toString();
+
+
+                      ResponsiveInfo.showLoaderDialog(context);
+
+                      var response1= await  apihelper.get(Apimethodes.showMemberDetails+"?mobile="+phoneNumber+"&timestamp="+ResponsiveInfo.getRandomNumber().toString());
+
+                      Navigator.pop(context);
+
+                      print(response1);
+
+                      NetworkDataEntity networkdataentity=NetworkDataEntity.fromJson(jsonDecode(response1));
+
+                      if(networkdataentity.status==1)
+                        {
+
+
+
+                          ResponsiveInfo.showLoaderDialog(context);
+
+                          var response2= await  apihelper.get(Apimethodes.getSettingsSlider+"?mobile="+phoneNumber+"&timestamp="+ResponsiveInfo.getRandomNumber().toString());
+
+                          Navigator.pop(context);
+
+                          print(response2);
+
+                          //Map mp=jsonDecode(response2);
+
+                          showShareDialog( context,  response2);
+
+
+
+
+
+
+                        }
+                      else{
+
+                     //   ResponsiveInfo.showAlertDialog(context, "SaveKart", "You are not purchased this application.do you want to purchase now ?");
+                      }
+
+
+
+
+
+                    }
+
+
+                  else if(index==7)
                   {
                     Widget okButton = TextButton(
                       child: Text("Yes"),
@@ -456,7 +529,7 @@ class _ProfileState extends State<Profile> {
                       },
                     );
                   }
-                  else if(index==7)
+                  else if(index==8)
                   {
                     Widget okButton = TextButton(
                       child: Text("Yes"),
@@ -535,6 +608,155 @@ class _ProfileState extends State<Profile> {
       ),
     );
   }
+
+
+  Future<void> showShareDialog(BuildContext context, String data) async {
+    try {
+      final jsonObject = jsonDecode(data);
+
+      if (jsonObject['status'] == 1) {
+        List<dynamic> jsonArray = jsonObject['data'];
+        List<SliderShareImage> sliderShareImages =
+        jsonArray.map((e) => SliderShareImage.fromJson(e)).toList();
+
+        final PageController pageController = PageController();
+        int currentIndex = 0;
+       String? token=await AppStorage.getString(AppStorage.token);
+       //Replace with your PreferenceHelper logic
+        final String link = "https://mysaveapp.com/signup?sponserid=" + token.toString();
+
+        showDialog(
+          context: context,
+          builder: (ctx) {
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return Dialog(
+                  insetPadding: EdgeInsets.zero,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: PageView.builder(
+                            controller: pageController,
+                            itemCount: sliderShareImages.length,
+                            onPageChanged: (index) {
+                              setState(() => currentIndex = index);
+                            },
+                            itemBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  Expanded(
+                                    child: Image.network(
+                                      "https://mysaving.in/images/"+sliderShareImages[index].image,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(sliderShareImages[index].description),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+
+                        // Indicator like TabLayout
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            sliderShareImages.length,
+                                (index) => Container(
+                              margin: const EdgeInsets.all(4),
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: currentIndex == index
+                                    ? Colors.blue
+                                    : Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Share / Copy / Purchase
+                        Text(link, style: const TextStyle(color: Colors.blue)),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () async {
+                                await Clipboard.setData(
+                                    ClipboardData(text: link));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("Link copied to clipboard")),
+                                );
+                              },
+                              child: const Text("Copy Link"),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                // Share.share(
+                                //     "${sliderShareImages[currentIndex].description}\n$link");
+
+
+                                ResponsiveInfo.showLoaderDialog(context);
+
+                                try {
+                                  // Download image
+                                  final response = await http.get(Uri.parse("https://mysaving.in/images/"+sliderShareImages[currentIndex].image));
+                                  final bytes = response.bodyBytes;
+
+                                  // Save to temporary file
+                                  final tempDir = await getTemporaryDirectory();
+                                  final file = File('${tempDir.path}/shared_image'+ResponsiveInfo.getRandomNumber().toString()+'.jpg');
+                                  await file.writeAsBytes(bytes);
+
+                                  // Share file + text
+                                  await Share.shareXFiles([XFile(file.path)], text: sliderShareImages[currentIndex].description+"\n\n"+link);
+
+                                  Navigator.pop(context);
+
+                                } catch (e) {
+
+                                  ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch image from url");
+
+                                  Navigator.pop(context);
+                                  print("Error sharing image: $e");
+                                }
+
+                              },
+                              child: const Text("Share"),
+                            ),
+                            // ElevatedButton(
+                            //   onPressed: () {
+                            //     Navigator.pop(context);
+                            //     // Call your purchase logic here
+                            //   },
+                            //   child: const Text("Purchase"),
+                            // ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      }
+    } catch (e) {
+      debugPrint("Error: $e");
+    }
+  }
+
 
   getProfile()async{
 

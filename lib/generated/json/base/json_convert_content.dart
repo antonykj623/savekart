@@ -12,6 +12,7 @@ import 'package:savekart/domain/cart_data_exist_entity.dart';
 import 'package:savekart/domain/cart_products_entity.dart';
 import 'package:savekart/domain/category_entity.dart';
 import 'package:savekart/domain/country_list_entity.dart';
+import 'package:savekart/domain/network_data_entity.dart';
 import 'package:savekart/domain/order_details_entity.dart';
 import 'package:savekart/domain/order_entity.dart';
 import 'package:savekart/domain/order_item_by_i_d_entity.dart';
@@ -102,7 +103,8 @@ class JsonConvert {
       return null;
     }
     try {
-      return value.map((dynamic e) => _asT<T>(e, enumConvert: enumConvert))
+      return value
+          .map((dynamic e) => _asT<T>(e, enumConvert: enumConvert))
           .toList();
     } catch (e, stackTrace) {
       debugPrint('asT<$T> $e $stackTrace');
@@ -235,6 +237,14 @@ class JsonConvert {
       return data.map<CountryListData>((Map<String, dynamic> e) =>
           CountryListData.fromJson(e)).toList() as M;
     }
+    if (<NetworkDataEntity>[] is M) {
+      return data.map<NetworkDataEntity>((Map<String, dynamic> e) =>
+          NetworkDataEntity.fromJson(e)).toList() as M;
+    }
+    if (<NetworkDataData>[] is M) {
+      return data.map<NetworkDataData>((Map<String, dynamic> e) =>
+          NetworkDataData.fromJson(e)).toList() as M;
+    }
     if (<OrderDetailsEntity>[] is M) {
       return data.map<OrderDetailsEntity>((Map<String, dynamic> e) =>
           OrderDetailsEntity.fromJson(e)).toList() as M;
@@ -256,7 +266,8 @@ class JsonConvert {
           OrderDetailsDataCartProduct.fromJson(e)).toList() as M;
     }
     if (<OrderDetailsDataPaymentDetails>[] is M) {
-      return data.map<OrderDetailsDataPaymentDetails>((
+      return data
+          .map<OrderDetailsDataPaymentDetails>((
           Map<String, dynamic> e) => OrderDetailsDataPaymentDetails.fromJson(e))
           .toList() as M;
     }
@@ -354,7 +365,8 @@ class JsonConvert {
           ProductSubCategoryData.fromJson(e)).toList() as M;
     }
     if (<ProductSubCategoryDataCategory>[] is M) {
-      return data.map<ProductSubCategoryDataCategory>((
+      return data
+          .map<ProductSubCategoryDataCategory>((
           Map<String, dynamic> e) => ProductSubCategoryDataCategory.fromJson(e))
           .toList() as M;
     }
@@ -531,6 +543,8 @@ class JsonConvertClassCollection {
     (CategoryData).toString(): CategoryData.fromJson,
     (CountryListEntity).toString(): CountryListEntity.fromJson,
     (CountryListData).toString(): CountryListData.fromJson,
+    (NetworkDataEntity).toString(): NetworkDataEntity.fromJson,
+    (NetworkDataData).toString(): NetworkDataData.fromJson,
     (OrderDetailsEntity).toString(): OrderDetailsEntity.fromJson,
     (OrderDetailsData).toString(): OrderDetailsData.fromJson,
     (OrderDetailsDataCartOrder).toString(): OrderDetailsDataCartOrder.fromJson,

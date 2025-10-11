@@ -64,6 +64,7 @@ class Assets {
   static const String iconsPrivacypolicy = 'assets/icons/privacypolicy.png';
   static const String iconsProductReturn = 'assets/icons/product-return.png';
   static const String iconsProfile = 'assets/icons/profile.png';
+  static const String iconsRefer = 'assets/icons/refer.png';
   static const String iconsSettings = 'assets/icons/settings.png';
   static const String iconsUpdate = 'assets/icons/update.png';
   static const String iconsUser = 'assets/icons/user.png';

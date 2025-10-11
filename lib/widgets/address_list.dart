@@ -219,7 +219,7 @@ class _AddressListState extends State<AddressList> {
                         ,
                         trailing: GestureDetector(
                           child: Text(
-                            "Edit/Delete",
+                            "Edit",
                             style: TextStyle(color: Colors.red, fontSize: 15),
                           ),
                           onTap: () async {
@@ -438,11 +438,11 @@ class _InputDialogState extends State<InputDialog> {
     _phoneController.dispose();
     super.dispose();
   }
-  void _deleteAddress(){
-    Navigator.of(context).pop({
-      'delete': "1"
-    });
-  }
+  // void _deleteAddress(){
+  //   Navigator.of(context).pop({
+  //     'delete': "1"
+  //   });
+  // }
 
   void _submitData() {
     final name = _nameController.text;
@@ -617,10 +617,10 @@ class _InputDialogState extends State<InputDialog> {
       ),
       actions: [
 
-        (userAddressDataData.id.toString().isNotEmpty)?  ElevatedButton(
-          onPressed: _deleteAddress,
-          child: Text("Delete"),
-        ) : Container(),
+        // (userAddressDataData.id.toString().isNotEmpty)?  ElevatedButton(
+        //   onPressed: _deleteAddress,
+        //   child: Text("Delete"),
+        // ) : Container(),
         ElevatedButton(
           onPressed: _submitData,
           child: Text("Submit"),

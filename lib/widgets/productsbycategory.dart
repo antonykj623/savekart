@@ -78,83 +78,118 @@ flex: 5,
               itemBuilder: (context, index) {
                 final product = products[index];
 
-                return GestureDetector(
-                    onTap: (){
-                      ProductsData pb=product;
-                      ProductSubCategoryDataData pbc=new ProductSubCategoryDataData();
-                      pbc.id=pb.id;
-                      pbc.productCode=pb.productCode;
-                      pbc.primeImage=pb.primeImage;
-                      pbc.productName=pb.productName;
-                      pbc.status=pb.status;
-                      pbc.productSpec=pb.productSpec;
-                      pbc.productDescription=pb.productDescription;
-                      pbc.sideImage4=pb.sideImage4;
-                      pbc.sideImage3=pb.sideImage3;
-                      pbc.sideImage2=pb.sideImage2;
-                      pbc.sideImage1=pb.sideImage1;
-                      pbc.categoryId=pb.categoryId;
-                      pbc.color=pb.color;
-                      pbc.colorEnabled=pb.colorEnabled;
-                      pbc.size=pb.size;
-                      pbc.sizeEnabled=pb.sizeEnabled;
-                      pbc.subCategoryId=pb.subCategoryId;
-                      pbc.unitId=pb.unitId;
-                      pbc.vendorId=pb.vendorId;
+                return Stack(
 
-                      Navigator.push(context,
-                          MaterialPageRoute(builder:
-                              (context) =>
-                              ProductDetails(pbc)
-                          )
-                      );
-                    },
+                  children: [
 
 
 
+                    Align(
+                      alignment: FractionalOffset.center,
 
-                    child: Card(
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Image.network(
-                              EcommerceApiHelper.productimageurl+  product.primeImage.toString(),
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child; // Image loaded successfully
-                                return Center(child: CircularProgressIndicator()); // Show loader while loading
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(10),
+                      child: GestureDetector(
+                          onTap: (){
+                            ProductsData pb=product;
+                            ProductSubCategoryDataData pbc=new ProductSubCategoryDataData();
+                            pbc.id=pb.id;
+                            pbc.productCode=pb.productCode;
+                            pbc.primeImage=pb.primeImage;
+                            pbc.productName=pb.productName;
+                            pbc.status=pb.status;
+                            pbc.productSpec=pb.productSpec;
+                            pbc.productDescription=pb.productDescription;
+                            pbc.sideImage4=pb.sideImage4;
+                            pbc.sideImage3=pb.sideImage3;
+                            pbc.sideImage2=pb.sideImage2;
+                            pbc.sideImage1=pb.sideImage1;
+                            pbc.categoryId=pb.categoryId;
+                            pbc.color=pb.color;
+                            pbc.colorEnabled=pb.colorEnabled;
+                            pbc.size=pb.size;
+                            pbc.sizeEnabled=pb.sizeEnabled;
+                            pbc.subCategoryId=pb.subCategoryId;
+                            pbc.unitId=pb.unitId;
+                            pbc.vendorId=pb.vendorId;
+
+                            Navigator.push(context,
+                                MaterialPageRoute(builder:
+                                    (context) =>
+                                    ProductDetails(pbc)
+                                )
+                            );
+                          },
+
+
+
+
+                          child: Card(
+                            elevation: 3,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text(
-                                  product.productName.toString(),
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
+                                Expanded(
+                                  child: Image.network(
+                                    EcommerceApiHelper.productimageurl+  product.primeImage.toString(),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child; // Image loaded successfully
+                                      return Center(child: CircularProgressIndicator()); // Show loader while loading
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
+                                    },
+                                  ),
                                 ),
-                                SizedBox(height: 4),
-                                // Text(
-                                //   "₹${product.price}",
-                                //   style: TextStyle(color: Colors.green, fontSize: 16),
-                                // ),
+                                Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        product.productName.toString(),
+                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(height: 4),
+                                      // Text(
+                                      //   "₹${product.price}",
+                                      //   style: TextStyle(color: Colors.green, fontSize: 16),
+                                      // ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
-                          ),
-                        ],
+                          ) )
+                    ),
+
+                    Align(
+                      alignment: FractionalOffset.topRight,
+                      child: Padding(padding: EdgeInsets.all(5),
+
+                        child:(product.currentQty.toString().compareTo("0")==0)? Container(
+                            color: Colors.red,
+                            child: Padding(padding: EdgeInsets.all(0),
+
+                              child: Text(" out of stock ",style: TextStyle(color: Colors.white)),
+
+
+                            )
+
+                        ) :Container(),
+
                       ),
-                    ) );
+                    )
+                  ],
+                );
+
+
+
+
+
               },
             ),
           ),

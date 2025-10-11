@@ -135,6 +135,13 @@ ProductsData $ProductsDataFromJson(Map<String, dynamic> json) {
   if (productCode != null) {
     productsData.productCode = productCode;
   }
+
+  final String? currentQty = jsonConvert.convert<String>(json['current_qty']);
+  if (currentQty != null) {
+    productsData.currentQty = currentQty;
+  }
+
+
   return productsData;
 }
 
@@ -162,6 +169,7 @@ Map<String, dynamic> $ProductsDataToJson(ProductsData entity) {
   data['status'] = entity.status;
   data['returnable'] = entity.returnable;
   data['product_code'] = entity.productCode;
+  data['current_qty']=entity.currentQty;
   return data;
 }
 
@@ -189,6 +197,7 @@ extension ProductsDataExtension on ProductsData {
     String? status,
     String? returnable,
     String? productCode,
+    String? currentQty
   }) {
     return ProductsData()
       ..id = id ?? this.id
@@ -212,6 +221,7 @@ extension ProductsDataExtension on ProductsData {
       ..offeredItemStatus = offeredItemStatus ?? this.offeredItemStatus
       ..status = status ?? this.status
       ..returnable = returnable ?? this.returnable
-      ..productCode = productCode ?? this.productCode;
+      ..productCode = productCode ?? this.productCode
+      ..currentQty=currentQty?? this.currentQty;
   }
 }

@@ -62,4 +62,7 @@ class Apimethodes{
    static String getPaymentCredentials="getPaymentCredentials.php";
    static String generateHash="generateHash.php";
    static String updateOrderStaus="updateOrderStaus.php";
+    static String showMemberDetails="getDSTByPhoneNumber.php";
+   static String getSettingsSlider="getSettingsSlider.php";
+  // static String getUserDetails="getUserDetails.php";
 }
