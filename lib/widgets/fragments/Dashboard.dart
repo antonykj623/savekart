@@ -1,5 +1,6 @@
 
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -20,7 +21,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../design/ResponsiveInfo.dart';
 import '../../domain/app_version_entity.dart';
 import '../../domain/product_sub_category_entity.dart';
+import '../../domain/profile_data_entity.dart';
 import '../../domain/wallet_balance_entity.dart';
+import '../../web/api_helper.dart';
 import '../../web/apimethodes.dart';
 
 import '../CategoryWidget.dart';
@@ -57,6 +60,8 @@ class _DashboardState extends State<Dashboard> {
   double walletbalance=0.0;
   String cartcount="0";
   int walletpoints=0;
+
+  String name="",regid="";
   final StreamController<SwipeRefreshState> _controller = StreamController<SwipeRefreshState>();
   Stream<SwipeRefreshState> get myRefreshStateStream => _controller.stream;
 
@@ -73,10 +78,12 @@ class _DashboardState extends State<Dashboard> {
     getWalletPoints();
     getCartCount();
     getAppUpdates();
+    getProfile();
   }
 
   Future<void> _handleRefresh() async {
     await Future.delayed(Duration(seconds: 1)); // simulate network fetch
+    getProfile();
     getBanners();
     getCategories();
     getBrands();
@@ -86,6 +93,7 @@ class _DashboardState extends State<Dashboard> {
     getWalletPoints();
     getCartCount();
     getAppUpdates();
+
   }
 
   @override
@@ -239,70 +247,87 @@ class _DashboardState extends State<Dashboard> {
           elevation: 4,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child:Column(
               children: [
-                // Wallet Balance
+                Text("Name : "+name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black)),
+                SizedBox(height: 5),
+                Text("Reg ID : "+regid, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black)),
+                SizedBox(height: 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Wallet Balance
 
-                GestureDetector(
-                  onTap: (){          Navigator.push(context,
-                      MaterialPageRoute(builder:
-                          (context) =>
-                          WalletTransaction()
-                      )
-                  );},
+                    GestureDetector(
+                      onTap: (){          Navigator.push(context,
+                          MaterialPageRoute(builder:
+                              (context) =>
+                              WalletTransaction()
+                          )
+                      );},
 
-                  child:Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Savekart Wallet Balance", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
-                      SizedBox(height: 5),
-                      Row(
+                      child:Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(Icons.account_balance_wallet, color: Colors.green, size: 24),
-                          SizedBox(width: 8),
-                          Text(""+walletbalance.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+
+
+
+                          Text("Savekart Wallet Balance", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+
+                              Icon(Icons.account_balance_wallet, color: Colors.green, size: 24),
+                              SizedBox(width: 8),
+                              Text(""+walletbalance.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                            ],
+                          ),
                         ],
-                      ),
-                    ],
-                  ) ,
-                )
-                ,
+                      ) ,
+                    )
+                    ,
 
-                // Reward Points
+                    // Reward Points
 
-                GestureDetector(
+                    GestureDetector(
 
-                  child:Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Purchase Points", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
-                      SizedBox(height: 5),
-                      Row(
+                      child:Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(Icons.star, color: Colors.orange, size: 24),
-                          SizedBox(width: 8),
-                          Text(walletpoints.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                          Text("Purchase Points", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Icon(Icons.star, color: Colors.orange, size: 24),
+                              SizedBox(width: 8),
+                              Text(walletpoints.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                            ],
+                          ),
                         ],
-                      ),
-                    ],
-                  ) ,
-                  onTap: (){
-                    Navigator.push(context,
-                        MaterialPageRoute(builder:
-                            (context) =>
-                            PurchasePoints()
-                        )
-                    );
+                      ) ,
+                      onTap: (){
+                        Navigator.push(context,
+                            MaterialPageRoute(builder:
+                                (context) =>
+                                PurchasePoints()
+                            )
+                        );
 
-                  },
-                )
+                      },
+                    )
 
 
 
-                ,
+                    ,
+                  ],
+                ),
+
               ],
-            ),
+            )
+
+
+
+
           ),
         ),
 
@@ -532,7 +557,7 @@ class _DashboardState extends State<Dashboard> {
                                                       mainAxisAlignment: MainAxisAlignment.start,
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
-                                                        Text(data[i].productName.toString(),maxLines: 3,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
+                                                        Text(data[i].productName.toString(),maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
                                                           textAlign: TextAlign.center,
                                                         ),
                                                         // Text("200 x 100 x 150",maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 11:13,fontWeight: FontWeight.bold,color: Colors.black26),
@@ -929,6 +954,38 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+
+  getProfile()async{
+
+    Map<String,String> m=new HashMap();
+
+
+    ApiHelper apihelper = new ApiHelper();
+
+    var response= await  apihelper.post(Apimethodes.getUserDetails,formDataPayload: m);
+
+
+
+    var js= jsonDecode(jsonDecode(response)) ;
+
+    print(js);
+
+    ProfileDataEntity entity=ProfileDataEntity.fromJson(js);
+
+    if(entity.status==1)
+    {
+
+      setState(() {
+        name=entity.data!.fullName.toString();
+        regid=entity.data!.regCode.toString();
+
+
+
+      });
+
+    }
+
+  }
 
   getAppUpdates()async{
     PackageInfo packageInfo = await PackageInfo.fromPlatform();

@@ -23,10 +23,10 @@ else{
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    flutterVersionName = '5.9'
+    flutterVersionName = '6.0'
 }
 else{
-    flutterVersionName = '5.9'
+    flutterVersionName = '6.0'
 }
 
 android {
