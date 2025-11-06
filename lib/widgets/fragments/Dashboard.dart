@@ -251,7 +251,7 @@ class _DashboardState extends State<Dashboard> {
               children: [
                 Text("Name : "+name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black)),
                 SizedBox(height: 5),
-                Text("Reg ID : "+regid, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black)),
+                Text("Customer ID : "+regid, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black)),
                 SizedBox(height: 5),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

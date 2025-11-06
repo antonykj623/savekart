@@ -194,18 +194,22 @@ class _AddressListState extends State<AddressList> {
                 itemBuilder: (BuildContext context, int index) {
                   return Card(
                     
-                    child:ListTile(
-                        leading: (_addresses[index].id.toString().compareTo(selected_addressid.toString())==0)?
-                        GestureDetector(
-                          child:Icon(Icons.radio_button_checked,color: Colors.green,) ,
+                    child:Column(
 
-                          onTap: (){
-                            setState(() {
-                              selected_addressid=_addresses[index].id.toString();
-                            });
-                          },
-                        )
-                         :
+                      children: [
+
+                        ListTile(
+                            leading: (_addresses[index].id.toString().compareTo(selected_addressid.toString())==0)?
+                            GestureDetector(
+                              child:Icon(Icons.radio_button_checked,color: Colors.green,) ,
+
+                              onTap: (){
+                                setState(() {
+                                  selected_addressid=_addresses[index].id.toString();
+                                });
+                              },
+                            )
+                                :
                             GestureDetector(
                               child:Icon(Icons.radio_button_off,color: Colors.black54,) ,
                               onTap: (){
@@ -216,31 +220,71 @@ class _AddressListState extends State<AddressList> {
                             )
 
 
-                        ,
-                        trailing: GestureDetector(
-                          child: Text(
-                            "Edit",
-                            style: TextStyle(color: Colors.red, fontSize: 15),
-                          ),
-                          onTap: () async {
-                            final result = await showDialog<Map<String, String>>(
-                              context: context,
-                              builder: (context) => InputDialog(_addresses[index]),
-                            );
+                            ,
+                            trailing: GestureDetector(
+                              child: Text(
+                                "Edit",
+                                style: TextStyle(color: Colors.red, fontSize: 15),
+                              ),
+                              onTap: () async {
+                                final result = await showDialog<Map<String, String>>(
+                                  context: context,
+                                  builder: (context) => InputDialog(_addresses[index]),
+                                );
 
-                            // Check if the result is not null
-                            if (result != null) {
-
-
+                                // Check if the result is not null
+                                if (result != null) {
 
 
 
-                              if(result.containsKey("delete"))
-                                {
-                                  String  delt = result['delete'] ?? '';
 
-                                  if (delt.compareTo("1")==0) {
+
+                                  if(result.containsKey("delete"))
+                                  {
+                                    String  delt = result['delete'] ?? '';
+
+                                    if (delt.compareTo("1")==0) {
+                                      Map<String, String> mp = new HashMap();
+
+                                      mp['id'] = _addresses[index].id.toString();
+
+                                      EcommerceApiHelper apihelper = new EcommerceApiHelper();
+
+                                      var t = EcommerceApiHelper.getTimeStamp();
+
+                                      var response = await apihelper.post(
+                                          Apimethodes.deleteAddress + "?q=" +
+                                              t.toString(), formDataPayload: mp);
+
+                                      var js = jsonDecode(response);
+
+                                      getAllAddress();
+                                    }
+
+
+                                  }
+                                  else {
+
+                                    String   name = result['name'] ?? '';
+                                    String  house = result['house'] ?? '';
+                                    String  flatno = result['flatno'] ?? '';
+                                    String  landmark = result['landmark'] ?? '';
+                                    String  district = result['district'] ?? '';
+                                    String place=result['place'] ?? '';
+                                    String  phone = result['phone'] ?? '';
+                                    String pincode=result['pincode'] ??'';
+                                    String state=result['state']??'';
                                     Map<String, String> mp = new HashMap();
+                                    mp['name'] = name;
+                                    mp['house'] = house;
+                                    mp['flatno']=flatno;
+                                    mp['landmark']=landmark;
+                                    mp['district']=district;
+                                    mp['place']=place;
+                                    mp['phone'] = phone;
+                                    mp['pincode']=pincode;
+                                    mp['state']=state;
+
 
                                     mp['id'] = _addresses[index].id.toString();
 
@@ -249,7 +293,7 @@ class _AddressListState extends State<AddressList> {
                                     var t = EcommerceApiHelper.getTimeStamp();
 
                                     var response = await apihelper.post(
-                                        Apimethodes.deleteAddress + "?q=" +
+                                        Apimethodes.updateAddress + "?q=" +
                                             t.toString(), formDataPayload: mp);
 
                                     var js = jsonDecode(response);
@@ -257,53 +301,46 @@ class _AddressListState extends State<AddressList> {
                                     getAllAddress();
                                   }
 
-
                                 }
-                              else {
-
-                                String   name = result['name'] ?? '';
-                                String  house = result['house'] ?? '';
-                                String  flatno = result['flatno'] ?? '';
-                                String  landmark = result['landmark'] ?? '';
-                                String  district = result['district'] ?? '';
-                                String place=result['place'] ?? '';
-                                String  phone = result['phone'] ?? '';
-                                String pincode=result['pincode'] ??'';
-                                String state=result['state']??'';
-                                Map<String, String> mp = new HashMap();
-                                mp['name'] = name;
-                                mp['house'] = house;
-                                mp['flatno']=flatno;
-                                mp['landmark']=landmark;
-                                mp['district']=district;
-                                mp['place']=place;
-                                mp['phone'] = phone;
-                                mp['pincode']=pincode;
-                                mp['state']=state;
 
 
-                                mp['id'] = _addresses[index].id.toString();
+                              },
+                            ),
 
-                                EcommerceApiHelper apihelper = new EcommerceApiHelper();
+                            title: Text(""+_addresses[index].name.toString()+"\n"+_addresses[index].housename.toString()+"\n"+_addresses[index].flatno.toString()+"\n"+_addresses[index].landmark.toString()+"\n"+_addresses[index].district.toString()+"\n"+_addresses[index].phone.toString()+"\n"+_addresses[index].state.toString(),maxLines: 10,)) ,
 
-                                var t = EcommerceApiHelper.getTimeStamp();
-
-                                var response = await apihelper.post(
-                                    Apimethodes.updateAddress + "?q=" +
-                                        t.toString(), formDataPayload: mp);
-
-                                var js = jsonDecode(response);
-
-                                getAllAddress();
-                              }
-
-                            }
-
-
+                        (_addresses[index].id.toString().compareTo(selected_addressid.toString())==0)?   ElevatedButton(
+                          onPressed: () {
+                            // Add your confirm logic here
+                            print("Confirmed!");
+                            Navigator.of(context).pop({
+                              'added': "1",
+                              'id':selected_addressid
+                            });
                           },
-                        ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green, // Button color
+                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: const Text(
+                            "Confirm",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        )
+                        :Container(),
+                        Container(height: 8,)
 
-                        title: Text(""+_addresses[index].name.toString()+"\n"+_addresses[index].housename.toString()+"\n"+_addresses[index].flatno.toString()+"\n"+_addresses[index].landmark.toString()+"\n"+_addresses[index].district.toString()+"\n"+_addresses[index].phone.toString()+"\n"+_addresses[index].state.toString(),maxLines: 10,)) ,
+                      ],
+                    ),
+
+
                     elevation: 10,
                   )
                     

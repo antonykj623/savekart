@@ -308,7 +308,7 @@ List<ProductSubCategoryDataData>pcdata=[];
                                       productStockEntity.data!.ppRedemption
                                           .toString());
 
-                                  if (current_walletpoints > ppredemption) {
+                                  if (current_walletpoints >= ppredemption) {
                                     Widget okButton = TextButton(
                                       child: Text("Yes"),
                                       onPressed: () {
@@ -602,7 +602,7 @@ List<ProductSubCategoryDataData>pcdata=[];
                                           productStockEntity.data!.ppRedemption
                                               .toString());
 
-                                      if (current_walletpoints > ppredemption) {
+                                      if (current_walletpoints >= ppredemption) {
                                         Widget okButton = TextButton(
                                           child: Text("Yes"),
                                           onPressed: () {
