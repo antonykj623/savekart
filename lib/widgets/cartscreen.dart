@@ -164,14 +164,18 @@ class _CounterScreenState extends State<CartScreen> {
                             onQuantityChanged: (newQuantity) {
 
 
+                              if(item.product_id.toString().compareTo("432")==0 && newQuantity>10)
+                                {
+                                  ResponsiveInfo.showAlertDialog(context, "SaveKart","Maximum quantity reached");
+                                }
+                              else {
+                                updateCartQuantity(item.cartid.toString(),
+                                    newQuantity.toString(), index);
 
-                              updateCartQuantity(item.cartid.toString(), newQuantity.toString(),index);
-
-                              setState(() {
-                                item.quantity=newQuantity.toString();
-                              });
-
-
+                                setState(() {
+                                  item.quantity = newQuantity.toString();
+                                });
+                              }
 
 
 
