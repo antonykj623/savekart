@@ -140,20 +140,26 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
 
         paymentstatus="0";
 
-        updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
+       // updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
 
         // ResponsiveInfo.showAlertDialog(context, "Savekart", "Payment failed");
-        // Navigator.of(context).pushAndRemoveUntil(
-        //   MaterialPageRoute(builder: (context) => HomeScreen()),
-        //       (Route<
-        //       dynamic> route) => false, // Remove all previous routes
-        // );
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+              (Route<
+              dynamic> route) => false, // Remove all previous routes
+        );
       }
 
     }
     else{
       paymentstatus="0";
-      updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
+     // updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+            (Route<
+            dynamic> route) => false, // Remove all previous routes
+      );
 
     }
 

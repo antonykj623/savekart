@@ -129,7 +129,21 @@ bool iswalletused=false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+        onWillPop: () async {
+          // Your logic here
+          print("Back button pressed");
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+                (Route<
+                dynamic> route) => false, // Remove all previous routes
+          );
+
+          // return true  -> allow back
+          // return false -> block back
+          return true;
+        },
+        child:  Scaffold(
       resizeToAvoidBottomInset: true,
         appBar: AppBar(title: Text('Place Order',style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:17,color: Colors.white)),
         backgroundColor: Color(0xff0B7D97),
@@ -433,7 +447,7 @@ bool iswalletused=false;
 
 
 
-
+        )
 
 
 
@@ -951,14 +965,14 @@ updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
 
           paymentstatus="0";
 
-          updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
+         // updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
 
           // ResponsiveInfo.showAlertDialog(context, "Savekart", "Payment failed");
-          // Navigator.of(context).pushAndRemoveUntil(
-          //   MaterialPageRoute(builder: (context) => HomeScreen()),
-          //       (Route<
-          //       dynamic> route) => false, // Remove all previous routes
-          // );
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+                (Route<
+                dynamic> route) => false, // Remove all previous routes
+          );
         }
       }
 
@@ -966,7 +980,7 @@ updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
 
     else{
       paymentstatus="0";
-      updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
+    //  updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
 
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => HomeScreen()),
