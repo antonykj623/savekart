@@ -9,6 +9,7 @@ import '../design/ResponsiveInfo.dart';
 import '../domain/cart_products_entity.dart';
 import '../domain/product_details_entity.dart';
 import '../domain/product_sub_category_entity.dart';
+import '../domain/soldcount_entity.dart';
 import '../web/AppStorage.dart';
 import '../web/apimethodes.dart';
 import '../web/ecommerce_api_helper.dart';
@@ -23,6 +24,7 @@ class _CounterScreenState extends State<CartScreen> {
 
   List<CartProductsData> cartItems = [];
   double fulltotal=0;
+  int procount=0;
   bool isoutofStock=false;
 
    _calculateSubtotal() {
@@ -56,6 +58,7 @@ class _CounterScreenState extends State<CartScreen> {
     // TODO: implement initState
     super.initState();
     getCartItems();
+    getSaveAppProCount();
   }
 
   @override
@@ -164,7 +167,7 @@ class _CounterScreenState extends State<CartScreen> {
                             onQuantityChanged: (newQuantity) {
 
 
-                              if(item.product_id.toString().compareTo("432")==0 && newQuantity>10)
+                              if(item.product_id.toString().compareTo("432")==0 && newQuantity>procount)
                                 {
                                   ResponsiveInfo.showAlertDialog(context, "SaveKart","Maximum quantity reached");
                                 }
@@ -180,6 +183,7 @@ class _CounterScreenState extends State<CartScreen> {
 
 
                             },
+                            procount: procount,
                           ),
                         ),flex: 1,),
 
@@ -348,6 +352,32 @@ class _CounterScreenState extends State<CartScreen> {
   }
 
 
+  getSaveAppProCount()async{
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+
+      ResponsiveInfo.showLoaderDialog(context);
+    });
+
+
+    EcommerceApiHelper apihelper = new EcommerceApiHelper();
+
+    var t=EcommerceApiHelper.getTimeStamp();
+
+    var response= await  apihelper.get(Apimethodes.getSaveAppProCount+"?q="+t.toString());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+
+      Navigator.pop(context);
+    });
+    var js= jsonDecode( response) ;
+
+    SoldcountEntity soldcountEntity=SoldcountEntity.fromJson(js);
+
+    procount=soldcountEntity.availableCount!;
+
+  }
+
+
   getCartItems()async
   {
 
@@ -491,8 +521,9 @@ class QuantitySelector extends StatefulWidget {
   final int quantity;
   final ValueChanged<int> onQuantityChanged;
   final CartProductsData cartProductsData;
+  final int procount;
 
-  QuantitySelector({required this.quantity, required this.onQuantityChanged,required this.cartProductsData});
+  QuantitySelector({required this.quantity, required this.onQuantityChanged,required this.cartProductsData,required this.procount});
 
   @override
   _QuantitySelectorState createState() => _QuantitySelectorState();
@@ -511,6 +542,27 @@ class _QuantitySelectorState extends State<QuantitySelector> {
 
   void _incrementQuantity() {
     int currentstock=int.parse(_cartProductsData.current_qty.toString());
+
+    if(_cartProductsData.product_id.toString().compareTo("432")==0)
+      {
+
+        if(_currentQuantity<widget.procount) {
+          setState(() {
+            _currentQuantity++;
+          });
+          widget.onQuantityChanged(_currentQuantity);
+        }
+        else{
+         // setState(() {
+          //  _currentQuantity--;
+         // });
+         // widget.onQuantityChanged(_currentQuantity);
+          ResponsiveInfo.showAlertDialog(context, "SaveKart", "maximum count reached");
+        }
+      }
+    else{
+
+
     if(currentstock>=_currentQuantity) {
       setState(() {
         _currentQuantity++;
@@ -518,11 +570,15 @@ class _QuantitySelectorState extends State<QuantitySelector> {
       widget.onQuantityChanged(_currentQuantity);
     }
     else{
-      setState(() {
-        _currentQuantity--;
-      });
-      widget.onQuantityChanged(_currentQuantity);
+     // setState(() {
+//_currentQuantity--;
+     // });
+    //  widget.onQuantityChanged(_currentQuantity);
       ResponsiveInfo.showAlertDialog(context, "SaveKart", "Out of stock");
+    }
+
+
+
     }
   }
 

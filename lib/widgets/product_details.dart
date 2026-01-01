@@ -1334,7 +1334,7 @@ setState(() {
                 }
               }
             else{
-              ResponsiveInfo.showAlertDialog(context, "", "Your SAVE APp PRO stock capacity exceeds. Please sale the stock to increase your purchasing power");
+              ResponsiveInfo.showAlertDialog(context, "", "Your SAVE APP PRO stock capacity exceeds. Please sale the stock to increase your purchasing power");
 
             }
 

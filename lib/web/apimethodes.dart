@@ -65,5 +65,6 @@ class Apimethodes{
    static String updateOrderStaus="updateOrderStaus.php";
     static String showMemberDetails="getDSTByPhoneNumber.php";
    static String getSettingsSlider="getSettingsSlider.php";
+   static String getSaveAppProCount="getSaveAppProCount.php";
   // static String getUserDetails="getUserDetails.php";
 }
