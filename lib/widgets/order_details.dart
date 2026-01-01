@@ -60,6 +60,7 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
     // TODO: implement initState
     super.initState();
     calculateWalletBalance();
+    getWalletBalanceAndPoints();
     setState(() {
 
     if(orderDetailsData!.cartOrder!.orderItemStatus.toString().compareTo("0")==0)
@@ -362,7 +363,9 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
 
 
   void showRetryDialog() {
-    _totalAmount = double.parse(orderDetailsData.cartOrder!.price!);
+
+    int qty=int.parse(orderDetailsData.cartStock!.currentQty.toString());
+    _totalAmount = double.parse(orderDetailsData.cartOrder!.price!)*qty;
     EcommerceApiHelper.totalamount=_totalAmount;
     totalamount_to_paid=_totalAmount;
 

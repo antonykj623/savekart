@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:savekart/design/ResponsiveInfo.dart';
 import 'package:savekart/domain/product_count_entity.dart';
 import 'package:savekart/domain/product_stock_entity.dart';
+import 'package:savekart/domain/soldcount_entity.dart';
 import 'package:savekart/domain/wishlistcheck_entity.dart';
 import 'package:savekart/web/ecommerce_api_helper.dart';
 import 'package:savekart/widgets/cartscreen.dart';
@@ -1292,30 +1293,79 @@ setState(() {
 
   getProductExistsinCart() async{
 
-    ResponsiveInfo.ShowProgressDialog(context);
 
-    EcommerceApiHelper apihelper = new EcommerceApiHelper();
+    if(productByCategoryDataData.id.toString().compareTo("432")==0)
+      {
+        ResponsiveInfo.ShowProgressDialog(context);
 
-    var t=EcommerceApiHelper.getTimeStamp();
+        EcommerceApiHelper apihelper = new EcommerceApiHelper();
 
-    var response= await  apihelper.get(Apimethodes.checkProductExistsCart+"?q="+t.toString()+"&product_id="+productByCategoryDataData.id.toString());
+        var t = EcommerceApiHelper.getTimeStamp();
 
-    var js= jsonDecode( response) ;
+        var response = await apihelper.get(
+            Apimethodes.checkAutopoolCount + "?q=" + t.toString());
 
-    Navigator.pop(context);
+        var js = jsonDecode(response);
 
-    CartDataExistEntity exist=CartDataExistEntity.fromJson(js);
-     if(exist.data!.length>0)
-       {
+        Navigator.pop(context);
 
-         ResponsiveInfo.showAlertDialog(context, "", "Already added to cart");
-       }
-     else{
+        SoldcountEntity soldcountEntity=SoldcountEntity.fromJson(js);
 
-       addToCart();
-     }
+        if(soldcountEntity.status==1)
+          {
+
+            if(soldcountEntity.availableCount!>=1)
+              {
+                ResponsiveInfo.ShowProgressDialog(context);
+                var response = await apihelper.get(
+                    Apimethodes.checkProductExistsCart + "?q=" + t.toString() +
+                        "&product_id=" + productByCategoryDataData.id.toString());
+
+                var js = jsonDecode(response);
+
+                Navigator.pop(context);
+
+                CartDataExistEntity exist = CartDataExistEntity.fromJson(js);
+                if (exist.data!.length > 0) {
+                  ResponsiveInfo.showAlertDialog(context, "", "Already added to cart");
+                }
+                else {
+                  addToCart();
+                }
+              }
+            else{
+              ResponsiveInfo.showAlertDialog(context, "", "Your SAVE APp PRO stock capacity exceeds. Please sale the stock to increase your purchasing power");
+
+            }
 
 
+          }
+
+
+      }
+    else {
+      ResponsiveInfo.ShowProgressDialog(context);
+
+      EcommerceApiHelper apihelper = new EcommerceApiHelper();
+
+      var t = EcommerceApiHelper.getTimeStamp();
+
+      var response = await apihelper.get(
+          Apimethodes.checkProductExistsCart + "?q=" + t.toString() +
+              "&product_id=" + productByCategoryDataData.id.toString());
+
+      var js = jsonDecode(response);
+
+      Navigator.pop(context);
+
+      CartDataExistEntity exist = CartDataExistEntity.fromJson(js);
+      if (exist.data!.length > 0) {
+        ResponsiveInfo.showAlertDialog(context, "", "Already added to cart");
+      }
+      else {
+        addToCart();
+      }
+    }
 
   }
 

@@ -387,7 +387,7 @@ class _CounterScreenState extends State<CartScreen> {
 
   updateCartQuantity(String id,String quantity,int index)async{
 
-
+ResponsiveInfo.showLoaderDialog(context);
 
 
     EcommerceApiHelper apihelper = new EcommerceApiHelper();
@@ -400,6 +400,7 @@ class _CounterScreenState extends State<CartScreen> {
 
 
     var response= await  apihelper.post(Apimethodes.updateQuantity+"?q="+t.toString(),formDataPayload: mp);
+    Navigator.pop(context);
 
     print(response);
 
@@ -429,6 +430,7 @@ class _CounterScreenState extends State<CartScreen> {
   deleteFromCart(String id,int index)async
   {
 
+    ResponsiveInfo.showLoaderDialog(context);
     EcommerceApiHelper apihelper = new EcommerceApiHelper();
 
     var t=EcommerceApiHelper.getTimeStamp();
@@ -440,7 +442,7 @@ class _CounterScreenState extends State<CartScreen> {
 
     var response= await  apihelper.post(Apimethodes.deleteFromCart+"?q="+t.toString(),formDataPayload: mp);
 
-
+Navigator.pop(context);
     var js= jsonDecode( jsonEncode(response) ) ;
 
     if(cartItems[index].pointsRedeemed.toString().compareTo("1")==0)

@@ -28,6 +28,7 @@ import 'package:savekart/domain/profile_data_entity.dart';
 import 'package:savekart/domain/return_policy_entity.dart';
 import 'package:savekart/domain/return_request_entity.dart';
 import 'package:savekart/domain/searched_products_entity.dart';
+import 'package:savekart/domain/soldcount_entity.dart';
 import 'package:savekart/domain/state_list_entity.dart';
 import 'package:savekart/domain/sub_category_entity.dart';
 import 'package:savekart/domain/subcategory_entity.dart';
@@ -414,6 +415,10 @@ class JsonConvert {
       return data.map<SearchedProductsData>((Map<String, dynamic> e) =>
           SearchedProductsData.fromJson(e)).toList() as M;
     }
+    if (<SoldcountEntity>[] is M) {
+      return data.map<SoldcountEntity>((Map<String, dynamic> e) =>
+          SoldcountEntity.fromJson(e)).toList() as M;
+    }
     if (<StateListEntity>[] is M) {
       return data.map<StateListEntity>((Map<String, dynamic> e) =>
           StateListEntity.fromJson(e)).toList() as M;
@@ -595,6 +600,7 @@ class JsonConvertClassCollection {
     (ReturnRequestData).toString(): ReturnRequestData.fromJson,
     (SearchedProductsEntity).toString(): SearchedProductsEntity.fromJson,
     (SearchedProductsData).toString(): SearchedProductsData.fromJson,
+    (SoldcountEntity).toString(): SoldcountEntity.fromJson,
     (StateListEntity).toString(): StateListEntity.fromJson,
     (StateListData).toString(): StateListData.fromJson,
     (SubCategoryEntity).toString(): SubCategoryEntity.fromJson,

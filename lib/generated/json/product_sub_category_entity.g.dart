@@ -228,11 +228,10 @@ ProductSubCategoryDataData $ProductSubCategoryDataDataFromJson(
   if (upd != null) {
     productSubCategoryDataData.upd = upd;
   }
-  final String? current_qty = jsonConvert.convert<String>(json['current_qty']);
-  if (upd != null) {
-    productSubCategoryDataData.currentQty = current_qty;
+  final String? currentQty = jsonConvert.convert<String>(json['current_qty']);
+  if (currentQty != null) {
+    productSubCategoryDataData.currentQty = currentQty;
   }
-
   return productSubCategoryDataData;
 }
 
@@ -264,7 +263,7 @@ Map<String, dynamic> $ProductSubCategoryDataDataToJson(
   data['returnable'] = entity.returnable;
   data['return_days'] = entity.returnDays;
   data['upd'] = entity.upd;
-  data['current_qty']=entity.currentQty;
+  data['current_qty'] = entity.currentQty;
   return data;
 }
 
@@ -295,7 +294,7 @@ extension ProductSubCategoryDataDataExtension on ProductSubCategoryDataData {
     String? returnable,
     String? returnDays,
     String? upd,
-    String? currentQty
+    String? currentQty,
   }) {
     return ProductSubCategoryDataData()
       ..id = id ?? this.id
@@ -323,6 +322,6 @@ extension ProductSubCategoryDataDataExtension on ProductSubCategoryDataData {
       ..returnable = returnable ?? this.returnable
       ..returnDays = returnDays ?? this.returnDays
       ..upd = upd ?? this.upd
-      ..currentQty=currentQty?? this.currentQty;
+      ..currentQty = currentQty ?? this.currentQty;
   }
 }
