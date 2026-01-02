@@ -1314,7 +1314,7 @@ setState(() {
         if(soldcountEntity.status==1)
           {
 
-            if(soldcountEntity.availableCount!>=1)
+            if(soldcountEntity.availableCount!>=0)
               {
                 ResponsiveInfo.ShowProgressDialog(context);
                 var response = await apihelper.get(
