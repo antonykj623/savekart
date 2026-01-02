@@ -58,7 +58,7 @@ class _CounterScreenState extends State<CartScreen> {
     // TODO: implement initState
     super.initState();
     getCartItems();
-    getSaveAppProCount();
+    checkProCount();
   }
 
   @override
@@ -354,10 +354,7 @@ class _CounterScreenState extends State<CartScreen> {
 
   getSaveAppProCount()async{
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-
-      ResponsiveInfo.showLoaderDialog(context);
-    });
+    ResponsiveInfo.showLoaderDialog(context);
 
 
     EcommerceApiHelper apihelper = new EcommerceApiHelper();
@@ -365,15 +362,71 @@ class _CounterScreenState extends State<CartScreen> {
     var t=EcommerceApiHelper.getTimeStamp();
 
     var response= await  apihelper.get(Apimethodes.getSaveAppProCount+"?q="+t.toString());
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-
-      Navigator.pop(context);
-    });
+    Navigator.pop(context);
     var js= jsonDecode( response) ;
 
     SoldcountEntity soldcountEntity=SoldcountEntity.fromJson(js);
 
-    procount=soldcountEntity.availableCount!;
+    setState(() {
+      procount=soldcountEntity.availableCount!;
+    });
+
+
+
+  }
+
+  checkProCount() async{
+
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+
+      ResponsiveInfo.showLoaderDialog(context);
+    });
+
+      EcommerceApiHelper apihelper = new EcommerceApiHelper();
+
+      var t = EcommerceApiHelper.getTimeStamp();
+
+      var response = await apihelper.get(
+          Apimethodes.checkAutopoolCount + "?q=" + t.toString());
+
+      var js = jsonDecode(response);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+
+      Navigator.pop(context);
+    });
+
+
+
+      SoldcountEntity soldcountEntity=SoldcountEntity.fromJson(js);
+
+      if(soldcountEntity.status==1)
+      {
+
+        int p=soldcountEntity.availableCount!;
+
+        if(p>0){
+
+          setState(() {
+            procount=p;
+          });
+
+
+
+        }
+        else{
+
+          getSaveAppProCount();
+        }
+
+
+
+      }
+
+
+
+
 
   }
 
