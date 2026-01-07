@@ -798,7 +798,7 @@ bool iswalletused=false;
         String txnid = idTransaction.toString();
 
         String a = merchantcode + "|" + txnid + "|" + paidamount + "||" +
-            customerid + "|" + phone + "|" + email + "||||||||||" + salt;
+            customerid + "|" + phone.trim() + "|" + email + "||||||||||" + salt;
 
         // String a=    merchantId+"|"+randomNumber+"|1||"+consumerId+"|"+consumerMobileNo+"|"+consumerEmailId+"||||||||||1178920237UGKJGI";
 

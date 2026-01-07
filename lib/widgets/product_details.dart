@@ -1314,7 +1314,26 @@ setState(() {
         if(soldcountEntity.status==1)
           {
 
-            if(soldcountEntity.availableCount!>=0)
+            if(soldcountEntity.availableCount==-1)
+              {
+                ResponsiveInfo.ShowProgressDialog(context);
+                var response = await apihelper.get(
+                    Apimethodes.checkProductExistsCart + "?q=" + t.toString() +
+                        "&product_id=" + productByCategoryDataData.id.toString());
+
+                var js = jsonDecode(response);
+
+                Navigator.pop(context);
+
+                CartDataExistEntity exist = CartDataExistEntity.fromJson(js);
+                if (exist.data!.length > 0) {
+                  ResponsiveInfo.showAlertDialog(context, "", "Already added to cart");
+                }
+                else {
+                  addToCart();
+                }
+              }
+            else if(soldcountEntity.availableCount!>0)
               {
                 ResponsiveInfo.ShowProgressDialog(context);
                 var response = await apihelper.get(

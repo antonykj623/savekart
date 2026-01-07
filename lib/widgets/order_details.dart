@@ -364,7 +364,7 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
 
   void showRetryDialog() {
 
-    int qty=int.parse(orderDetailsData.cartStock!.currentQty.toString());
+    int qty=int.parse(orderDetailsData.cartOrder!.quantity.toString());
     _totalAmount = double.parse(orderDetailsData.cartOrder!.price!)*qty;
     EcommerceApiHelper.totalamount=_totalAmount;
     totalamount_to_paid=_totalAmount;
