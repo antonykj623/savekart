@@ -492,7 +492,7 @@ class _ProfileState extends State<Profile> {
 
                         AppStorage.SaveToken(AppStorage.token, "");
 
-                        Navigator.push(context,
+                        Navigator.pushReplacement(context,
                             MaterialPageRoute(builder:
                                 (context) =>
                                 LoginPage()
@@ -877,7 +877,7 @@ class _ProfileState extends State<Profile> {
 
       AppStorage.SaveToken(AppStorage.token, "");
 
-      Navigator.push(context,
+      Navigator.pushReplacement(context,
           MaterialPageRoute(builder:
               (context) =>
               LoginPage()
