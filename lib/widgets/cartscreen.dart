@@ -172,12 +172,19 @@ class _CounterScreenState extends State<CartScreen> {
                                   ResponsiveInfo.showAlertDialog(context, "SaveKart","Maximum quantity reached");
                                 }
                               else {
-                                updateCartQuantity(item.cartid.toString(),
-                                    newQuantity.toString(), index);
 
-                                setState(() {
-                                  item.quantity = newQuantity.toString();
-                                });
+                                if(newQuantity>10)
+                                  {
+                                    ResponsiveInfo.showAlertDialog(context, "SaveKart", "Can't add more than 10 in a single order");
+                                  }
+                                else {
+                                  updateCartQuantity(item.cartid.toString(),
+                                      newQuantity.toString(), index);
+
+                                  setState(() {
+                                    item.quantity = newQuantity.toString();
+                                  });
+                                }
                               }
 
 
@@ -600,10 +607,16 @@ class _QuantitySelectorState extends State<QuantitySelector> {
       {
 
         if(_currentQuantity<widget.procount) {
-          setState(() {
-            _currentQuantity++;
-          });
-          widget.onQuantityChanged(_currentQuantity);
+
+          if(_currentQuantity<10) {
+            setState(() {
+              _currentQuantity++;
+            });
+            widget.onQuantityChanged(_currentQuantity);
+          }
+          else{
+            ResponsiveInfo.showAlertDialog(context, "SaveKart", "Can't add more than 10 in a single order");
+          }
         }
         else{
          // setState(() {
