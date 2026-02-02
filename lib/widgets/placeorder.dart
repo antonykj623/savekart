@@ -722,7 +722,7 @@ bool iswalletused=false;
 
 
 
-        showOrderDialog(context, true, "Your order placed successfully!");
+        showOrderDialog(context, true, "\nORDER ID : "+orderid+"\n Your order placed successfully!");
 
       }
       else{
@@ -959,7 +959,7 @@ updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
 
 
             // For success
-            // showOrderDialog(context, true, "Your order  placed successfully!");
+             showOrderDialog(context, true, "\nORDER ID : "+orderid+"\nYour order  placed successfully!");
           }
         else{
 
