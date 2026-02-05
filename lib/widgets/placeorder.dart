@@ -1025,7 +1025,7 @@ updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
 
     if(paymentstatus.compareTo("1")==0)
       {
-        showOrderDialog(context, true, "Your order  placed successfully!");
+        showOrderDialog(context, true,"Order Id : "+orderid+ "Your order  placed successfully!");
       }
     else{
     //  ResponsiveInfo.showAlertDialog(context, "Savekart", "Payment failed");
@@ -1073,13 +1073,13 @@ updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
         updateWalletPoints(orderid);
 
         // For success
-        showOrderDialog(context, true, "Your order  placed successfully!");
+        showOrderDialog(context, true, "Order ID : "+order_id+"Your order  placed successfully!");
 
       }
       else{
 
 // For failure
-        showOrderDialog(context, false, "Payment failed. Please try again.");
+        showOrderDialog(context, false, "Order ID : "+order_id+"Payment failed. Please try again.");
       }
 
 

@@ -189,6 +189,8 @@ class _OrdersState extends State<Orders> {
                         // Order Status Messages
 
                         ...[
+                          Text("Order ID : "+item.cartOrder!.orderId.toString()),
+
                           if (paymentDetails.paymentStatus.toString().compareTo("1")!=0)
                             _buildStatusText("Payment failed", Colors.red)
                           else ...[
