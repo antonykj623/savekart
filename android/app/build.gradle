@@ -13,21 +13,28 @@ if (localPropertiesFile.exists()) {
 }
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '65'
+
+if (flutterVersionCode == null || flutterVersionCode.trim().isEmpty()) {
+    flutterVersionCode = '68'
 }
 else{
-    flutterVersionCode = '65'
+    flutterVersionCode = '68'
 
 }
+
+
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '7.4'
+
+if (flutterVersionName == null || flutterVersionName.trim().isEmpty()) {
+    flutterVersionName = '7.7'
 }
 else{
-    flutterVersionName = '7.4'
+    flutterVersionName = '7.7'
+
 }
+
+
 
 android {
     namespace "com.integra.savekart"

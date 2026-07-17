@@ -51,6 +51,8 @@ bool iswalletused=false;
 
   _PlaceOrderWidgetState(this._totalAmount);
 
+  String name="",regid="";
+
   @override
   void initState() {
     super.initState();
@@ -59,6 +61,7 @@ bool iswalletused=false;
     getCartItems();
     getAllAddress();
     calculateWalletBalance();
+    getProfile();
     EcommerceApiHelper.totalamount=_totalAmount;
     totalamount_to_paid=_totalAmount;
     wlCheckoutFlutter.on(WeiplCheckoutFlutter.wlResponse, handleResponse);
@@ -713,7 +716,7 @@ bool iswalletused=false;
 
       Map<String, dynamic> data=  jsonDecode(d)  ;
 
-      if(data['status']==1) {
+        if(data['status']==1) {
         String idTransaction = data['data'].toString();
         orderid=idTransaction.toString();
 
@@ -725,6 +728,8 @@ bool iswalletused=false;
         showOrderDialog(context, true, "\nORDER ID : "+orderid+"\n Your order placed successfully!");
 
       }
+
+
       else{
         //  ResponsiveInfo.showAlertDialog(context, "Savekart", "Something went wrong");
         Navigator.of(context).pushAndRemoveUntil(
@@ -1025,7 +1030,7 @@ updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
 
     if(paymentstatus.compareTo("1")==0)
       {
-        showOrderDialog(context, true,"Order Id : "+orderid+ "Your order  placed successfully!");
+        showOrderDialog(context, true,"\nOrder Id : "+orderid+ "Your order  placed successfully!");
       }
     else{
     //  ResponsiveInfo.showAlertDialog(context, "Savekart", "Payment failed");
@@ -1073,13 +1078,13 @@ updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
         updateWalletPoints(orderid);
 
         // For success
-        showOrderDialog(context, true, "Order ID : "+order_id+"Your order  placed successfully!");
+        showOrderDialog(context, true, "\nOrder ID : "+order_id+"Your order  placed successfully!");
 
       }
       else{
 
 // For failure
-        showOrderDialog(context, false, "Order ID : "+order_id+"Payment failed. Please try again.");
+        showOrderDialog(context, false, "\nOrder ID : "+order_id+"Payment failed. Please try again.");
       }
 
 
@@ -1090,7 +1095,37 @@ updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
   }
 
 
+  getProfile()async{
 
+    Map<String,String> m=new HashMap();
+
+
+    ApiHelper apihelper = new ApiHelper();
+
+    var response= await  apihelper.post(Apimethodes.getUserDetails,formDataPayload: m);
+
+
+
+    var js= jsonDecode(jsonDecode(response)) ;
+
+    print(js);
+
+    ProfileDataEntity entity=ProfileDataEntity.fromJson(js);
+
+    if(entity.status==1)
+    {
+
+      setState(() {
+        name=entity.data!.fullName.toString();
+        regid=entity.data!.regCode.toString();
+
+
+
+      });
+
+    }
+
+  }
 
   void showOrderDialog(BuildContext context, bool isSuccess, String message) {
     showDialog(
@@ -1110,7 +1145,7 @@ updatePaymentStatus(transactiondetails,transactionId,paymentstatus);
               Text(isSuccess ? 'Order Successful' : 'Order Failed'),
             ],
           ),
-          content: Text(message),
+          content: Text(message +"\n"+"Name : "+name+"\nReg Code : "+regid),
           actions: [
             TextButton(
               child: Text("OK"),

@@ -49,6 +49,7 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
   ];
 
   String orderid="0";
+  String name="",regid="";
 
   OrderDetailsData orderDetailsData;
   WeiplCheckoutFlutter wlCheckoutFlutter = WeiplCheckoutFlutter();
@@ -59,6 +60,7 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    getProfile();
     calculateWalletBalance();
     getWalletBalanceAndPoints();
     setState(() {
@@ -96,6 +98,37 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
 
     wlCheckoutFlutter.on(WeiplCheckoutFlutter.wlResponse, handleResponse);
   }
+  getProfile()async{
+
+    Map<String,String> m=new HashMap();
+
+
+    ApiHelper apihelper = new ApiHelper();
+
+    var response= await  apihelper.post(Apimethodes.getUserDetails,formDataPayload: m);
+
+
+
+    var js= jsonDecode(jsonDecode(response)) ;
+
+    print(js);
+
+    ProfileDataEntity entity=ProfileDataEntity.fromJson(js);
+
+    if(entity.status==1)
+    {
+
+      setState(() {
+        name=entity.data!.fullName.toString();
+        regid=entity.data!.regCode.toString();
+
+
+
+      });
+
+    }
+
+  }
 
   void handleResponse(dynamic response) {
     //  ResponsiveInfo.showAlertDialog(context, "Response", response.toString());
@@ -123,7 +156,7 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
     if(statusCode.compareTo("0300")==0)
     {
 
-      if(statusMessage.compareTo("SUCCESS")==0)
+      if(statusMessage.toLowerCase().compareTo("success")==0)
       {
         updateWalletBalance();
         updateWalletPoints(orderid);
@@ -269,10 +302,12 @@ class _OrderItemDetailsScreenState extends State<OrderItemDetailsScreen> {
                       padding: EdgeInsets.only(left: 10),
                       child: Text(
                         orderDetailsData.cartProduct!.productName.toString()+"\n"+
-                            "Pice : "+orderDetailsData.cartOrder!.price.toString()+"\n"
+                            "Unit Price : "+orderDetailsData.cartOrder!.price.toString()+"\n"
                             "Quantity : "+orderDetailsData.cartOrder!.quantity.toString()+"\n"+
                         "Order No. : "+orderDetailsData.cartOrder!.orderId.toString()+"\n"+
-                        "Item Code : "+orderDetailsData.cartProduct!.productCode.toString()+"/"+orderDetailsData.cartOrder!.id.toString()
+                        "Item Code : "+orderDetailsData.cartProduct!.productCode.toString()+"/"+orderDetailsData.cartOrder!.id.toString()+"\n"+
+                        "Name : "+name+"\n"+
+                        "Reg Code : "+regid
                         ,
 
 

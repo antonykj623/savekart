@@ -1,5 +1,6 @@
 
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -12,6 +13,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../design/ResponsiveInfo.dart';
 import '../../domain/app_version_entity.dart';
 import '../../domain/order_details_entity.dart';
+import '../../domain/profile_data_entity.dart';
+import '../../web/api_helper.dart';
 import '../../web/apimethodes.dart';
 import '../../web/ecommerce_api_helper.dart';
 import '../order_details.dart';
@@ -31,12 +34,45 @@ class _OrdersState extends State<Orders> {
 
   List<OrderDetailsData>? data = [];
   String serverdate="";
+  String name="",regid="";
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getAllOrders();
     getAppUpdates();
+    getProfile();
+  }
+  getProfile()async{
+
+    Map<String,String> m=new HashMap();
+
+
+    ApiHelper apihelper = new ApiHelper();
+
+    var response= await  apihelper.post(Apimethodes.getUserDetails,formDataPayload: m);
+
+
+
+    var js= jsonDecode(jsonDecode(response)) ;
+
+    print(js);
+
+    ProfileDataEntity entity=ProfileDataEntity.fromJson(js);
+
+    if(entity.status==1)
+    {
+
+      setState(() {
+        name=entity.data!.fullName.toString();
+        regid=entity.data!.regCode.toString();
+
+
+
+      });
+
+    }
+
   }
 
   getAppUpdates()async{
@@ -190,6 +226,8 @@ class _OrdersState extends State<Orders> {
 
                         ...[
                           Text("Order ID : "+item.cartOrder!.orderId.toString()),
+                          Text("Name : "+name),
+                          Text("Reg Code : "+regid),
 
                           if (paymentDetails.paymentStatus.toString().compareTo("1")!=0)
                             _buildStatusText("Payment failed", Colors.red)
