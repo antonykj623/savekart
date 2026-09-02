@@ -40,7 +40,7 @@ class _PlaceOrderWidgetState extends State<PlaceOrderWidget> {
   ];
   double _totalAmount = 0,walletbalance=0,usedwalletamount=0,totalamount_to_paid=0;
   String? _selectedOption="0";
-  final List<String> _options = ["Cash on Delivery", "Online Payment"];
+  final List<String> _options = [ "Online Payment"];
 bool iswalletused=false;
 
   final _enteredwalletamountcontroller = TextEditingController();
@@ -697,8 +697,7 @@ bool iswalletused=false;
     mp['address_id']=selected_addressid.toString();
     mp['totalprice']=total;
     mp['isWalletUsed']=(iswalletsused?1:0).toString();
-     mp['paid_amount']=paidamount;
-
+    mp['paid_amount']=paidamount;
     mp['payment_type']=paymenttype.toString();
     mp['wallet_amount_used']=walletamountused;
 
@@ -847,7 +846,7 @@ bool iswalletused=false;
             "token": value,
             "paymentMode": "all",
             "merchantLogoUrl":
-            "https://mysaveapp.com/ic_launcher.png",
+            "https://mysaving.in/client/savekart_api/ic_launcher.png",
             "merchantId": merchantcode,
             "currency": "INR",
             "consumerId": customerid,
@@ -876,54 +875,6 @@ bool iswalletused=false;
 
 
     }
-
-
-
-
-
-
-
-     //real one
-     // if(data['status']==1) {
-     //   if (_totalAmount == 0 && paymenttype==3 ) {
-     //
-     //     updateWalletBalance();
-     //     updateWalletPoints(data['data']);
-     //
-     //     showOrderDialog(context, true, "Your order placed successfully!");
-     //   }
-     //   else{
-     //
-     //     String urldata=data['data'];
-     //
-     //     Completer c=Completer();
-     //
-     //
-     //     NativeBridge().redirectToNative(urldata,c);
-     //    var result= await c.future;
-     //    if(result!=null&&result.toString().isNotEmpty && result.toString().contains("https://mysaveapp.com/ecommercepayment/paymentgateway/result.php")) {
-     //      showPaymentStatus(result);
-     //    }
-     //    else{
-     //      ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch your payment details");
-     //      Navigator.of(context).pushAndRemoveUntil(
-     //        MaterialPageRoute(builder: (context) => HomeScreen()),
-     //            (Route<
-     //            dynamic> route) => false, // Remove all previous routes
-     //      );
-     //    }
-     //
-     //   }
-     // }
-     // else{
-     //   ResponsiveInfo.showAlertDialog(context, "Savekart", "Something went wrong");
-     //   Navigator.of(context).pushAndRemoveUntil(
-     //     MaterialPageRoute(builder: (context) => HomeScreen()),
-     //         (Route<
-     //         dynamic> route) => false, // Remove all previous routes
-     //   );
-     // }
-
 
 
 

@@ -149,14 +149,14 @@ class _LoginPageState extends State<LoginPage> {
                                           ResponsiveInfo.showLoaderDialog(
                                               context);
                                           Map<String,String> m=new HashMap();
-                                          m['uuid']="siuhdfid";
+                                          m['uuid']="sdfddfdf";
                                           m['mobile']=mobile.text.toString();
                                           m['password']=Password.text.toString();
                                           m['timestamp']=ApiHelper.getTimeStamp();
 
                                           ApiHelper apihelper = new ApiHelper();
 
-                                       var response= await  apihelper.post(Apimethodes.login,formDataPayload: m);
+                                       var response= await  apihelper.post(Apimethodes.login+"?q="+ApiHelper.getTimeStamp().toString(),formDataPayload: m);
 
                                        Navigator.pop(context);
 

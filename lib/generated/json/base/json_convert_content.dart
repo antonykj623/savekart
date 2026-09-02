@@ -29,6 +29,8 @@ import 'package:savekart/domain/return_policy_entity.dart';
 import 'package:savekart/domain/return_request_entity.dart';
 import 'package:savekart/domain/searched_products_entity.dart';
 import 'package:savekart/domain/soldcount_entity.dart';
+import 'package:savekart/domain/ssm/s_s_m_event_entity.dart';
+import 'package:savekart/domain/ssm/s_s_m_ticket_entity.dart';
 import 'package:savekart/domain/state_list_entity.dart';
 import 'package:savekart/domain/sub_category_entity.dart';
 import 'package:savekart/domain/subcategory_entity.dart';
@@ -419,6 +421,22 @@ class JsonConvert {
       return data.map<SoldcountEntity>((Map<String, dynamic> e) =>
           SoldcountEntity.fromJson(e)).toList() as M;
     }
+    if (<SSMEventEntity>[] is M) {
+      return data.map<SSMEventEntity>((Map<String, dynamic> e) =>
+          SSMEventEntity.fromJson(e)).toList() as M;
+    }
+    if (<SSMEventData>[] is M) {
+      return data.map<SSMEventData>((Map<String, dynamic> e) =>
+          SSMEventData.fromJson(e)).toList() as M;
+    }
+    if (<SSMTicketEntity>[] is M) {
+      return data.map<SSMTicketEntity>((Map<String, dynamic> e) =>
+          SSMTicketEntity.fromJson(e)).toList() as M;
+    }
+    if (<SSMTicketData>[] is M) {
+      return data.map<SSMTicketData>((Map<String, dynamic> e) =>
+          SSMTicketData.fromJson(e)).toList() as M;
+    }
     if (<StateListEntity>[] is M) {
       return data.map<StateListEntity>((Map<String, dynamic> e) =>
           StateListEntity.fromJson(e)).toList() as M;
@@ -601,6 +619,10 @@ class JsonConvertClassCollection {
     (SearchedProductsEntity).toString(): SearchedProductsEntity.fromJson,
     (SearchedProductsData).toString(): SearchedProductsData.fromJson,
     (SoldcountEntity).toString(): SoldcountEntity.fromJson,
+    (SSMEventEntity).toString(): SSMEventEntity.fromJson,
+    (SSMEventData).toString(): SSMEventData.fromJson,
+    (SSMTicketEntity).toString(): SSMTicketEntity.fromJson,
+    (SSMTicketData).toString(): SSMTicketData.fromJson,
     (StateListEntity).toString(): StateListEntity.fromJson,
     (StateListData).toString(): StateListData.fromJson,
     (SubCategoryEntity).toString(): SubCategoryEntity.fromJson,

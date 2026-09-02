@@ -9,15 +9,15 @@ import 'package:http/http.dart' as http;
 import 'AppStorage.dart';
 
 
-String imagePath = 'https://eduklader.com/public/assets/uploads/user-images/';
+
 
 class ApiHelper  {
-   String _baseUrl = 'https://mysaving.in/IntegraAccount/api/';
+   String _baseUrl = 'https://mysaving.in/client/save_popular/';
   String sessionTimedOutMessage = 'Server is taking too long to respond';
-  String resulturl="https://mysaveapp.com/rechargeAPINew/paymentgateway/result.php";
-     String imgbaseurl="https://mysaving.in/uploads/profile/";
 
-  static String bannerimageurl="https://mysaving.in/cart/save_cart_sliders/";
+
+
+  static String bannerimageurl="https://mysaving.in/skfiles/save_cart_sliders/";
 
   final int timeoutDuration = 40;
 

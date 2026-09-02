@@ -9,18 +9,18 @@ import 'package:http/http.dart' as http;
 import 'AppStorage.dart';
 
 
-String imagePath = 'https://eduklader.com/public/assets/uploads/user-images/';
+
 
 class EcommerceApiHelper  {
-  static const _baseUrl = 'https://mysaving.in/IntegraAccount/ecommerce_api/';
+  static const _baseUrl = 'https://mysaving.in/client/savekart_api/';
 
-  static const baseUrldata = 'https://mysaving.in/IntegraAccount/ecommerce_api/';
+  static const baseUrldata = 'https://mysaving.in/save_popular/savekart_api/';
 
-  static const categoryimageurl="https://mysaving.in/cart/category/";
-  static const brandimageurl="https://mysaving.in/cart/brand/";
+  static const categoryimageurl="https://mysaving.in/skfiles/category/";
+  static const brandimageurl="https://mysaving.in/skfiles/brand/";
 
-  static const productimageurl="https://mysaving.in/cart/";
-  static const returnproductimagesurl="https://mysaving.in/cart/returnproductimages/";
+  static const productimageurl="https://mysaving.in/skfiles/";
+  static const returnproductimagesurl="https://mysaving.in/skfiles/returnproductimages/";
 
   String sessionTimedOutMessage = 'Server is taking too long to respond';
 
@@ -84,8 +84,7 @@ class EcommerceApiHelper  {
         bool showLoadingDialog = false,
         bool? urlV5,
         bool showErrorDialog = true}) async {
-    // assert((jsonPayload == null && formDataPayload != null) ||
-    //     (jsonPayload != null && formDataPayload == null));
+
 
     try {
       String url = (endpoint.startsWith(_baseUrl) ? '' : _baseUrl) + endpoint;

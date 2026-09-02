@@ -56,23 +56,23 @@ getProfile();
             Stack(
               children: [
 
-                Align(
-                  alignment: FractionalOffset.center,
-                  child:             (profileImageUrl.isNotEmpty)? GestureDetector(
-                    onTap: _changeProfileImage, // Allow image change on tap
-                    child: CircleAvatar(
-                        radius: 50,
-                        backgroundImage:  NetworkImage(profileImageUrl)
-                    ),
-                  ) :
-                  GestureDetector(
-                    onTap: _changeProfileImage, // Allow image change on tap
-                    child: CircleAvatar(
-                        radius: 50,
-                        backgroundImage:  AssetImage('assets/profileplaceholder.png')
-                    ),
-                  ),
-                ),
+                // Align(
+                //   alignment: FractionalOffset.center,
+                //   child:             (profileImageUrl.isNotEmpty)? GestureDetector(
+                //     onTap: _changeProfileImage, // Allow image change on tap
+                //     child: CircleAvatar(
+                //         radius: 50,
+                //         backgroundImage:  NetworkImage(profileImageUrl)
+                //     ),
+                //   ) :
+                //   GestureDetector(
+                //     onTap: _changeProfileImage, // Allow image change on tap
+                //     child: CircleAvatar(
+                //         radius: 50,
+                //         backgroundImage:  AssetImage('assets/profileplaceholder.png')
+                //     ),
+                //   ),
+                // ),
 
                 Align(
                   alignment: FractionalOffset.topCenter,
@@ -235,7 +235,7 @@ getProfile();
         emailController.text=entity.data!.emailId.toString();
         usernameController.text=entity.data!.username.toString();
         phoneNumber=entity.data!.mobile.toString();
-        profileImageUrl=ApiHelper().imgbaseurl+entity.data!.profileImage.toString();
+       // profileImageUrl=ApiHelper().imgbaseurl+entity.data!.profileImage.toString();
 
       });
 

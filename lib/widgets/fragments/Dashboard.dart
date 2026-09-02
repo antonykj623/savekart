@@ -32,6 +32,7 @@ import '../all_products_by_category.dart';
 import '../cartscreen.dart';
 import '../fasting_moving_items.dart';
 import '../productsbycategory.dart';
+import '../s_s_m_ticket.dart';
 import '../searchproduct.dart';
 import '../todays_special_offer.dart';
 import '../todaysbulkdetails.dart';
@@ -61,7 +62,7 @@ class _DashboardState extends State<Dashboard> {
   String cartcount="0";
   int walletpoints=0;
 
-  String name="",regid="";
+  String name="",regid="",mobile="";
   final StreamController<SwipeRefreshState> _controller = StreamController<SwipeRefreshState>();
   Stream<SwipeRefreshState> get myRefreshStateStream => _controller.stream;
 
@@ -119,6 +120,25 @@ class _DashboardState extends State<Dashboard> {
 
 
         actions: [
+
+          IconButton(onPressed: () async {
+
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SSMTicket(mobile)),
+            );
+
+            if (result != null||result==null) {
+
+              getCartCount();
+              getWalletPoints();
+              getWalletBalanceAndPoints();
+
+            }
+
+
+          }, icon: Icon(Icons.sticky_note_2,size: 25,color: Color(0xff0B7D97),)),
+
           IconButton(onPressed: () async {
 
 
@@ -983,6 +1003,7 @@ class _DashboardState extends State<Dashboard> {
       setState(() {
         name=entity.data!.fullName.toString();
         regid=entity.data!.regCode.toString();
+        mobile=entity.data!.mobile.toString();
 
 
 
