@@ -59,8 +59,13 @@ class SavekartApiService {
         Map<String, dynamic>? body,
         String? token,
       }) async {
+
+
     try {
       final url = Uri.parse('$baseUrl$endpoint');
+
+      print(url.path);
+      print(body.toString());
 
       final response = await http.post(
         url,

@@ -202,12 +202,19 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
 
   showProfileDetails() async {
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
 
+      ResponsiveInfo.showLoaderDialog(context);
+    });
     //ResponsiveInfo.ShowProgressDialog(context);
     Map<String,String> m=new HashMap();
     ApiHelper apihelper1 = new ApiHelper();
 
     var response2= await  apihelper1.post(Apimethodes.getUserDetails,formDataPayload: m);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      Navigator.pop(context);
+    });
     var js= jsonDecode(jsonDecode(response2)) ;
     ProfileDataEntity entity=ProfileDataEntity.fromJson(js);
 
@@ -419,17 +426,25 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
 
   updatePaymentStatus(String transactionId,String paymentstatus)async{
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      ResponsiveInfo.showLoaderDialog(context);
+    });
+
     String? token= await AppStorage.getString(AppStorage.token);
 
     final res = await SavekartApiService.post(
-      Apimethodes.addEventBookingDetails,
+      Apimethodes.updatePaymentStatus,
       token: token,
       body: {
         'ref_id': transactionId,
         'payment_status': paymentstatus
       },
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
 
+  Navigator.pop(context);
+    });
 
     if(res!=null){
 

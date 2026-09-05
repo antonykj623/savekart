@@ -1,14 +1,23 @@
+import 'dart:collection';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as ApiService;
 import 'package:savekart/design/ResponsiveInfo.dart';
 import 'package:savekart/web/SavekartApiHelper.dart';
 import 'package:savekart/web/apimethodes.dart';
+import 'package:savekart/web/encrypthelper.dart';
 // Make sure this import points to your actual TicketInfoScreen file
 import 'package:savekart/widgets/ticketinfo.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import '../domain/profile_data_entity.dart';
 import '../domain/ssm/s_s_m_event_entity.dart';
 import '../domain/ssm/s_s_m_ticket_entity.dart';
 import '../web/AppStorage.dart';
+import 'package:intl/intl.dart';
+
+import '../web/api_helper.dart';
+import 'bookedticketdetails.dart';
 
 class SSMTicket extends StatefulWidget {
   String mobile;
@@ -26,6 +35,11 @@ class _SSMTicketState extends State<SSMTicket> {
   SSMTicketData? ssmt=null;
 
   String qrstring="";
+  String formattedDate ="";
+
+  String email="";
+  String phone="";
+  String fullname="";
 
   void _increment() {
     setState(() {
@@ -48,6 +62,7 @@ class _SSMTicketState extends State<SSMTicket> {
     super.initState();
 
     getEventDetails();
+    showProfileDetails();
   }
 
 
@@ -62,13 +77,40 @@ class _SSMTicketState extends State<SSMTicket> {
         title:  Text('Mega SSM Ticket', style: TextStyle(color: Colors.black,fontSize: 14)),
         backgroundColor: Colors.white,
         elevation: 1,
+        actions: [
+          Padding(padding: EdgeInsets.all(10),
+
+          child: IconButton(onPressed: (){
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => EventTicketsPage(eventId: ssmdata!.id.toString(),mobile: phone,)),
+            );
+
+          }, icon: Icon(Icons.qr_code,color: Colors.black54,)),
+
+          )
+        ],
       ),
       body: Center(
-        child: (qrstring.isNotEmpty)?QrImageView(
-          data: qrstring,
-          version: QrVersions.auto,
-          size: 250,
-        ):  (ssmdata!=null)?SingleChildScrollView(
+        child: (qrstring.isNotEmpty)? Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+
+            QrImageView(
+              data: qrstring,
+              version: QrVersions.auto,
+              size: 250,
+            ),
+            Padding(padding: EdgeInsets.all(10),
+            child: Text("Scan this QR code.Mark your attendance\n\n Venue : "+ssmdata!.venue.toString()+" "+ssmdata!.place.toString()+"\n\nEvent : "+ssmdata!.eventName.toString()+"\n\nDate : "+formattedDate,style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+            
+            )
+          ],
+        )
+        
+        :  (ssmdata!=null)?SingleChildScrollView(
           padding:  EdgeInsets.all(16.0),
           child: Material(
             elevation: 4,
@@ -122,7 +164,7 @@ class _SSMTicketState extends State<SSMTicket> {
                   // Event Details (Specific text from image)
                   _buildDetailText(
                       'VENUE: '+ssmdata!.venue.toString()+"\n"+ssmdata!.place.toString()),
-                  _buildDetailText('DATE: '+ssmdata!.eventDate.toString()),
+                  _buildDetailText('DATE: '+formattedDate),
                   _buildDetailText('TIME: '+ssmdata!.time.toString()),
                    SizedBox(height: 32),
 
@@ -216,6 +258,35 @@ class _SSMTicketState extends State<SSMTicket> {
     );
   }
 
+  showProfileDetails() async {
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      ResponsiveInfo.showLoaderDialog(context);
+    });
+    //ResponsiveInfo.ShowProgressDialog(context);
+    Map<String,String> m=new HashMap();
+    ApiHelper apihelper1 = new ApiHelper();
+
+    var response2= await  apihelper1.post(Apimethodes.getUserDetails,formDataPayload: m);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      Navigator.pop(context);
+    });
+    var js= jsonDecode(jsonDecode(response2)) ;
+    ProfileDataEntity entity=ProfileDataEntity.fromJson(js);
+
+    setState(() {
+
+      email=entity.data!.emailId.toString();
+      phone=entity.data!.mobile.toString();
+      fullname=entity.data!.fullName.toString();
+    });
+
+
+    // Navigator.pop(context);
+  }
+
   // Helper widget for consistent detail text style
   Widget _buildDetailText(String text) {
     return Padding(
@@ -235,6 +306,10 @@ class _SSMTicketState extends State<SSMTicket> {
 
   getEventDetails()async
   {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      ResponsiveInfo.showLoaderDialog(context);
+    });
     String? token= await AppStorage.getString(AppStorage.token);
     final response = await SavekartApiService.get(
       Apimethodes.getEventData,
@@ -242,6 +317,11 @@ class _SSMTicketState extends State<SSMTicket> {
     );
 
     print(response);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+   Navigator.pop(context);
+    });
 
     if(response!=null )
       {
@@ -253,7 +333,9 @@ class _SSMTicketState extends State<SSMTicket> {
             setState(() {
 
               ssmdata=smm.data!;
-              getEventTicket(ssmdata!.id.toString());
+              DateTime parsedDate = DateTime.parse(ssmdata!.eventDate!.toString());
+               formattedDate = DateFormat('dd/MM/yyyy').format(parsedDate);
+             // getEventTicket(ssmdata!.id.toString());
             });
 
          
@@ -277,6 +359,11 @@ class _SSMTicketState extends State<SSMTicket> {
 
   getEventTicket(String eventid)async{
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      ResponsiveInfo.showLoaderDialog(context);
+    });
+
     String? token= await AppStorage.getString(AppStorage.token);
 
     final res = await SavekartApiService.post(
@@ -287,6 +374,12 @@ class _SSMTicketState extends State<SSMTicket> {
         'mobile': widget.mobile
       },
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+
+      Navigator.pop(context);
+    });
 
     if(res!=null)
       {
@@ -310,7 +403,7 @@ class _SSMTicketState extends State<SSMTicket> {
 
                       ssmt=smm.data![0];
 
-                      qrstring=   ssmt!.toJson().toString();
+                      qrstring=   EncryptionHelper.encryptText(ssmt!.toJson().toString());
 
                     }
 
