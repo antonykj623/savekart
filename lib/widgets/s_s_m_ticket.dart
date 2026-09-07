@@ -17,6 +17,7 @@ import '../web/AppStorage.dart';
 import 'package:intl/intl.dart';
 
 import '../web/api_helper.dart';
+import 'Qrscanner.dart';
 import 'bookedticketdetails.dart';
 
 class SSMTicket extends StatefulWidget {
@@ -88,6 +89,19 @@ class _SSMTicketState extends State<SSMTicket> {
             );
 
           }, icon: Icon(Icons.qr_code,color: Colors.black54,)),
+
+          ),
+
+          Padding(padding: EdgeInsets.all(10),
+
+            child: IconButton(onPressed: (){
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => QRScannerPage()),
+              );
+
+            }, icon: Icon(Icons.scanner,color: Colors.black54,)),
 
           )
         ],

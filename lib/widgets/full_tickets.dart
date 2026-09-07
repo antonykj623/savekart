@@ -4,6 +4,13 @@ import 'package:http/http.dart' as http;
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:savekart/web/encrypthelper.dart';
 import '../web/AppStorage.dart';
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
+import 'package:flutter/rendering.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class TicketDetailsPage extends StatefulWidget {
   final String eventRefId;
@@ -28,6 +35,7 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
   int unverifiedCount = 0;
   int sharedCount = 0;
   int notSharedCount = 0;
+  final Map<String, GlobalKey> qrKeys = {};
 
   @override
   void initState() {
@@ -107,6 +115,50 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
       });
     }
   }
+
+  Future<File?> qrImageToFile(String ticketId) async {
+    try {
+      final key = qrKeys[ticketId];
+
+      if (key == null || key.currentContext == null) {
+        return null;
+      }
+
+      final RenderRepaintBoundary boundary =
+      key.currentContext!.findRenderObject()
+      as RenderRepaintBoundary;
+
+      final ui.Image image = await boundary.toImage(
+        pixelRatio: 3.0,
+      );
+
+      final ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
+
+      if (byteData == null) {
+        return null;
+      }
+
+      final Uint8List pngBytes =
+      byteData.buffer.asUint8List();
+
+      final Directory directory =
+      await getTemporaryDirectory();
+
+      final File file = File(
+        '${directory.path}/ticket_$ticketId.png',
+      );
+
+      await file.writeAsBytes(pngBytes);
+
+      return file;
+    } catch (e) {
+      print('QR File Error: $e');
+      return null;
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -265,6 +317,14 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
     final bool shared =
         ticket['shared'].toString() == '1';
 
+    final String ticketId =
+    ticket['id'].toString();
+
+    qrKeys.putIfAbsent(
+      ticketId,
+          () => GlobalKey(),
+    );
+
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
 
@@ -277,10 +337,24 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
 
           children: [
 
-            QrImageView(
-              data:  EncryptionHelper.encryptText(widget.eventRefId.toString()+":"+ticket['id'].toString()),
-              version: QrVersions.auto,
-              size: 125,
+            RepaintBoundary(
+              key: qrKeys.putIfAbsent(
+                ticket['id'].toString(),
+                    () => GlobalKey(),
+              ),
+              child: Container(
+                color: Colors.white,
+                padding: const EdgeInsets.all(10),
+                child: QrImageView(
+                  data: EncryptionHelper.encryptText(
+                    widget.eventRefId.toString() +
+                        ":" +
+                        ticket['id'].toString(),
+                  ),
+                  version: QrVersions.auto,
+                  size: 125,
+                ),
+              ),
             ),
 
             Text(
@@ -335,9 +409,35 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ) :
-                  TextButton(onPressed: (){
+                  TextButton(
+                    onPressed: () async {
 
-                  }, child: Text("Share Ticket")),
+                      final String ticketId =
+                      ticket['id'].toString();
+
+                      final File? qrFile =
+                      await qrImageToFile(ticketId);
+
+                      if (qrFile == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Failed to generate QR image'),
+                          ),
+                        );
+                        return;
+                      }
+
+                      print('QR File: ${qrFile.path}');
+
+
+
+                      await Share.shareXFiles([XFile(qrFile.path)], text: 'SaveApp Ticket\n\n'
+                          'Ticket ID: $ticketId\n'
+                          'Event Ref ID: ${ticket['event_ref_id']}');
+
+                    },
+                    child: const Text('Share Ticket'),
+                  ),
                 ),
               ],
             ),
