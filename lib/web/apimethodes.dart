@@ -76,5 +76,8 @@ static String getEventData="getEventDetails";
 static String addEventBookingDetails="addEventBookingDetails";
 static String updatePaymentStatus="updatePaymentStatus";
 static String getEventTicket="getEventTicket";
+static String getUserDetailsByWord="getUserDetailsByWord";
+static String updateShareStatus="updateShareStatus";
+static String getSharedTicket="getSharedTicket";
 
 }

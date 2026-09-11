@@ -36,14 +36,14 @@ class _QRScannerPageState extends State<QRScannerPage> {
     debugPrint('QR Result: $value');
 
     try {
-      final decrypted =
-      EncryptionHelper.decryptText(value);
+      // final decrypted =
+      // EncryptionHelper.decryptText(value);
+      //
+      // debugPrint('Decrypted QR: $decrypted');
 
-      debugPrint('Decrypted QR: $decrypted');
+      ResponsiveInfo.showAlertDialog(context,"",value.toString()+"\n\n");
 
-      ResponsiveInfo.showAlertDialog(context,"",value.toString()+"\n\n"+decrypted);
-
-      Navigator.pop(context, decrypted);
+      //Navigator.pop(context, decrypted);
     } catch (e) {
       isScanned = false;
 

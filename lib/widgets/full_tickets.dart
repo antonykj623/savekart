@@ -2,7 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:savekart/domain/userdata_entity.dart';
 import 'package:savekart/web/encrypthelper.dart';
+import 'package:savekart/widgets/searchuser.dart';
+import '../design/ResponsiveInfo.dart';
 import '../web/AppStorage.dart';
 import 'dart:io';
 import 'dart:typed_data';
@@ -11,6 +14,9 @@ import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+
+import '../web/SavekartApiHelper.dart';
+import '../web/apimethodes.dart';
 
 class TicketDetailsPage extends StatefulWidget {
   final String eventRefId;
@@ -116,49 +122,40 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
     }
   }
 
-  Future<File?> qrImageToFile(String ticketId) async {
+  Future<File?> generateQrFileFromString(String qrData, String ticketId) async {
     try {
-      final key = qrKeys[ticketId];
-
-      if (key == null || key.currentContext == null) {
-        return null;
-      }
-
-      final RenderRepaintBoundary boundary =
-      key.currentContext!.findRenderObject()
-      as RenderRepaintBoundary;
-
-      final ui.Image image = await boundary.toImage(
-        pixelRatio: 3.0,
+      // 1. Create a QR painter instance directly from the string
+      final painter = QrPainter(
+        data: qrData,
+        version: QrVersions.auto,
+        errorCorrectionLevel: QrErrorCorrectLevel.H,
+        color: const Color(0xFF000000),
+        emptyColor: const Color(0xFFFFFFFF),
       );
 
+      // 2. Define image dimensions (e.g., 512x512 pixels for high quality)
+      final ui.Image image = await painter.toImage(512);
+
+      // 3. Convert image to byte data (PNG format)
       final ByteData? byteData = await image.toByteData(
         format: ui.ImageByteFormat.png,
       );
 
-      if (byteData == null) {
-        return null;
-      }
+      if (byteData == null) return null;
 
-      final Uint8List pngBytes =
-      byteData.buffer.asUint8List();
+      final Uint8List pngBytes = byteData.buffer.asUint8List();
 
-      final Directory directory =
-      await getTemporaryDirectory();
-
-      final File file = File(
-        '${directory.path}/ticket_$ticketId.png',
-      );
-
+      // 4. Save to temporary directory file
+      final Directory directory = await getTemporaryDirectory();
+      final File file = File('${directory.path}/qr_ticket_$ticketId.png');
       await file.writeAsBytes(pngBytes);
 
       return file;
     } catch (e) {
-      print('QR File Error: $e');
+      print('Background QR Generation Error: $e');
       return null;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -311,146 +308,229 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
   }
 
   Widget _ticketCard(dynamic ticket) {
-    final bool verified =
-        ticket['verified'].toString() == '1';
+    final bool verified = ticket['verified'].toString() == '1';
+    final bool shared = ticket['shared'].toString() == '1';
+    final String ticketId = ticket['id'].toString();
 
-    final bool shared =
-        ticket['shared'].toString() == '1';
-
-    final String ticketId =
-    ticket['id'].toString();
-
-    qrKeys.putIfAbsent(
+    // 1. Get or create the GlobalKey for this specific ticket ID
+    final GlobalKey ticketKey = qrKeys.putIfAbsent(
       ticketId,
           () => GlobalKey(),
     );
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-
-      child: Padding(
-        padding: const EdgeInsets.all(15),
-
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-
-          children: [
-
-            RepaintBoundary(
-              key: qrKeys.putIfAbsent(
-                ticket['id'].toString(),
-                    () => GlobalKey(),
-              ),
-              child: Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(10),
-                child: QrImageView(
-                  data: EncryptionHelper.encryptText(
-                    widget.eventRefId.toString() +
-                        ":" +
-                        ticket['id'].toString(),
-                  ),
-                  version: QrVersions.auto,
-                  size: 125,
-                ),
-              ),
+    // 2. Wrap your card layout inside a RepaintBoundary
+    return RepaintBoundary(
+      key: ticketKey,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 2,
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-
-            Text(
-              'Ticket ID: ${ticket['id']}',
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            Text(
-              'Event ID: ${ticket['event_id']}',
-            ),
-
-            Text(
-              'Event Ref ID: ${ticket['event_ref_id']}',
-            ),
-
-            const SizedBox(height: 8),
-
-            Row(
-              children: [
-
-                Expanded(
-                  child: Text(
-                    verified
-                        ? '✓ Verified'
-                        : '✗ Not Verified',
-
-                    style: TextStyle(
-                      color: verified
-                          ? Colors.green
-                          : Colors.red,
-
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-
-                Expanded(
-                  child: shared? Text(
-
-                         '✓ Shared',
-
-
-                    style: TextStyle(
-                      color: Colors.green,
-
-
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ) :
-                  TextButton(
-                    onPressed: () async {
-
-                      final String ticketId =
-                      ticket['id'].toString();
-
-                      final File? qrFile =
-                      await qrImageToFile(ticketId);
-
-                      if (qrFile == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Failed to generate QR image'),
-                          ),
-                        );
-                        return;
-                      }
-
-                      print('QR File: ${qrFile.path}');
-
-
-
-                      await Share.shareXFiles([XFile(qrFile.path)], text: 'SaveApp Ticket\n\n'
-                          'Ticket ID: $ticketId\n'
-                          'Event Ref ID: ${ticket['event_ref_id']}');
-
-                    },
-                    child: const Text('Share Ticket'),
-                  ),
-                ),
-              ],
-            ),
-
-            if (ticket['verified_date'] != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  'Verified Date: ${ticket['verified_date']}',
-                ),
-              ),
           ],
         ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Material(
+            color: Colors.transparent,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '#MY_SAVE_${ticket['id']}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      _buildStatusBadge(
+                        label: verified ? 'Verified' : 'Not Verified',
+                        isSuccess: verified,
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 24, thickness: 1),
+                  Row(
+                    children: [
+                      const Icon(Icons.receipt_long_outlined, size: 18, color: Colors.grey),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Ref: ${ticket['event_ref_id']}',
+                        style: const TextStyle(color: Colors.black54, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: shared
+                        ? Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.check_circle, size: 16, color: Colors.green),
+                          SizedBox(width: 6),
+                          Text(
+                            'Ticket Shared',
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                        : ElevatedButton.icon(
+                      onPressed: () async {
+
+
+
+                        final selectedItem = await showDialog(
+                          context: context,
+                          builder: (context) => SearchListDialog(),
+                        );
+
+                        if (selectedItem != null) {
+
+                          UserdataData usr=selectedItem as UserdataData;
+                          String userid_to_share=usr.id.toString();
+
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+
+                            ResponsiveInfo.showLoaderDialog(context);
+                          });
+
+                          String? token= await AppStorage.getString(AppStorage.token);
+                          final timestamp =
+                              DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+
+
+                          final res = await SavekartApiService.post(
+                            Apimethodes.updateShareStatus+"?q="+timestamp.toString(),
+                            token: token,
+                            body: {
+                              'shared': "1",
+                              'user_id':userid_to_share,
+                              'id':ticket['id'].toString(),
+                              'timestamp':timestamp.toString()
+
+                            },
+                          );
+
+                          print(res);
+                          Navigator.pop(context);
+
+
+                          bool status = res['data']['status'];
+                          String message = res['data']['message'];
+
+                          if (status) {
+                            //print(message);
+
+                            setState(() {
+                              ticket['shared']=1;
+                            });
+
+                            ResponsiveInfo.showAlertDialog(context, "SAVEKART", message);
+                            // Ticket shared successfully
+                          } else {
+                           // print(message);
+
+                            ResponsiveInfo.showAlertDialog(context, "SAVEKART", "Ticket sharing failed");
+                          }
+
+
+                        }
+
+
+
+                        // final File? qrFile = await generateQrFileFromString(ticket['event_ref_id']+":"+ticket['id'],ticketId);
+                        //
+                        // if (qrFile == null) {
+                        //   ScaffoldMessenger.of(context).showSnackBar(
+                        //     const SnackBar(
+                        //       content: Text('Failed to generate QR image'),
+                        //     ),
+                        //   );
+                        //   return;
+                        // }
+                        //
+                        // await Share.shareXFiles(
+                        //   [XFile(qrFile.path)],
+                        //   text: 'SaveApp Ticket\n\n'
+                        //       'Ticket ID: $ticketId\n'
+                        //       'Event Ref ID: ${ticket['event_ref_id']}',
+                        // );
+
+
+
+                      },
+                      icon: const Icon(Icons.share_outlined, size: 16),
+                      label: const Text('Share Ticket'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge({required String label, required bool isSuccess}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: isSuccess ? Colors.green.shade50 : Colors.red.shade50,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isSuccess ? Icons.check : Icons.close,
+            size: 12,
+            color: isSuccess ? Colors.green : Colors.red,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSuccess ? Colors.green.shade700 : Colors.red.shade700,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }

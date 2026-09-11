@@ -38,6 +38,7 @@ import 'package:savekart/domain/token_data_entity.dart';
 import 'package:savekart/domain/user_address_data_entity.dart';
 import 'package:savekart/domain/user_address_entity.dart';
 import 'package:savekart/domain/user_entity.dart';
+import 'package:savekart/domain/userdata_entity.dart';
 import 'package:savekart/domain/wallet_balance_entity.dart';
 import 'package:savekart/domain/wallet_points_entity.dart';
 import 'package:savekart/domain/wallet_transaction_entity.dart';
@@ -489,6 +490,14 @@ class JsonConvert {
       return data.map<UserData>((Map<String, dynamic> e) =>
           UserData.fromJson(e)).toList() as M;
     }
+    if (<UserdataEntity>[] is M) {
+      return data.map<UserdataEntity>((Map<String, dynamic> e) =>
+          UserdataEntity.fromJson(e)).toList() as M;
+    }
+    if (<UserdataData>[] is M) {
+      return data.map<UserdataData>((Map<String, dynamic> e) =>
+          UserdataData.fromJson(e)).toList() as M;
+    }
     if (<WalletBalanceEntity>[] is M) {
       return data.map<WalletBalanceEntity>((Map<String, dynamic> e) =>
           WalletBalanceEntity.fromJson(e)).toList() as M;
@@ -636,6 +645,8 @@ class JsonConvertClassCollection {
     (UserAddressData).toString(): UserAddressData.fromJson,
     (UserEntity).toString(): UserEntity.fromJson,
     (UserData).toString(): UserData.fromJson,
+    (UserdataEntity).toString(): UserdataEntity.fromJson,
+    (UserdataData).toString(): UserdataData.fromJson,
     (WalletBalanceEntity).toString(): WalletBalanceEntity.fromJson,
     (WalletBalanceData).toString(): WalletBalanceData.fromJson,
     (WalletPointsEntity).toString(): WalletPointsEntity.fromJson,

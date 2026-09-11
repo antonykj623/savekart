@@ -14,7 +14,7 @@ class SavekartApiService {
 
     return {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Accept': 'application/json',
+      'Accept': '*/*',
       'Timestamp': timestamp.toString(),
       if (token != null)
         'Authorization': '$token|$timestamp',

@@ -92,18 +92,18 @@ class _SSMTicketState extends State<SSMTicket> {
 
           ),
 
-          Padding(padding: EdgeInsets.all(10),
-
-            child: IconButton(onPressed: (){
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => QRScannerPage()),
-              );
-
-            }, icon: Icon(Icons.scanner,color: Colors.black54,)),
-
-          )
+          // Padding(padding: EdgeInsets.all(10),
+          //
+          //   child: IconButton(onPressed: (){
+          //
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => QRScannerPage()),
+          //     );
+          //
+          //   }, icon: Icon(Icons.scanner,color: Colors.black54,)),
+          //
+          // )
         ],
       ),
       body: Center(

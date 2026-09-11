@@ -118,7 +118,19 @@ class _EventTicketsPageState extends State<EventTicketsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Event Tickets'),
+        title:  Text('Event Tickets',style: TextStyle(fontSize: 14),),
+
+        actions: [
+
+          TextButton(onPressed: (){
+
+
+
+
+
+          }, child: Text("Shared Ticket",style: TextStyle(fontSize: 13),))
+
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: getEventTickets,
@@ -195,7 +207,7 @@ class _EventTicketsPageState extends State<EventTicketsPage> {
                                       const SizedBox(width: 10),
                                       Expanded(
                                         child: Text(
-                                          'Ticket #${ticket['id']}',
+                                          'Ticket #SAVEApp_000${ticket['id']}',
                                           style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
