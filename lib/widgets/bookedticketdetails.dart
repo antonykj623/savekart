@@ -1,8 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:savekart/domain/shared_ticket_entity.dart';
+import 'package:savekart/widgets/shared_q_r_code.dart';
 
+import '../design/ResponsiveInfo.dart';
 import '../web/AppStorage.dart';
+import '../web/SavekartApiHelper.dart';
+import '../web/apimethodes.dart';
 import 'full_tickets.dart';
 
 class EventTicketsPage extends StatefulWidget {
@@ -122,9 +127,45 @@ class _EventTicketsPageState extends State<EventTicketsPage> {
 
         actions: [
 
-          TextButton(onPressed: (){
+          TextButton(onPressed: () async {
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+
+              ResponsiveInfo.showLoaderDialog(context);
+            });
+            String? token= await AppStorage.getString(AppStorage.token);
+            final response = await SavekartApiService.get(
+              Apimethodes.getSharedTicket+"?event_id="+widget.eventId.toString(),
+              token: token!,
+            );
+
+            print(response);
+
+            if (mounted) {
+              Navigator.pop(context);
+            }
 
 
+            SharedTicketEntity sharedticket=SharedTicketEntity.fromJson(response);
+            if(sharedticket.status.toString().compareTo("true")==0) {
+
+              String qrstring=sharedticket.data!.eventRefId.toString()+":"+sharedticket.data!.id.toString();
+
+
+              Navigator.push(context,
+                  MaterialPageRoute(builder:
+                      (context) =>
+                      QrScreen(qrString: qrstring,)
+                  )
+              );
+
+
+            }
+            else{
+
+
+              ResponsiveInfo.showAlertDialog(context, "SAVEKART", "There is no ticket shared with you");
+            }
 
 
 

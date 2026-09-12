@@ -28,6 +28,7 @@ import 'package:savekart/domain/profile_data_entity.dart';
 import 'package:savekart/domain/return_policy_entity.dart';
 import 'package:savekart/domain/return_request_entity.dart';
 import 'package:savekart/domain/searched_products_entity.dart';
+import 'package:savekart/domain/shared_ticket_entity.dart';
 import 'package:savekart/domain/soldcount_entity.dart';
 import 'package:savekart/domain/ssm/s_s_m_event_entity.dart';
 import 'package:savekart/domain/ssm/s_s_m_ticket_entity.dart';
@@ -418,6 +419,14 @@ class JsonConvert {
       return data.map<SearchedProductsData>((Map<String, dynamic> e) =>
           SearchedProductsData.fromJson(e)).toList() as M;
     }
+    if (<SharedTicketEntity>[] is M) {
+      return data.map<SharedTicketEntity>((Map<String, dynamic> e) =>
+          SharedTicketEntity.fromJson(e)).toList() as M;
+    }
+    if (<SharedTicketData>[] is M) {
+      return data.map<SharedTicketData>((Map<String, dynamic> e) =>
+          SharedTicketData.fromJson(e)).toList() as M;
+    }
     if (<SoldcountEntity>[] is M) {
       return data.map<SoldcountEntity>((Map<String, dynamic> e) =>
           SoldcountEntity.fromJson(e)).toList() as M;
@@ -627,6 +636,8 @@ class JsonConvertClassCollection {
     (ReturnRequestData).toString(): ReturnRequestData.fromJson,
     (SearchedProductsEntity).toString(): SearchedProductsEntity.fromJson,
     (SearchedProductsData).toString(): SearchedProductsData.fromJson,
+    (SharedTicketEntity).toString(): SharedTicketEntity.fromJson,
+    (SharedTicketData).toString(): SharedTicketData.fromJson,
     (SoldcountEntity).toString(): SoldcountEntity.fromJson,
     (SSMEventEntity).toString(): SSMEventEntity.fromJson,
     (SSMEventData).toString(): SSMEventData.fromJson,
