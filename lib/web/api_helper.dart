@@ -34,10 +34,11 @@ class ApiHelper  {
       bool showErrorDialog = true}) async {
     try {
       String url = (endpoint.startsWith(_baseUrl) ? '' : _baseUrl) + endpoint;
-
+      final timestamp =
+          DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
       String? token= await AppStorage.getString(AppStorage.token);
-      Map<String, String> headers = {"Authorization" : token.toString()};
+      Map<String, String> headers = {"Authorization" : token.toString()+"."+timestamp.toString()};
 
       _logRequest('GET', url, headers);
 
@@ -74,9 +75,11 @@ class ApiHelper  {
       String url = (endpoint.startsWith(_baseUrl) ? '' : _baseUrl) + endpoint;
       // String token = (await AppStorage.getValue(AppStorage.token)) ?? '';
       // Map<String, String> headers = {};
+      final timestamp =
+          DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
       String? token= await AppStorage.getString(AppStorage.token);
-      Map<String, String> headers = {"Authorization" : token.toString()};
+      Map<String, String> headers = {"Authorization" : token.toString()+"."+timestamp.toString()};
 
       http.Response response;
       // if (showLoadingDialog) AppDialogs.showLoadingDialog();

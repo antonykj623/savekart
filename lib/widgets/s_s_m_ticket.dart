@@ -43,9 +43,19 @@ class _SSMTicketState extends State<SSMTicket> {
   String fullname="";
 
   void _increment() {
-    setState(() {
-      _quantity++;
-    });
+
+    if (_quantity < 20) {
+      setState(() {
+        if (_quantity < 20) {
+          _quantity++;
+        }
+      });
+    }
+    else{
+
+      ResponsiveInfo.showAlertDialog(context, "SAVEKART", "Maximum ticket count reached");
+
+    }
   }
 
   void _decrement() {

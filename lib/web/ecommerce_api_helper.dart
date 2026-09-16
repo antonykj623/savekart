@@ -51,7 +51,9 @@ class EcommerceApiHelper  {
     try {
       String url = (endpoint.startsWith(_baseUrl) ? '' : _baseUrl) + endpoint;
       String? token= await AppStorage.getString(AppStorage.token);
-      Map<String, String> headers = {"Authorization" : token.toString()};
+      final timestamp =
+          DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      Map<String, String> headers = {"Authorization" : token.toString()+"."+timestamp.toString()};
 
 
 
@@ -89,8 +91,12 @@ class EcommerceApiHelper  {
     try {
       String url = (endpoint.startsWith(_baseUrl) ? '' : _baseUrl) + endpoint;
       // String token = (await AppStorage.getValue(AppStorage.token)) ?? '';
+
+      final timestamp =
+          DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
       String? token= await AppStorage.getString(AppStorage.token);
-      Map<String, String> headers = {"Authorization" : token.toString()};
+      Map<String, String> headers = {"Authorization" : token.toString()+"."+timestamp.toString()};
 
       http.Response response;
       // if (showLoadingDialog) AppDialogs.showLoadingDialog();
