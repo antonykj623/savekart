@@ -7,10 +7,12 @@ import 'package:savekart/design/ResponsiveInfo.dart';
 import 'package:savekart/web/SavekartApiHelper.dart';
 import 'package:savekart/web/apimethodes.dart';
 import 'package:savekart/web/encrypthelper.dart';
+import 'package:savekart/widgets/shared_q_r_code.dart';
 // Make sure this import points to your actual TicketInfoScreen file
 import 'package:savekart/widgets/ticketinfo.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../domain/profile_data_entity.dart';
+import '../domain/shared_ticket_entity.dart';
 import '../domain/ssm/s_s_m_event_entity.dart';
 import '../domain/ssm/s_s_m_ticket_entity.dart';
 import '../web/AppStorage.dart';
@@ -85,35 +87,103 @@ class _SSMTicketState extends State<SSMTicket> {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         leading:  BackButton(color: Colors.black), // Standard back button
-        title:  Text('Mega SSM Ticket', style: TextStyle(color: Colors.black,fontSize: 14)),
+        title:  Text('Mega SSM Ticket', style: TextStyle(color: Colors.black,fontSize: 12)),
         backgroundColor: Colors.white,
         elevation: 1,
         actions: [
-          Padding(padding: EdgeInsets.all(10),
 
-          child: IconButton(onPressed: (){
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => EventTicketsPage(eventId: ssmdata!.id.toString(),mobile: phone,)),
-            );
+            onSelected: (value) async {
 
-          }, icon: Icon(Icons.qr_code,color: Colors.black54,)),
+              if (value == 'shared_ticket') {
 
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  ResponsiveInfo.showLoaderDialog(context);
+                });
+
+                String? token =
+                await AppStorage.getString(AppStorage.token);
+
+                final response = await SavekartApiService.get(
+                  Apimethodes.getSharedTicket +
+                      "?event_id=" +
+                      ssmdata!.id.toString(),
+                  token: token!,
+                );
+
+                if (mounted) {
+                  Navigator.pop(context);
+                }
+
+                SharedTicketEntity sharedticket =
+                SharedTicketEntity.fromJson(response);
+
+                if (sharedticket.status.toString() == "true") {
+
+                  String qrstring =
+                      "${sharedticket.data!.eventRefId}:${sharedticket.data!.id}";
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          QrScreen(qrString: qrstring),
+                    ),
+                  );
+
+                } else {
+
+                  ResponsiveInfo.showAlertDialog(
+                    context,
+                    "SAVEKART",
+                    "There is no ticket shared with you",
+                  );
+                }
+
+              } else if (value == 'booked_tickets') {
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EventTicketsPage(
+                      eventId: ssmdata!.id.toString(),
+                      mobile: phone,
+                    ),
+                  ),
+                );
+              }
+            },
+
+            itemBuilder: (context) => const [
+
+              PopupMenuItem(
+                value: 'shared_ticket',
+                child: Row(
+                  children: [
+                    Icon(Icons.qr_code),
+                    SizedBox(width: 10),
+                    Text("Shared Ticket"),
+                  ],
+                ),
+              ),
+
+              PopupMenuItem(
+                value: 'booked_tickets',
+                child: Row(
+                  children: [
+                    Icon(Icons.confirmation_num_outlined),
+                    SizedBox(width: 10),
+                    Text("Booked Tickets"),
+                  ],
+                ),
+              ),
+
+            ],
           ),
 
-          // Padding(padding: EdgeInsets.all(10),
-          //
-          //   child: IconButton(onPressed: (){
-          //
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(builder: (context) => QRScannerPage()),
-          //     );
-          //
-          //   }, icon: Icon(Icons.scanner,color: Colors.black54,)),
-          //
-          // )
+
         ],
       ),
       body: Center(
@@ -293,10 +363,7 @@ class _SSMTicketState extends State<SSMTicket> {
     ApiHelper apihelper1 = new ApiHelper();
 
     var response2= await  apihelper1.post(Apimethodes.getUserDetails,formDataPayload: m);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-
-      Navigator.pop(context);
-    });
+    Navigator.pop(context);
     var js= jsonDecode(jsonDecode(response2)) ;
     ProfileDataEntity entity=ProfileDataEntity.fromJson(js);
 
@@ -342,10 +409,7 @@ class _SSMTicketState extends State<SSMTicket> {
 
     print(response);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-
-   Navigator.pop(context);
-    });
+    Navigator.pop(context);
 
     if(response!=null )
       {
@@ -399,11 +463,7 @@ class _SSMTicketState extends State<SSMTicket> {
       },
     );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-
-
-      Navigator.pop(context);
-    });
+    Navigator.pop(context);
 
     if(res!=null)
       {

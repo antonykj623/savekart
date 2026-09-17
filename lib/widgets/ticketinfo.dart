@@ -45,6 +45,12 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
   Widget build(BuildContext context) {
      totalAmount = widget.quantity * double.parse(widget.ssmEventData.ticketAmount.toString());
 
+     double total_gst=(totalAmount*18)/100;
+
+     totalAmount=totalAmount+total_gst;
+
+
+
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
@@ -211,10 +217,7 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
     ApiHelper apihelper1 = new ApiHelper();
 
     var response2= await  apihelper1.post(Apimethodes.getUserDetails,formDataPayload: m);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-
-      Navigator.pop(context);
-    });
+    Navigator.pop(context);
     var js= jsonDecode(jsonDecode(response2)) ;
     ProfileDataEntity entity=ProfileDataEntity.fromJson(js);
 
@@ -441,10 +444,7 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
         'payment_status': paymentstatus
       },
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-
-  Navigator.pop(context);
-    });
+    Navigator.pop(context);
 
     if(res!=null){
 
