@@ -29,7 +29,8 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
   final Color _ticketColor =  Color(0xFF1E5149);
   String email="",phone="",fullname="";
   double totalAmount =0;
-
+  double totalAmount_withoutgst =0;
+  double total_gst=0;
   WeiplCheckoutFlutter wlCheckoutFlutter = WeiplCheckoutFlutter();
 
 
@@ -43,11 +44,11 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-     totalAmount = widget.quantity * double.parse(widget.ssmEventData.ticketAmount.toString());
+    totalAmount_withoutgst = widget.quantity * double.parse(widget.ssmEventData.ticketAmount.toString());
 
-     double total_gst=(totalAmount*18)/100;
+      total_gst=(totalAmount_withoutgst*18)/100;
 
-     totalAmount=totalAmount+total_gst;
+     totalAmount=totalAmount_withoutgst+total_gst;
 
 
 
@@ -125,11 +126,25 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
                     'Unit Amount :-  ${widget.ssmEventData.ticketAmount.toString()} ₹',
                     style:  TextStyle(fontSize: 16, color: Colors.white),
                   ),
-                   SizedBox(height: 32),
+
+                  SizedBox(height: 8),
+                  Text(
+                    'Total Amount :-  ${totalAmount_withoutgst.toString()} ₹',
+                    style:  TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+
+                  SizedBox(height: 8),
+                  Text(
+                    'GST Amount :-  ${total_gst.toString()} ₹',
+                    style:  TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+
+                  SizedBox(height: 8),
+
 
                   // ==================== TOTAL & CONFIRM SECTION ====================
                   Container(
-                    padding:  EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    padding:  EdgeInsets.symmetric(vertical: 12, horizontal: 10),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -139,62 +154,71 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Total: ${totalAmount.toStringAsFixed(2)} ₹',
+                          'Amount to pay: ${totalAmount.toStringAsFixed(2)} ₹',
                           style:  TextStyle(
-                            fontSize: 18,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: _ticketColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          onPressed: () {
 
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title:  Text('Confirm Purchase'),
-                                  content:  Text('Are you sure you want to confirm this ticket booking?'),
-                                  actions: [
-                                    // Cancel Button
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(); // Close the dialog
-                                      },
-                                      child:  Text('Cancel'),
-                                    ),
-                                    // Confirm Button
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(); // Close the dialog
-                                        // Add your confirmation logic here (e.g., navigation or API call)
-
-                                        placeTicketOrder();
-
-
-
-                                      },
-                                      child:  Text('Yes, Confirm'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-
-
-                          },
-                          child:  Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
                       ],
                     ),
                   ),
+                  SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 45,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: _ticketColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      onPressed: () {
+
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Confirm Purchase'),
+                              content: const Text(
+                                'Are you sure you want to confirm this ticket booking?',
+                              ),
+                              actions: [
+
+                                // Cancel Button
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+
+                                // Confirm Button
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+
+                                    placeTicketOrder();
+                                  },
+                                  child: const Text('Yes, Confirm'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: const Text(
+                        'Confirm',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
@@ -290,7 +314,7 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
     String txnid = idTransaction.toString();
 
     String a = merchantcode + "|" + txnid + "|" + totalAmount.toString() + "||" +
-        customerid + "|" + phone.trim() + "|" + email + "||||||||||" + salt;
+        customerid + "|" + phone.trim() + "|" + "ssmticket@gmail.com" + "||||||||||" + salt;
 
 
 
@@ -332,7 +356,7 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
         "currency": "INR",
         "consumerId": customerid,
         "consumerMobileNo": phone,
-        "consumerEmailId": email,
+        "consumerEmailId": "ssmticket@gmail.com",
         "txnId": txnid, //Unique merchant transaction ID
         "items": [
           {"itemId": "first", "amount": totalAmount.toString(), "comAmt": "0"}

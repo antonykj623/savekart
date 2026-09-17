@@ -164,7 +164,7 @@ class _ProfileState extends State<Profile> {
 
     child: Padding(
 
-      padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?5:8),
+      padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?3:5),
       child:Container(
           decoration: BoxDecoration(
             border: Border.all(
@@ -215,7 +215,7 @@ class _ProfileState extends State<Profile> {
 
     child:  Padding(
 
-      padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?5:8),
+      padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?3:5),
       child:Container(
           decoration: BoxDecoration(
             border: Border.all(
