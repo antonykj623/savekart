@@ -99,47 +99,59 @@ class _SSMTicketState extends State<SSMTicket> {
 
               if (value == 'shared_ticket') {
 
-                WidgetsBinding.instance.addPostFrameCallback((_) {
+
+                try {
                   ResponsiveInfo.showLoaderDialog(context);
-                });
 
-                String? token =
-                await AppStorage.getString(AppStorage.token);
+                  String? token = await AppStorage.getString(AppStorage.token);
 
-                final response = await SavekartApiService.get(
-                  Apimethodes.getSharedTicket +
-                      "?event_id=" +
-                      ssmdata!.id.toString(),
-                  token: token!,
-                );
-
-                if (mounted) {
-                  Navigator.pop(context);
-                }
-
-                SharedTicketEntity sharedticket =
-                SharedTicketEntity.fromJson(response);
-
-                if (sharedticket.status.toString() == "true") {
-
-                  String qrstring =
-                      "${sharedticket.data!.eventRefId}:${sharedticket.data!.id}";
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          QrScreen(qrString: qrstring),
-                    ),
+                  final response = await SavekartApiService.get(
+                    Apimethodes.getSharedTicket +
+                        "?event_id=" +
+                        ssmdata!.id.toString(),
+                    token: token!,
                   );
 
-                } else {
+                  if (mounted) {
+                    Navigator.pop(context);
+                  }
 
-                  ResponsiveInfo.showAlertDialog(
-                    context,
-                    "SAVEKART",
-                    "There is no ticket shared with you",
-                  );
+                  SharedTicketEntity sharedticket =
+                  SharedTicketEntity.fromJson(response);
+
+                  if (sharedticket.status.toString() == "true") {
+                    String qrstring =
+                        "${sharedticket.data!.eventRefId}:${sharedticket.data!.id}";
+
+                    if (mounted) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QrScreen(
+                            qrString: qrstring,
+                          ),
+                        ),
+                      );
+                    }
+                  } else {
+                    if (mounted) {
+                      ResponsiveInfo.showAlertDialog(
+                        context,
+                        "SAVEKART",
+                        "There is no ticket shared with you",
+                      );
+                    }
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    Navigator.pop(context);
+
+                    ResponsiveInfo.showAlertDialog(
+                      context,
+                      "SAVEKART",
+                      "Something went wrong. Please try again.",
+                    );
+                  }
                 }
 
               } else if (value == 'booked_tickets') {

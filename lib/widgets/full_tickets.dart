@@ -312,6 +312,14 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
     final bool shared = ticket['shared'].toString() == '1';
     final String ticketId = ticket['id'].toString();
 
+    String shared_to=ticket['full_name'].toString()+"\n"+
+        ticket['mobile'].toString()+"\n"+ticket['reg_code']
+    ;
+
+
+    String qrstring =
+    ticket['event_ref_id'].toString()+":"+ticket['id'].toString();
+
     // 1. Get or create the GlobalKey for this specific ticket ID
     final GlobalKey ticketKey = qrKeys.putIfAbsent(
       ticketId,
@@ -342,8 +350,17 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+
+                  (!shared)?   QrImageView(
+                    data: qrstring,
+                    version: QrVersions.auto,
+                    size: 150,
+                    backgroundColor: Colors.white,
+                  ):Text("Shared To :  \n"+shared_to,style: TextStyle(fontSize: 12,color: Colors.teal),),
+
+                  Container(height: 15,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

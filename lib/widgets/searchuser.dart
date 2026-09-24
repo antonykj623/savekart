@@ -134,12 +134,32 @@ class _SearchListDialogState extends State<SearchListDialog> {
               child: ListView.builder(
                 itemCount: usrdata.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(usrdata[index].fullName.toString()+"\nMobile : "+usrdata[index].mobile.toString()+"\nReg ID :"+usrdata[index].regCode.toString()),
-                    onTap: () {
-                      Navigator.pop(context, usrdata[index]);
-                    },
-                  );
+                  return Card(
+
+                    child: ListTile(
+                      title: Text(usrdata[index].fullName.toString()+"\nMobile : "+usrdata[index].mobile.toString()+"\nReg ID :"+usrdata[index].regCode.toString()),
+                      subtitle: Padding(padding: EdgeInsets.all(10),
+
+                        child: TextButton(onPressed: (){
+                          Navigator.pop(context, usrdata[index]);
+
+                        }, child: Text("Select",style: TextStyle(fontSize: 13,color: Colors.teal),)),
+
+                      )
+
+
+
+                      ,
+                      onTap: () {
+                        Navigator.pop(context, usrdata[index]);
+                      },
+                    ),
+                    elevation: 10,
+                  )
+
+
+
+                    ;
                 },
               ),
             ),
