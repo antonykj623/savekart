@@ -21,6 +21,7 @@ import 'package:intl/intl.dart';
 import '../web/api_helper.dart';
 import 'Qrscanner.dart';
 import 'bookedticketdetails.dart';
+import 'get_full_tickets.dart';
 
 class SSMTicket extends StatefulWidget {
   String mobile;
@@ -91,6 +92,25 @@ class _SSMTicketState extends State<SSMTicket> {
         backgroundColor: Colors.white,
         elevation: 1,
         actions: [
+
+          // IconButton(onPressed: () async {
+          //
+          //
+          //   Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //       builder: (context) => GetFullTickets(
+          //       ),
+          //     ),
+          //   );
+          //
+          //
+          //
+          //
+          // }, icon: Icon(Icons.airplane_ticket,color: Color(0xff0B7D97),))
+
+
+
 
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
@@ -194,6 +214,7 @@ class _SSMTicketState extends State<SSMTicket> {
 
             ],
           ),
+
 
 
         ],

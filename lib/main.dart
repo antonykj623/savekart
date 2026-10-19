@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:savekart/design/ResponsiveInfo.dart';
 import 'package:savekart/web/AppStorage.dart';
 import 'package:savekart/widgets/Home.dart';
 import 'package:savekart/widgets/login_page.dart';
 
-void main() {
+ main() async {
+
   runApp(const MyApp());
 }
 

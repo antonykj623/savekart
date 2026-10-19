@@ -162,7 +162,7 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Ticket Details - ${widget.eventRefId}',
+          'Ticket Details ',
         ),
       ),
 
@@ -365,7 +365,7 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '#MY_SAVE_${ticket['id']}',
+                        'Ticket No : ${ticket['ticket_no']}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

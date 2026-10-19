@@ -33,12 +33,6 @@ class _AddressListState extends State<AddressList> {
   getAllAddress()async
   {
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-
-      ResponsiveInfo.showLoaderDialog(context);
-
-
-    });
 
     EcommerceApiHelper apihelper = new EcommerceApiHelper();
 
@@ -46,12 +40,7 @@ class _AddressListState extends State<AddressList> {
 
     var response= await  apihelper.get(Apimethodes.getAddressList+"?q="+t.toString());
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
 
-     Navigator.pop(context);
-
-
-    });
 
 
     var js= jsonDecode( response) ;
@@ -163,7 +152,7 @@ class _AddressListState extends State<AddressList> {
 
                var response= await  apihelper.post(Apimethodes.addAddress+"?q="+t.toString(),formDataPayload: mp);
 
-               var js= jsonDecode( response) ;
+               //var js= jsonDecode( response) ;
 
                getAllAddress();
 
@@ -351,7 +340,7 @@ class _AddressListState extends State<AddressList> {
               height: double.infinity,
               child: Center(
 
-                child: Text("No Data Found"),
+                child: CircularProgressIndicator()
               )
             ),
           )

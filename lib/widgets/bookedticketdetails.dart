@@ -206,7 +206,7 @@ class _EventTicketsPageState extends State<EventTicketsPage> {
                                       const SizedBox(width: 10),
                                       Expanded(
                                         child: Text(
-                                          'Ticket #SAVEApp_000${ticket['id']}',
+                                          '',
                                           style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,

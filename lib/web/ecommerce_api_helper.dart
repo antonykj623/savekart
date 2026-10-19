@@ -478,21 +478,39 @@ class EcommerceApiHelper  {
       case 500:
       default:
         String? msg;
+
         try {
-          Map map = json.decode(utf8.decode(response.bodyBytes));
-          if (map.containsKey('detail')) {
-            msg = map['detail'];
+          final responseBody = utf8.decode(response.bodyBytes);
+          final decoded = json.decode(responseBody);
+
+          if (decoded is Map) {
+            final detail = decoded['detail'];
+
+            if (detail != null) {
+              if (detail is String) {
+                msg = detail;
+              } else if (detail is Map) {
+                msg = detail.toString();
+              } else {
+                msg = detail.toString();
+              }
+            } else if (decoded['message'] != null) {
+              msg = decoded['message'].toString();
+            }
+          } else if (decoded is String) {
+            msg = decoded;
           }
         } catch (e, s) {
-          Completer().completeError(e, s);
+          print('Response parsing error: $e');
+          print( s);
+          msg = 'Unable to parse server response.';
         }
-        if (msg != null) {
-          if (showErrorDialog) {
-            // throw FetchDataException(msg
-            //     // ?? 'Server encountered an unexpected condition that prevented it from fulfilling the request'
-            //     );
-          }
+
+        if (msg != null && showErrorDialog) {
+          print('API Error: $msg');
+          // Show your error dialog here.
         }
+        break;
     }
   }
 
