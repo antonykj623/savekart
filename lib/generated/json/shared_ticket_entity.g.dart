@@ -71,6 +71,10 @@ SharedTicketData $SharedTicketDataFromJson(Map<String, dynamic> json) {
   if (userId != null) {
     sharedTicketData.userId = userId;
   }
+  final String? ticketNo = jsonConvert.convert<String>(json['ticket_no']);
+  if (ticketNo != null) {
+    sharedTicketData.ticketNo = ticketNo;
+  }
   return sharedTicketData;
 }
 
@@ -83,6 +87,7 @@ Map<String, dynamic> $SharedTicketDataToJson(SharedTicketData entity) {
   data['verified_date'] = entity.verifiedDate;
   data['shared'] = entity.shared;
   data['user_id'] = entity.userId;
+  data['ticket_no'] =entity.ticketNo;
   return data;
 }
 
@@ -95,6 +100,7 @@ extension SharedTicketDataExtension on SharedTicketData {
     String? verifiedDate,
     String? shared,
     String? userId,
+    String? ticketNo
   }) {
     return SharedTicketData()
       ..id = id ?? this.id
@@ -103,6 +109,7 @@ extension SharedTicketDataExtension on SharedTicketData {
       ..verified = verified ?? this.verified
       ..verifiedDate = verifiedDate ?? this.verifiedDate
       ..shared = shared ?? this.shared
-      ..userId = userId ?? this.userId;
+      ..userId = userId ?? this.userId
+      ..ticketNo = ticketNo ?? this.ticketNo;
   }
 }

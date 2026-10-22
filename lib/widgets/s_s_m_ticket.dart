@@ -149,6 +149,7 @@ class _SSMTicketState extends State<SSMTicket> {
                         MaterialPageRoute(
                           builder: (context) => QrScreen(
                             qrString: qrstring,
+                            ticketNo: sharedticket.data!.ticketNo.toString(),
                           ),
                         ),
                       );

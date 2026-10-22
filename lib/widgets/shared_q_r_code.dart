@@ -4,10 +4,12 @@ import 'package:flutter/services.dart';
 
 class QrScreen extends StatefulWidget {
   final String qrString;
+  final String ticketNo;
 
   const QrScreen({
     super.key,
     required this.qrString,
+    required this.ticketNo
   });
 
   @override
@@ -55,6 +57,9 @@ class _QrScreenState extends State<QrScreen> {
               size: 280,
               backgroundColor: Colors.white,
             ),
+
+            Container(height: 15,),
+            Text("Ticket No : "+widget.ticketNo,style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),),
 
             Container(height: 15,),
 

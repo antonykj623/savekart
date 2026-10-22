@@ -34,6 +34,8 @@ class SharedTicketData {
 	String? shared = '';
 	@JSONField(name: "user_id")
 	String? userId = '';
+	@JSONField(name: "ticket_no")
+	String? ticketNo = '';
 
 	SharedTicketData();
 
