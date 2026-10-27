@@ -31,6 +31,7 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
   double totalAmount =0;
   double totalAmount_withoutgst =0;
   double total_gst=0;
+  double unit_amount=0;
   WeiplCheckoutFlutter wlCheckoutFlutter = WeiplCheckoutFlutter();
 
 
@@ -44,6 +45,13 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+
+    unit_amount=double.parse(widget.ssmEventData.ticketAmount.toString());
+
+   double u_gst=(unit_amount*18)/100;
+
+    unit_amount=unit_amount+u_gst;
     totalAmount_withoutgst = widget.quantity * double.parse(widget.ssmEventData.ticketAmount.toString());
 
       total_gst=(totalAmount_withoutgst*18)/100;
@@ -273,6 +281,8 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
         'email': email,
         'mobile': phone,
         'payment_type': '1',
+        'unit_amount': unit_amount.toString(),
+        'paid_amount':totalAmount.toString(),
         'qty': widget.quantity.toString(),
       },
     );
