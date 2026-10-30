@@ -869,7 +869,8 @@ bool iswalletused=false;
           }
         };
 
-
+        updateWalletBalance();
+        updateWalletPoints(orderid);
         wlCheckoutFlutter.open(reqJson);
       }
 
@@ -905,8 +906,8 @@ transactionId+"\n"+"Order ID : "+orderId+"\nCustomer ID : "+customerId+"\n"+
       {
         if(statusMessage.toLowerCase().compareTo("success")==0)
           {
-            updateWalletBalance();
-            updateWalletPoints(orderid);
+            // updateWalletBalance();
+            // updateWalletPoints(orderid);
             paymentstatus="1";
 
 

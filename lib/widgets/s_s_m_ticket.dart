@@ -298,7 +298,7 @@ class _SSMTicketState extends State<SSMTicket> {
 
                   // ==================== QUANTITY COUNTER ====================
                   // Centered counter as seen in the wireframe
-                  Row(
+                  (ssmdata!.visibility.toString().compareTo("1")==0)?     Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
@@ -330,11 +330,11 @@ class _SSMTicketState extends State<SSMTicket> {
                         ),
                       ),
                     ],
-                  ),
+                  ) :Container(),
                    SizedBox(height: 32),
 
                   // ==================== SUBMIT BUTTON ====================
-                  SizedBox(
+                  (ssmdata!.visibility.toString().compareTo("1")==0)?   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -358,7 +358,11 @@ class _SSMTicketState extends State<SSMTicket> {
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
-                  ),
+                  ) : Container(),
+
+
+
+
                    SizedBox(height: 24),
 
                   // ==================== FOOTER TAGLINE & ICON ====================

@@ -1031,33 +1031,39 @@ class _DashboardState extends State<Dashboard> {
       double appversionfromserver=double.parse(versionfromserver);
 
      if (appversionfromserver>currentversion) {
-       showDialog(
-         context: context,
-         barrierDismissible: false,
-         builder: (context) =>
-             AlertDialog(
-               title: Text("App Version"),
 
-               content: Text("New version: $versionfromserver is available"),
-               actions: [
-                 (appversionfromserver > currentversion) ? TextButton(
-                   onPressed: () async {
-                     final Uri url = Uri.parse(
-                         "https://play.google.com/store/apps/details?id=com.integra.savekart"); // Change URL based on platform
+    showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => PopScope(
+    canPop: false,
+    child: AlertDialog(
+    title: const Text("App Version"),
+    content: Text("New version: $versionfromserver is available"),
+    actions: [
+    if (appversionfromserver > currentversion)
+    TextButton(
+    onPressed: () async {
+    final Uri url = Uri.parse(
+    "https://play.google.com/store/apps/details?id=com.integra.savekart",
+    );
 
-                     if (await canLaunchUrl(url)) {
-                       await launchUrl(
-                           url, mode: LaunchMode.externalApplication);
-                     } else {
-                       throw "Could not launch $url";
-                     }
-                   },
-                   child: Text("Update"),
-                 ) : Container(),
+    if (await canLaunchUrl(url)) {
+    await launchUrl(
+    url,
+    mode: LaunchMode.externalApplication,
+    );
+    } else {
+    throw "Could not launch $url";
+    }
+    },
+    child: const Text("Update"),
+    ),
+    ],
+    ),
+    ),
+    );
 
-               ],
-             ),
-       );
      }
     }
 
