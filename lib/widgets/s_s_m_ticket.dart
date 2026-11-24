@@ -41,6 +41,8 @@ class _SSMTicketState extends State<SSMTicket> {
   String qrstring="";
   String formattedDate ="";
 
+  double ticket_amount=0;
+
   String email="";
   String phone="";
   String fullname="";
@@ -298,7 +300,7 @@ class _SSMTicketState extends State<SSMTicket> {
 
                   // ==================== QUANTITY COUNTER ====================
                   // Centered counter as seen in the wireframe
-                  (ssmdata!.visibility.toString().compareTo("1")==0)?     Row(
+                  (ssmdata!.visibility.toString().compareTo("1")==0 && ticket_amount!=0)?     Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
@@ -459,6 +461,7 @@ class _SSMTicketState extends State<SSMTicket> {
             setState(() {
 
               ssmdata=smm.data!;
+              ticket_amount=double.parse(ssmdata!.ticketAmount.toString());
               DateTime parsedDate = DateTime.parse(ssmdata!.eventDate!.toString());
                formattedDate = DateFormat('dd/MM/yyyy').format(parsedDate);
              // getEventTicket(ssmdata!.id.toString());

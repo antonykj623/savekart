@@ -210,7 +210,13 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
                                   onPressed: () {
                                     Navigator.of(context).pop();
 
-                                    placeTicketOrder();
+                                    if(totalAmount>0) {
+                                      placeTicketOrder();
+                                    }
+                                    else{
+
+                                      placeOrder();
+                                    }
                                   },
                                   child: const Text('Yes, Confirm'),
                                 ),
@@ -264,6 +270,48 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
    // Navigator.pop(context);
   }
 
+  placeOrder() async{
+
+    ResponsiveInfo.ShowProgressDialog(context);
+
+    String idTransaction="0";
+
+    String? token= await AppStorage.getString(AppStorage.token);
+
+    final res = await SavekartApiService.post(
+      Apimethodes.addEventBookingDetails,
+      token: token,
+      body: {
+        'event_id': widget.ssmEventData.id.toString(),
+        'name': fullname,
+        'email': email,
+        'mobile': phone,
+        'payment_type': '1',
+        'payment_status':'1',
+        'unit_amount': unit_amount.toString(),
+        'paid_amount':totalAmount.toString(),
+        'qty': widget.quantity.toString(),
+      },
+    );
+
+    Navigator.pop(context);
+
+    if(res!=null)
+    {
+      print(res);
+
+      if(res['status'].toString().compareTo("true")==0) {
+        idTransaction = res['event_id'].toString();
+
+        ResponsiveInfo.showAlertDialog(context, "SAVEKART", "ticket booked successfully");
+      }
+
+    }
+
+  }
+
+
+
   placeTicketOrder() async{
 
     ResponsiveInfo.ShowProgressDialog(context);
@@ -281,6 +329,7 @@ class _TicketInfoScreenState extends State<TicketInfoScreen> {
         'email': email,
         'mobile': phone,
         'payment_type': '1',
+        'payment_status':'0',
         'unit_amount': unit_amount.toString(),
         'paid_amount':totalAmount.toString(),
         'qty': widget.quantity.toString(),
