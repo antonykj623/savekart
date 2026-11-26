@@ -15,10 +15,10 @@ if (localPropertiesFile.exists()) {
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 
 if (flutterVersionCode == null || flutterVersionCode.trim().isEmpty()) {
-    flutterVersionCode = '86'
+    flutterVersionCode = '87'
 }
 else{
-    flutterVersionCode = '86'
+    flutterVersionCode = '87'
 
 }
 
@@ -27,10 +27,10 @@ else{
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 
 if (flutterVersionName == null || flutterVersionName.trim().isEmpty()) {
-    flutterVersionName = '9.5'
+    flutterVersionName = '9.6'
 }
 else{
-    flutterVersionName = '9.5'
+    flutterVersionName = '9.6'
 
 }
 

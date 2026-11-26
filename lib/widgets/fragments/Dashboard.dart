@@ -1,17 +1,13 @@
-
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:savekart/domain/brand_entity.dart';
 import 'package:savekart/domain/cart_banners_entity.dart';
 import 'package:savekart/domain/category_entity.dart';
-import 'package:savekart/domain/product_by_category_entity.dart';
+import 'package:savekart/domain/product_sub_category_entity.dart';
 import 'package:savekart/domain/sub_category_entity.dart';
-import 'package:savekart/domain/wallet_points_entity.dart';
-import 'package:savekart/web/AppStorage.dart';
 import 'package:savekart/web/ecommerce_api_helper.dart';
 import 'package:savekart/widgets/product_details.dart';
 import 'package:savekart/widgets/purchase_points.dart';
@@ -20,56 +16,58 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../design/ResponsiveInfo.dart';
 import '../../domain/app_version_entity.dart';
-import '../../domain/product_sub_category_entity.dart';
 import '../../domain/profile_data_entity.dart';
 import '../../domain/wallet_balance_entity.dart';
+import '../../web/AppStorage.dart';
 import '../../web/api_helper.dart';
 import '../../web/apimethodes.dart';
-
-import '../CategoryWidget.dart';
 import '../Slidbarscreen.dart';
 import '../all_products_by_category.dart';
 import '../cartscreen.dart';
-import '../fasting_moving_items.dart';
 import '../productsbycategory.dart';
 import '../s_s_m_ticket.dart';
 import '../searchproduct.dart';
-import '../todays_special_offer.dart';
-import '../todaysbulkdetails.dart';
-import '../trendingbrands.dart';
-import '../trendingproducts.dart';
 import '../wallet_transaction.dart';
 
-
-
 class Dashboard extends StatefulWidget {
-   Dashboard();
+  const Dashboard({super.key});
 
   @override
   State<Dashboard> createState() => _DashboardState();
 }
 
 class _DashboardState extends State<Dashboard> {
+  static const Color primaryTeal = Color(0xFF0B7D97);
+  static const Color surfaceBg = Color(0xFFF6F8FA);
 
   List<CategoryData> categorydata = [];
-
   List<BrandData> data = [];
-
-  List<SubCategoryData> subcategorydata=[];
+  List<SubCategoryData> subcategorydata = [];
   List<ProductSubCategoryData> productbycategorydata = [];
   List<CartBannersData> bannersdata = [];
-  double walletbalance=0.0;
-  String cartcount="0";
-  int walletpoints=0;
 
-  String name="",regid="",mobile="";
-  final StreamController<SwipeRefreshState> _controller = StreamController<SwipeRefreshState>();
+  double walletbalance = 0.0;
+  String cartcount = "0";
+  int walletpoints = 0;
+  String name = "", regid = "", mobile = "";
+
+  final StreamController<SwipeRefreshState> _controller =
+  StreamController<SwipeRefreshState>();
   Stream<SwipeRefreshState> get myRefreshStateStream => _controller.stream;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _loadAllDashboardData();
+  }
+
+  @override
+  void dispose() {
+    _controller.close();
+    super.dispose();
+  }
+
+  void _loadAllDashboardData() {
     getBanners();
     getCategories();
     getBrands();
@@ -82,903 +80,81 @@ class _DashboardState extends State<Dashboard> {
     getProfile();
   }
 
-  Future<void> _handleRefresh() async {
-    await Future.delayed(Duration(seconds: 1)); // simulate network fetch
-    getProfile();
-    getBanners();
-    getCategories();
-    getBrands();
-    getSubCategoriess();
-    getProductWithSubcategory();
-    getWalletBalanceAndPoints();
-    getWalletPoints();
+  Future<void> _refreshAfterNav(Future<dynamic> navFuture) async {
+    await navFuture;
+    if (!mounted) return;
     getCartCount();
-    getAppUpdates();
+    getWalletPoints();
+    getWalletBalanceAndPoints();
+  }
 
+  Future<void> _handleRefresh() async {
+    await Future.delayed(const Duration(seconds: 1));
+    _loadAllDashboardData();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = ResponsiveInfo.isMobile(context);
 
     return Scaffold(
+      backgroundColor: surfaceBg,
       appBar: AppBar(
-        backgroundColor: Color(0xfff7f7f7),
-        forceMaterialTransparency: true,
-        title:Align(
-          alignment: FractionalOffset.centerLeft,
-          child: Padding(
-
-            padding: EdgeInsets.all(2),
-            child: Image.asset("assets/appbaricon.jpeg",width: MediaQuery.sizeOf(context).width/2,height: (MediaQuery.sizeOf(context).width/2)/2,fit: BoxFit.fill,)
-            ,
-          )
-
-
-          ,
-        ) ,
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        surfaceTintColor: Colors.white,
         centerTitle: false,
-
-
+        title: Image.asset(
+          "assets/appbaricon.jpeg",
+          width: MediaQuery.sizeOf(context).width * 0.42,
+          height: 38,
+          fit: BoxFit.contain,
+        ),
         actions: [
-
-          IconButton(onPressed: () async {
-
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => SSMTicket(mobile)),
-            );
-
-            if (result != null||result==null) {
-
-              getCartCount();
-              getWalletPoints();
-              getWalletBalanceAndPoints();
-
-            }
-
-
-          }, icon: Icon(Icons.sticky_note_2,size: 25,color: Color(0xff0B7D97),)),
-
-          IconButton(onPressed: () async {
-
-
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ProductSearchScreen()),
-            );
-
-            if (result != null||result==null) {
-
-              getCartCount();
-              getWalletPoints();
-              getWalletBalanceAndPoints();
-
-            }
-
-          }, icon: Icon(Icons.search_rounded,color: Color(0xff0B7D97),)),
-
-
-          Stack(
-            children: [
-
-              Align(
-                alignment: FractionalOffset.center,
-                child:GestureDetector(
-
-                  child: Padding(padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?10:15),
-
-                    child: Icon(Icons.shopping_cart,color: Color(0xff0B7D97),size: ResponsiveInfo.isMobile(context)?20:25,),
-
-                  ),
-                  onTap: () async {
-
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => CartScreen()),
-                    );
-
-                    if (result != null||result==null) {
-
-                      getCartCount();
-                      getWalletPoints();
-                      getWalletBalanceAndPoints();
-
-                    }
-
-
-
-
-
-                  },
-                ) ,
+          IconButton(
+            onPressed: () => _refreshAfterNav(
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => SSMTicket(mobile)),
               ),
-              (cartcount.compareTo("0")!=0)?  Align(alignment: FractionalOffset.topCenter,
-
-                  child: GestureDetector(
-
-                    child:
-
-                    Padding(padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?10:15,ResponsiveInfo.isMobile(context)?5:6,0,0),
-
-                      child:CircleAvatar(
-                        radius: ResponsiveInfo.isMobile(context)?8:10,
-                        backgroundColor: Colors.red,
-                        child: Text(cartcount,style: TextStyle(color: Colors.white,fontSize: ResponsiveInfo.isMobile(context)?12:14),),
-                      )
-
-
-                      ,) ,
-
-                    onTap: () async {
-
-
-
-
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => CartScreen()),
-                      );
-
-                      if (result != null||result==null) {
-
-                        getCartCount();
-                        getWalletPoints();
-                        getWalletBalanceAndPoints();
-
-                      }
-
-
-
-                    },
-
-                  )
-
-              ) : Container(),
-            ],
-
-          )
-
-
-
+            ),
+            icon: const Icon(Icons.sticky_note_2_outlined, color: primaryTeal),
+          ),
+          IconButton(
+            onPressed: () => _refreshAfterNav(
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ProductSearchScreen()),
+              ),
+            ),
+            icon: const Icon(Icons.search_rounded, color: primaryTeal),
+          ),
+          _buildCartButton(isMobile),
+          const SizedBox(width: 6),
         ],
-
       ),
-      body:RefreshIndicator(
-
-    onRefresh: _handleRefresh,
-
-
-
-
-    child:  SingleChildScrollView(
-
-      child:Column(children: [
-
-        (bannersdata.length>0)? Slidbar(bannersdata) : Container(
-          width: double.infinity,
-          height: ResponsiveInfo.isMobile(context)?150:200,
-          child: Center(
-
-            child: CircularProgressIndicator(),
-          ),
-
-        ),
-        SizedBox(
-          height:ResponsiveInfo.isMobile(context)? 20:25,
-        ),
-
-        Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 4,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child:Column(
-              children: [
-                Text("Name : "+name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black)),
-                SizedBox(height: 5),
-                Text("Customer ID : "+regid, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black)),
-                SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Wallet Balance
-
-                    GestureDetector(
-                      onTap: (){          Navigator.push(context,
-                          MaterialPageRoute(builder:
-                              (context) =>
-                              WalletTransaction()
-                          )
-                      );},
-
-                      child:Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-
-
-
-                          Text("Savekart Wallet Balance", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
-                          SizedBox(height: 5),
-                          Row(
-                            children: [
-
-                              Icon(Icons.account_balance_wallet, color: Colors.green, size: 24),
-                              SizedBox(width: 8),
-                              Text(""+walletbalance.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
-                            ],
-                          ),
-                        ],
-                      ) ,
-                    )
-                    ,
-
-                    // Reward Points
-
-                    GestureDetector(
-
-                      child:Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Purchase Points", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
-                          SizedBox(height: 5),
-                          Row(
-                            children: [
-                              Icon(Icons.star, color: Colors.orange, size: 24),
-                              SizedBox(width: 8),
-                              Text(walletpoints.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
-                            ],
-                          ),
-                        ],
-                      ) ,
-                      onTap: (){
-                        Navigator.push(context,
-                            MaterialPageRoute(builder:
-                                (context) =>
-                                PurchasePoints()
-                            )
-                        );
-
-                      },
-                    )
-
-
-
-                    ,
-                  ],
-                ),
-
-              ],
-            )
-
-
-
-
+      body: RefreshIndicator(
+        color: primaryTeal,
+        onRefresh: _handleRefresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.only(bottom: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildBannerSection(isMobile),
+              const SizedBox(height: 14),
+              _buildMemberWalletCard(),
+              const SizedBox(height: 16),
+              _buildCategoriesSection(isMobile),
+              const SizedBox(height: 16),
+              _buildSubCategorySections(isMobile),
+            ],
           ),
         ),
-
-        (categorydata!.length>0)? Container(
-          width: double.infinity,
-          height: 75*((categorydata.length/4)*2),
-          child: GridView.count(
-              crossAxisCount: 4,
-              crossAxisSpacing: 4.0,
-              mainAxisSpacing: 8.0,
-              childAspectRatio: 0.7,
-              physics: NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              primary: false,
-              children: List.generate(categorydata!.length, (index) {
-                return GestureDetector(
-
-                    onTap: () async {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => ProductsByCategoryScreen(categoryId: categorydata[index].id.toString(),categoryname: categorydata[index].categoryName.toString(),),
-                      //   ),
-                      // );
-
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AllProductsByCategory(categoryId: categorydata[index].id.toString(),categoryname: categorydata[index].categoryName.toString(),)),
-                      );
-
-                      if (result != null||result==null) {
-
-                        getCartCount();
-                        getWalletPoints();
-                        getWalletBalanceAndPoints();
-
-                      }
-
-
-
-
-                    },
-
-
-
-                    child:  Container(
-
-
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-
-                          Container(
-                            width: ResponsiveInfo.isMobile(context)? 50:70,
-                            height: ResponsiveInfo.isMobile(context)? 50:70,
-                            child: Center(
-                              child:Image.network(EcommerceApiHelper.categoryimageurl+ categorydata[index].image.toString(),width: ResponsiveInfo.isMobile(context)?50:60,
-                                height: ResponsiveInfo.isMobile(context)?50:60, loadingBuilder: (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child; // Image loaded successfully
-                                  return Center(child: CircularProgressIndicator()); // Show loader while loading
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-                                },) ,
-                            ),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.transparent,
-                            ),
-                          ),
-
-
-                          Text(categorydata[index].categoryName.toString(),maxLines: 3,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 10:13,fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-
-                        ],
-                      ),
-                    ) );
-              }
-              )
-          ),
-        ) : Container(
-          width: double.infinity,
-          height: ResponsiveInfo.isMobile(context)?150:200,
-          child: Center(
-
-            child: CircularProgressIndicator(),
-          ),
-
-        ),
-
-
-
-
-        (productbycategorydata.length>0)? ListView.builder(
-            itemCount: productbycategorydata.length,
-            shrinkWrap: true,
-            primary: false,
-            itemBuilder: (BuildContext context, int index) {
-              //
-              // List<ProductSubCategoryDataData> data =
-              // productbycategorydata[index].data!
-
-              List<ProductSubCategoryDataData> data =
-              productbycategorydata[index].data!.length > 15
-                  ? productbycategorydata[index].data!.sublist(0, 15)
-                  : productbycategorydata[index].data!;
-
-
-              List<List<ProductSubCategoryDataData>> chunkedList = [];
-              int chunkSize = 5;
-
-              if(data.length>5) {
-                for (int i = 0; i < data.length; i += chunkSize) {
-                  int end = (i + chunkSize < data.length) ? i + chunkSize : data
-                      .length;
-                  chunkedList.add(data.sublist(i, end));
-                }
-              }
-
-              return (data.length<=5)?Container(
-                  width: double.infinity,
-                  height: ResponsiveInfo.isMobile(context)? 260 :320,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-
-                    children: [
-
-                      Padding(padding: EdgeInsets.all(5),
-                          child:Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-
-                          Expanded(child:  Text( productbycategorydata[index].category!.subCategoryName.toString(),maxLines: 2,overflow: TextOverflow.ellipsis,style: TextStyle(fontWeight: FontWeight.bold,fontSize: ResponsiveInfo.isMobile(context)?15:17),),flex: 3,),
-
-              Expanded(child:    TextButton(onPressed: () async {
-
-                                final result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => ProductsByCategoryScreen(categoryId: productbycategorydata[index].category!.subCategoryId.toString(),categoryname: productbycategorydata[index].category!.subCategoryName.toString(),)),
-                                );
-
-                                if (result != null||result==null) {
-
-                                  getCartCount();
-                                  getWalletPoints();
-                                  getWalletBalanceAndPoints();
-
-                                }
-
-
-                              }, child: Text("View All",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:18,color: Color(0xff0B7D97)),)),flex: 1,)
-
-                            ],
-
-                          )
-
-
-
-                      ),
-
-                      Padding(padding: EdgeInsets.all(5),
-
-                        child: Container(
-                            width: double.infinity,
-                            height: ResponsiveInfo.isMobile(context)? 180 :210,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              primary: false,
-                              scrollDirection: Axis.horizontal,
-                              itemCount: data.length,
-                              itemBuilder: (BuildContext context, int i) => GestureDetector(
-
-                                child:Padding(padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?5:10, 0, ResponsiveInfo.isMobile(context)?5:10, 0),
-
-                                  child: Stack(
-                                    children: [
-
-                                      Align(
-                                        alignment: FractionalOffset.center,
-
-                                        child:  Container(
-
-                                            width: ResponsiveInfo.isMobile(context)? 140:173,
-                                            height: ResponsiveInfo.isMobile(context)? 170 :195,
-
-                                            child: Card(
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-
-                                                  Expanded(child:Stack(
-
-                                                    children: [
-                                                      Align(
-                                                        alignment: FractionalOffset.center,
-                                                        child: Image.network(EcommerceApiHelper.productimageurl+data[i].primeImage.toString(),width: ResponsiveInfo.isMobile(context)?100:120,
-                                                          height: ResponsiveInfo.isMobile(context)?100:120,fit: BoxFit.fill,loadingBuilder: (context, child, loadingProgress) {
-                                                            if (loadingProgress == null) return child; // Image loaded successfully
-                                                            return Center(child: CircularProgressIndicator()); // Show loader while loading
-                                                          },
-                                                          errorBuilder: (context, error, stackTrace) {
-                                                            return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-                                                          },) ,
-
-                                                      ),
-
-
-                                                    ],
-                                                  )
-
-
-
-                                                    ,flex: 2, )
-
-                                                  ,
-
-                                                  Expanded(child: Padding(
-                                                    padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?5:8, 0, 0, 0),
-
-                                                    child: Column(
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Text(data[i].productName.toString(),maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
-                                                          textAlign: TextAlign.center,
-                                                        ),
-                                                        // Text("200 x 100 x 150",maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 11:13,fontWeight: FontWeight.bold,color: Colors.black26),
-                                                        //   textAlign: TextAlign.center,
-                                                        //
-                                                        // ),
-
-                                                        //Price area commented by antony
-
-                                                        // Row(
-                                                        //   children: [
-                                                        //     Expanded(child:     Text("150 Rs",maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
-                                                        //       textAlign: TextAlign.center,
-                                                        //     ),flex: 1,),
-                                                        //     Expanded(child: Container(
-                                                        //
-                                                        //       child: Icon(Icons.add_box_rounded,color: Colors.green,size: ResponsiveInfo.isMobile(context)?18:23,),
-                                                        //
-                                                        //     ),flex: 1,)
-                                                        //   ],
-                                                        // )
-
-
-                                                      ],
-                                                    ) ,
-                                                  )
-
-                                                  )
-
-
-
-
-                                                ],
-                                              ),
-                                              color: Colors.white,
-                                              elevation: ResponsiveInfo.isMobile(context)?5:10,
-                                            )
-
-
-
-                                        ),
-
-                                      )
-
-                                      ,
-
-                                      Align(
-                                        alignment: FractionalOffset.topRight,
-                                        child: Padding(padding: EdgeInsets.all(5),
-
-                                          child:(data[i].currentQty.toString().compareTo("0")==0)? Container(
-                                              color: Colors.red,
-                                              child: Padding(padding: EdgeInsets.all(0),
-
-                                                child: Text(" out of stock ",style: TextStyle(color: Colors.white)),
-
-
-                                              )
-
-                                          ) :Container(),
-
-                                        ),
-                                      )
-                                    ],
-                                  ),
-
-
-
-
-
-
-
-                                ) ,
-                                onTap: () async {
-
-
-
-
-                                  final result = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => ProductDetails(data[i])),
-                                  );
-
-                                  if (result != null||result==null) {
-
-                                    getCartCount();
-                                    getWalletPoints();
-                                    getWalletBalanceAndPoints();
-
-                                  }
-
-
-                                },
-                              ),
-                            ) ) ,
-                      )
-
-                    ],
-                  )
-
-
-
-
-              ) :
-
-
-              Container(
-                width: double.infinity,
-                height: ResponsiveInfo.isMobile(context)? (245*(data.length / 5).ceil())+10 :(275*(data.length / 5).ceil())+10,
-
-
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-
-                  children: [
-                    Padding(padding: EdgeInsets.all(10),
-                      child:Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-
-                          Expanded(child: Text( productbycategorydata[index].category!.subCategoryName.toString(),overflow: TextOverflow.ellipsis,maxLines: 2,style: TextStyle(fontWeight: FontWeight.bold,fontSize: ResponsiveInfo.isMobile(context)?15:17),),flex: 3,)
-
-                          ,
-
-              Expanded(child:  TextButton(onPressed: () async {
-
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ProductsByCategoryScreen(categoryId: productbycategorydata[index].category!.subCategoryId.toString(),categoryname: productbycategorydata[index].category!.subCategoryName.toString(),)),
-                            );
-
-                            if (result != null||result==null) {
-
-                              getCartCount();
-                              getWalletPoints();
-                              getWalletBalanceAndPoints();
-
-                            }
-
-
-                          }, child: Text("View All",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:18,color: Color(0xff0B7D97)),))
-
-
-                ,flex: 1,)
-
-                        ],
-
-                      )
-                                         ),
-                    Padding(padding: EdgeInsets.only(left: 10),
-                      child: Container(
-                          width: double.infinity,
-                          height: ResponsiveInfo.isMobile(context)? (190.0*(data.length / 5).ceil()) :
-                          (220.0*(data.length / 5).ceil()),
-
-                          child: ListView.builder(
-                          itemCount: chunkedList.length,
-                            physics: NeverScrollableScrollPhysics(),
-
-
-              itemBuilder: (context, chunkIndex) {
-              List<ProductSubCategoryDataData> sublist = chunkedList[chunkIndex];
-
-              return Padding(padding: EdgeInsets.only(left: 10,top: 5),
-                  child:Container(
-                  width: double.infinity,
-                  height:
-                  ResponsiveInfo.isMobile(context)? 180:210,
-
-                  child: ListView.builder(
-                shrinkWrap: true,
-                primary: false,
-                scrollDirection: Axis.horizontal,
-                itemCount: sublist.length,
-                itemBuilder: (BuildContext context, int i) => GestureDetector(
-
-                  child:Padding(padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?5:10, 0, ResponsiveInfo.isMobile(context)?5:10, 0),
-
-                    child: Stack(
-
-                      children: [
-
-                        Align(
-                          alignment: FractionalOffset.center,
-                          child:   Container(
-
-                              width: ResponsiveInfo.isMobile(context)? 145:180,
-                              height: ResponsiveInfo.isMobile(context)? 178 :200,
-
-                              child: Card(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-
-                                    Expanded(child:Stack(
-
-                                      children: [
-                                        Align(
-                                          alignment: FractionalOffset.center,
-                                          child: Image.network(EcommerceApiHelper.productimageurl+sublist[i].primeImage.toString(),width: ResponsiveInfo.isMobile(context)?100:120,
-                                            height: ResponsiveInfo.isMobile(context)?100:120,fit: BoxFit.fill,loadingBuilder: (context, child, loadingProgress) {
-                                              if (loadingProgress == null) return child; // Image loaded successfully
-                                              return Center(child: CircularProgressIndicator()); // Show loader while loading
-                                            },
-                                            errorBuilder: (context, error, stackTrace) {
-                                              return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-                                            },) ,
-
-                                        ),
-
-
-                                      ],
-                                    )
-
-
-
-                                      ,flex: 2, )
-
-                                    ,
-
-                                    Expanded(child: Padding(
-                                      padding: EdgeInsets.fromLTRB(ResponsiveInfo.isMobile(context)?5:8, 0, 0, 0),
-
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(sublist[i].productName.toString(),maxLines: 2,style: TextStyle(fontSize:ResponsiveInfo.isMobile(context)? 13:15,fontWeight: FontWeight.bold),
-                                            textAlign: TextAlign.center,
-                                          ),
-
-
-                                        ],
-                                      ) ,
-                                    )
-
-                                    )
-
-
-
-
-                                  ],
-                                ),
-                                color: Colors.white,
-                                elevation: ResponsiveInfo.isMobile(context)?5:10,
-                              )
-
-
-
-                          ) ,
-                        )
-                        ,
-
-                        Align(
-                          alignment: FractionalOffset.topRight,
-                          child: Padding(padding: EdgeInsets.all(5),
-
-                          child:(sublist[i].currentQty.toString().compareTo("0")==0)? Container(
-                            color: Colors.red,
-                            child: Padding(padding: EdgeInsets.all(0),
-
-                            child: Text(" out of stock ",style: TextStyle(color: Colors.white)),
-
-
-                            )
-
-                          ) :Container(),
-
-                          ),
-                        )
-
-                      ],
-                    )
-
-
-
-                 ,
-                  ) ,
-                  onTap: () async {
-
-
-
-
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ProductDetails(sublist[i])),
-                    );
-
-                    if (result != null||result==null) {
-
-                      getCartCount();
-                      getWalletPoints();
-                      getWalletBalanceAndPoints();
-
-                    }
-
-
-                  },
-                ),
-              ) ) );
-              },
-              )
-
-
-
-
-
-
-
-
-
-                      ) ,
-                    ),
-
-                    Container(
-                      width: double.infinity,
-                      height: ResponsiveInfo.isMobile(context)?40:50,
-
-                      child:  Stack(
-                        children: [
-                          Align(
-                              alignment: FractionalOffset.center,
-                              child: Padding(padding: EdgeInsets.all(3),
-                                child: TextButton(onPressed: () async {
-
-                                  final result = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => ProductsByCategoryScreen(categoryId: productbycategorydata[index].category!.subCategoryId.toString(),categoryname: productbycategorydata[index].category!.subCategoryName.toString(),)),
-                                  );
-
-                                  if (result != null||result==null) {
-
-                                    getCartCount();
-                                    getWalletPoints();
-                                    getWalletBalanceAndPoints();
-
-                                  }
-
-
-                                }, child: Text("View More",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:18,color: Color(0xff0B7D97)),))
-                                ,
-
-                              )
-                          )
-                        ],
-                      ) ,
-                    )
-
-
-
-                  ],
-                )
-
-
-
-              );
-            }) :
-        Container(
-          width: double.infinity,
-          height: ResponsiveInfo.isMobile(context)?150:200,
-          child: Center(
-
-            child: CircularProgressIndicator(),
-          ),
-
-        )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ],) ,
-    ) )
-
-
-
-
-
-
-
-      ,
+      ),
     );
   }
-
 
   getProfile()async{
 
@@ -1030,41 +206,41 @@ class _DashboardState extends State<Dashboard> {
       String versionfromserver=appversion.data!.version.toString();
       double appversionfromserver=double.parse(versionfromserver);
 
-     if (appversionfromserver>currentversion) {
+      if (appversionfromserver>currentversion) {
 
-    showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) => PopScope(
-    canPop: false,
-    child: AlertDialog(
-    title: const Text("App Version"),
-    content: Text("New version: $versionfromserver is available"),
-    actions: [
-    if (appversionfromserver > currentversion)
-    TextButton(
-    onPressed: () async {
-    final Uri url = Uri.parse(
-    "https://play.google.com/store/apps/details?id=com.integra.savekart",
-    );
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => PopScope(
+            canPop: false,
+            child: AlertDialog(
+              title: const Text("App Version"),
+              content: Text("New version: $versionfromserver is available"),
+              actions: [
+                if (appversionfromserver > currentversion)
+                  TextButton(
+                    onPressed: () async {
+                      final Uri url = Uri.parse(
+                        "https://play.google.com/store/apps/details?id=com.integra.savekart",
+                      );
 
-    if (await canLaunchUrl(url)) {
-    await launchUrl(
-    url,
-    mode: LaunchMode.externalApplication,
-    );
-    } else {
-    throw "Could not launch $url";
-    }
-    },
-    child: const Text("Update"),
-    ),
-    ],
-    ),
-    ),
-    );
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(
+                          url,
+                          mode: LaunchMode.externalApplication,
+                        );
+                      } else {
+                        throw "Could not launch $url";
+                      }
+                    },
+                    child: const Text("Update"),
+                  ),
+              ],
+            ),
+          ),
+        );
 
-     }
+      }
     }
 
   }
@@ -1162,18 +338,18 @@ class _DashboardState extends State<Dashboard> {
     CartBannersEntity entity=CartBannersEntity.fromJson(js);
 
     if(entity.status==1)
-      {
-        entity.data?.sort((a, b) =>
-            int.parse(a.orderNumber ?? '0').compareTo(int.parse(b.orderNumber ?? '0')));
+    {
+      entity.data?.sort((a, b) =>
+          int.parse(a.orderNumber ?? '0').compareTo(int.parse(b.orderNumber ?? '0')));
 
-        setState(() {
-          bannersdata.clear();
+      setState(() {
+        bannersdata.clear();
 
-          bannersdata?.addAll(entity.data!);
-        });
+        bannersdata?.addAll(entity.data!);
+      });
 
 
-      }
+    }
 
 
 
@@ -1192,24 +368,24 @@ class _DashboardState extends State<Dashboard> {
     CategoryEntity categoryEntity=CategoryEntity.fromJson(js);
 
     if(categoryEntity.status==1)
-      {
+    {
 
-        setState(() {
-          categorydata.clear();
-          for(int i=0;i<categoryEntity.data!.length;i++)
-            {
-              if(categoryEntity.data![i].status.toString().compareTo("0")==0)
-                {
-                  categorydata!.add(categoryEntity.data![i]);
-                }
+      setState(() {
+        categorydata.clear();
+        for(int i=0;i<categoryEntity.data!.length;i++)
+        {
+          if(categoryEntity.data![i].status.toString().compareTo("0")==0)
+          {
+            categorydata!.add(categoryEntity.data![i]);
+          }
 
-            }
+        }
 
 
 
-        });
+      });
 
-      }
+    }
 
 
   }
@@ -1227,13 +403,13 @@ class _DashboardState extends State<Dashboard> {
     BrandEntity brandEntity=BrandEntity.fromJson(js);
 
     if(brandEntity.data!.length>0)
-      {
-        setState(() {
+    {
+      setState(() {
 
-          data.clear();
-          data.addAll(brandEntity.data!);
-        });
-      }
+        data.clear();
+        data.addAll(brandEntity.data!);
+      });
+    }
 
   }
 
@@ -1286,4 +462,506 @@ class _DashboardState extends State<Dashboard> {
       });
     }
   }
+
+  Widget _buildCartButton(bool isMobile) {
+    final hasItems = cartcount != "0" && cartcount.isNotEmpty;
+    return InkWell(
+      borderRadius: BorderRadius.circular(24),
+      onTap: () => _refreshAfterNav(
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => CartScreen()),
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12, vertical: 8),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Icon(
+              Icons.shopping_cart_outlined,
+              color: primaryTeal,
+              size: isMobile ? 24 : 26,
+            ),
+            if (hasItems)
+              Positioned(
+                top: -6,
+                right: -8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    cartcount,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBannerSection(bool isMobile) {
+    if (bannersdata.isEmpty) {
+      return SizedBox(
+        height: isMobile ? 150 : 200,
+        child: const Center(child: CircularProgressIndicator(color: primaryTeal)),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Slidbar(bannersdata),
+      ),
+    );
+  }
+
+  Widget _buildMemberWalletCard() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    name.isEmpty ? "Welcome" : name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1A1D1F),
+                    ),
+                  ),
+                ),
+                if (regid.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: surfaceBg,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      "ID: $regid",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatTile(
+                    label: "Savekart Wallet",
+                    value: walletbalance.toString(),
+                    icon: Icons.account_balance_wallet_rounded,
+                    iconColor: Colors.green.shade700,
+                    bgColor: const Color(0xFFEAF7EE),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => WalletTransaction()),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildStatTile(
+                    label: "Purchase Points",
+                    value: walletpoints.toString(),
+                    icon: Icons.stars_rounded,
+                    iconColor: Colors.orange.shade700,
+                    bgColor: const Color(0xFFFFF4E5),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => PurchasePoints()),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatTile({
+    required String label,
+    required String value,
+    required IconData icon,
+    required Color iconColor,
+    required Color bgColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade700,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Icon(icon, color: iconColor, size: 20),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1A1D1F),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoriesSection(bool isMobile) {
+    if (categorydata.isEmpty) {
+      return SizedBox(
+        height: isMobile ? 140 : 180,
+        child: const Center(child: CircularProgressIndicator(color: primaryTeal)),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Shop by Category",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1A1D1F),
+            ),
+          ),
+          const SizedBox(height: 10),
+          GridView.builder(
+            itemCount: categorydata.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 10,
+              childAspectRatio: isMobile ? 0.78 : 0.85,
+            ),
+            itemBuilder: (context, index) {
+              final cat = categorydata[index];
+              return InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => _refreshAfterNav(
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AllProductsByCategory(
+                        categoryId: cat.id.toString(),
+                        categoryname: cat.categoryName.toString(),
+                      ),
+                    ),
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: isMobile ? 54 : 68,
+                      height: isMobile ? 54 : 68,
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: Image.network(
+                        EcommerceApiHelper.categoryimageurl + cat.image.toString(),
+                        fit: BoxFit.contain,
+                        loadingBuilder: (_, child, progress) => progress == null
+                            ? child
+                            : const Center(
+                          child: SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        errorBuilder: (_, __, ___) => const Icon(
+                          Icons.image_not_supported_outlined,
+                          color: Colors.black38,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      cat.categoryName.toString(),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: isMobile ? 11 : 13,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF2B2F33),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubCategorySections(bool isMobile) {
+    if (productbycategorydata.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      children: List.generate(productbycategorydata.length, (index) {
+        final section = productbycategorydata[index];
+        final rawItems = section.data ?? [];
+        final items = rawItems.length > 15 ? rawItems.sublist(0, 15) : rawItems;
+        if (items.isEmpty) return const SizedBox.shrink();
+
+        final subCatName = section.category?.subCategoryName.toString() ?? "";
+        final subCatId = section.category?.subCategoryId.toString() ?? "";
+
+        final rows = <List<ProductSubCategoryDataData>>[];
+        if (items.length <= 5) {
+          rows.add(items);
+        } else {
+          for (int i = 0; i < items.length; i += 5) {
+            rows.add(items.sublist(i, (i + 5 < items.length) ? i + 5 : items.length));
+          }
+        }
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        subCatName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: isMobile ? 16 : 18,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF1A1D1F),
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => _refreshAfterNav(
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ProductsByCategoryScreen(
+                              categoryId: subCatId,
+                              categoryname: subCatName,
+                            ),
+                          ),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "View All",
+                            style: TextStyle(
+                              color: primaryTeal,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(width: 2),
+                          Icon(Icons.chevron_right, size: 18, color: primaryTeal),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 6),
+              ...rows.map(
+                    (rowItems) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: SizedBox(
+                    height: isMobile ? 196 : 220,
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: rowItems.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 10),
+                      itemBuilder: (context, i) =>
+                          _buildProductCard(rowItems[i], isMobile),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildProductCard(ProductSubCategoryDataData item, bool isMobile) {
+    final isOutOfStock = item.currentQty.toString() == "0";
+    final cardWidth = isMobile ? 142.0 : 172.0;
+    final imgSize = isMobile ? 96.0 : 116.0;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: () => _refreshAfterNav(
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => ProductDetails(item)),
+        ),
+      ),
+      child: Container(
+        width: cardWidth,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Image.network(
+                        EcommerceApiHelper.productimageurl +
+                            item.primeImage.toString(),
+                        width: imgSize,
+                        height: imgSize,
+                        fit: BoxFit.contain,
+                        loadingBuilder: (_, child, progress) => progress == null
+                            ? child
+                            : const Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        errorBuilder: (_, __, ___) => const Icon(
+                          Icons.image_outlined,
+                          size: 44,
+                          color: Colors.black26,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    item.productName.toString(),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: isMobile ? 12.5 : 14,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1A1D1F),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isOutOfStock)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade600,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text(
+                    "Out of stock",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
 }
