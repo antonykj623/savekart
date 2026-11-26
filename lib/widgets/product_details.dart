@@ -2,788 +2,513 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:savekart/design/ResponsiveInfo.dart';
+import 'package:savekart/domain/cart_data_exist_entity.dart';
 import 'package:savekart/domain/product_count_entity.dart';
 import 'package:savekart/domain/product_stock_entity.dart';
+import 'package:savekart/domain/product_sub_category_entity.dart';
+import 'package:savekart/domain/return_policy_entity.dart';
 import 'package:savekart/domain/soldcount_entity.dart';
 import 'package:savekart/domain/wishlistcheck_entity.dart';
+import 'package:savekart/web/apimethodes.dart';
 import 'package:savekart/web/ecommerce_api_helper.dart';
 import 'package:savekart/widgets/cartscreen.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:savekart/widgets/zoomimage.dart';
-import '../domain/cart_data_exist_entity.dart';
-import '../domain/cart_products_entity.dart';
-import '../domain/product_by_category_entity.dart';
-import '../domain/product_sub_category_entity.dart';
-import '../domain/return_policy_entity.dart';
-import '../web/AppStorage.dart';
-import '../web/apimethodes.dart';
-import 'Slidbarscreen.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ProductDetails extends StatefulWidget {
+  final ProductSubCategoryDataData productByCategoryDataData;
 
-  ProductSubCategoryDataData productByCategoryDataData;
-   ProductDetails(this.productByCategoryDataData) ;
+  const ProductDetails(this.productByCategoryDataData, {super.key});
 
   @override
-  _ProductDetailsState createState() => _ProductDetailsState(this.productByCategoryDataData);
+  _ProductDetailsState createState() =>
+      _ProductDetailsState(productByCategoryDataData);
 }
 
-class _ProductDetailsState extends State<ProductDetails> with SingleTickerProviderStateMixin {
+class _ProductDetailsState extends State<ProductDetails>
+    with SingleTickerProviderStateMixin {
+  static const Color primaryTeal = Color(0xFF0B7D97);
+  static const Color surfaceBg = Color(0xFFF6F8FA);
 
   ProductSubCategoryDataData productByCategoryDataData;
-  ProductStockEntity productStockEntity = new ProductStockEntity();
+  ProductStockEntity productStockEntity = ProductStockEntity();
 
   _ProductDetailsState(this.productByCategoryDataData);
 
-  List<Widget> Adsimages = [
-  ];
+  final List<Widget> Adsimages = [];
   int AdsCurrentIndex = 0;
   String wishlist_id = "0";
-  int selectedindex=0;
+  int selectedindex = 0;
 
   bool iswishlist = false;
-
-  String description = "",price_details="",returnpolicies="No Data Found",
+  String description = "",
+      price_details = "",
+      returnpolicies = "No Data Found",
       cartcount = "0",
       product_stockid = "0";
   bool ispointredeemeed = false;
   double tempwalletpoints = 0;
-  int stockquantity=0;
+  int stockquantity = 0;
 
-late TabController   _tabController ;
-
-List<String>images=[];
-
-int count=0;
-
-List<ProductSubCategoryDataData>pcdata=[];
-
- late Timer timer;
+  late TabController _tabController;
+  final List<String> images = [];
+  int count = 0;
+  final List<ProductSubCategoryDataData> pcdata = [];
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-   getProductCount();
+    getProductCount();
   }
 
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = ResponsiveInfo.isMobile(context);
+    final hasItemsInCart = cartcount != "0" && cartcount.isNotEmpty;
+
     return Scaffold(
-
-      appBar: AppBar(title: Text(
-        productByCategoryDataData.productName.toString(),maxLines: 2 ,style: TextStyle(
-          fontSize: ResponsiveInfo.isMobile(context) ? 15 : 17,
-
-          color: Colors.white),),
-        leading: GestureDetector(
-
-          child: Icon(Icons.arrow_back, color: Colors.white,
-            size: ResponsiveInfo.isMobile(context) ? 20 : 25,),
-
-          onTap: () {
-            Navigator.pop(context);
-          },
+      backgroundColor: surfaceBg,
+      appBar: AppBar(
+        backgroundColor: primaryTeal,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+            size: isMobile ? 20 : 24,
+          ),
+          onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: Color(0xff0B7D97),
+        title: Text(
+          productByCategoryDataData.productName.toString(),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: isMobile ? 15 : 17,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
         actions: [
-
-          Stack(
-            children: [
-
-              Align(
-                alignment: FractionalOffset.center,
-                child: GestureDetector(
-
-                  child: Padding(padding: EdgeInsets.all(
-                      ResponsiveInfo.isMobile(context) ? 10 : 15),
-
-                    child: Icon(Icons.shopping_cart, color: Colors.white,
-                      size: ResponsiveInfo.isMobile(context) ? 20 : 25,),
-
-                  ),
-                  onTap: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => CartScreen()),
-                    );
-
-                    if (result != null||result==null) {
-
-                      getCartCount();
-
-
-                    }
-                  },
-                ),
+          InkWell(
+            borderRadius: BorderRadius.circular(24),
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => CartScreen()),
+              );
+              if (mounted) {
+                getCartCount();
+              }
+            },
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 12 : 16,
+                vertical: 10,
               ),
-              (cartcount.compareTo("0") != 0) ? Align(
-                  alignment: FractionalOffset.topCenter,
-
-                  child: Padding(padding: EdgeInsets.fromLTRB(
-                      ResponsiveInfo.isMobile(context) ? 10 : 15,
-                      ResponsiveInfo.isMobile(context) ? 3 : 5, 0, 0),
-
-                    child: CircleAvatar(
-                      radius: ResponsiveInfo.isMobile(context) ? 8 : 10,
-                      backgroundColor: Colors.red,
-                      child: Text(cartcount, style: TextStyle(
-                          color: Colors.white,
-                          fontSize: ResponsiveInfo.isMobile(context)
-                              ? 12
-                              : 14),),
-                    )
-
-
-                    ,)
-
-              ) : Container(),
-            ],
-
-          )
-
-
-        ]
-
-        ,),
-
-      body:(count==1)? Column(
-
-        children: [
-
-          Expanded(child: (Adsimages.length > 0) ? Padding(
-            padding: EdgeInsets.all(ResponsiveInfo.isMobile(context) ? 10 : 15),
-
-            child: Column(
-              children: [
-
-                Stack(
-                  children: [
-
-                    Align(
-                        alignment: FractionalOffset.topRight,
-                        child: GestureDetector(
-
-                          child: (!iswishlist) ? Padding(padding: EdgeInsets
-                              .all(5),
-                            child: Icon(
-                              Icons.favorite_border, color: Colors.black,
-                              size: ResponsiveInfo.isMobile(context)
-                                  ? 20
-                                  : 25,),
-                          ) : Padding(padding: EdgeInsets.all(5),
-                            child: Icon(Icons.favorite, color: Colors.redAccent,
-                              size: ResponsiveInfo.isMobile(context)
-                                  ? 20
-                                  : 25,),
-                          ),
-                          onTap: () {
-                            if (!iswishlist) {
-                              addProductToWishlist();
-                            }
-                            else {
-                              deleteProductFromWishlist();
-                            }
-                          },
-                        )
-
-
-                    )
-                  ],
-                ),
-                CarouselSlider(options: CarouselOptions(
-                  autoPlayCurve: Curves.fastOutSlowIn,
-                  autoPlayAnimationDuration: Duration(microseconds: 800),
-                  autoPlayInterval: Duration(seconds: 2),
-                  autoPlay: true,
-                  //  height: 200,
-                  enlargeCenterPage: true,
-                  aspectRatio: 2.3,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      AdsCurrentIndex = index;
-                    });
-                  },
-                ),
-                  items: Adsimages,
-                ),
-                Padding(padding: EdgeInsets.all(5),
-
-                  child: AnimatedSmoothIndicator(activeIndex: AdsCurrentIndex,
-                    count: Adsimages.length,
-                    effect:
-                    WormEffect(
-                        dotWidth: 12,
-                        dotHeight: 12,
-                        dotColor: Colors.grey,
-                        // spacing: 2,
-                        activeDotColor: Colors.black,
-                        paintStyle: PaintingStyle.fill
-                    ),
-                  ),
-                )
-
-              ],
-            ),
-          )
-
-
-              : Image.asset("assets/web-error.png"), flex: 1,),
-
-          Expanded(child: Column(
-            children: [
-
-              Expanded(child: Column(
-
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-
-                  TabBar(
-                    labelColor: Color(0xff0B7D97), // Color of the selected tab
-                    unselectedLabelColor: Colors.grey, // Color of unselected tabs
-                    indicatorColor: Color(0xff0B7D97), // Underline color of the selected tab
-                    indicatorWeight: 2.0, //
-                    controller: _tabController,
-
-
-                    tabs: [
-                      Tab(text: "Price"),
-                      Tab(text: "Description"),
-                      Tab(text: "Return Policy"),
-                    ],
+                  Icon(
+                    Icons.shopping_cart_outlined,
+                    color: Colors.white,
+                    size: isMobile ? 22 : 26,
                   ),
-                  Expanded(
-                    child: TabBarView(
-
-                      controller: _tabController,
-                      children: [
-                        _buildTabContent(0),
-                        _buildTabContent(1),
-                        _buildTabContent(2),
-                      ],
-                    ),
-                  ),
-
-                ],
-
-
-              ), flex: 2,),
-
-
-              Expanded(child: Stack(
-
-                children: [
-                  (stockquantity>0) ?  Align(
-                    alignment: FractionalOffset.center,
-                    child:
-                    (productStockEntity.data!.currentQty.toString().isNotEmpty &&
-                        productStockEntity.data!.currentQty.toString().compareTo("0")!=0)?
-                    Padding(
-                      padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)
-                          ? 15
-                          : 20),
+                  if (hasItemsInCart)
+                    Positioned(
+                      top: -6,
+                      right: -8,
                       child: Container(
-                        width: double.infinity,
-                        height: ResponsiveInfo.isMobile(context) ? 50 : 70,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xff0B7D97), // background
-                            foregroundColor: Colors.white, // foreground
-                          ),
-                          onPressed: () async {
-                            double current_walletpoints = await calculateWalletPoints();
-                            double ppredemption = 0;
-
-
-                            if (current_walletpoints != null) {
-
-                              if (productStockEntity != null) {
-                                if (productStockEntity.data!.ppRedemption !=
-                                    null) {
-                                  ppredemption = double.parse(
-                                      productStockEntity.data!.ppRedemption
-                                          .toString());
-
-                                  if (current_walletpoints >= ppredemption) {
-                                    Widget okButton = TextButton(
-                                      child: Text("Yes"),
-                                      onPressed: () {
-                                        tempwalletpoints =
-                                            current_walletpoints - ppredemption;
-                                        // AppStorage.setString(AppStorage.current_wallet_point, tempwalletpoints.toString());
-                                        ispointredeemeed = true;
-                                        getProductExistsinCart();
-
-                                        Navigator.pop(context);
-                                      },
-                                    );
-
-                                    Widget noButton = TextButton(
-                                      child: Text("No"),
-                                      onPressed: () {
-                                        ispointredeemeed = false;
-                                        getProductExistsinCart();
-
-                                        Navigator.pop(context);
-                                      },
-                                    );
-
-                                    // set up the AlertDialog
-                                    AlertDialog alert = AlertDialog(
-                                      title: Text("Savekart"),
-                                      content: Text("Your wallet point is " +
-                                          current_walletpoints.toString() +
-                                          ".So you are eligible to redeem points.Do you want to redeem now ?"),
-                                      actions: [
-                                        okButton,
-                                        noButton
-                                      ],
-                                    );
-
-                                    // show the dialog
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return alert;
-                                      },
-                                    );
-                                  }
-                                  else {
-                                    getProductExistsinCart();
-                                  }
-                                }
-                              }
-                            }
-                            else {
-                              getProductExistsinCart();
-                            }
-                          },
-                          child: Text('Add to cart', style: TextStyle(
-                              fontSize: ResponsiveInfo.isMobile(context)
-                                  ? 14
-                                  : 17),),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 2,
                         ),
-                      ),) : Text("No Stock Available",style: TextStyle(color: Color(0xff0B7D97),fontSize: ResponsiveInfo.isMobile(context)?14:17,),
-                  ) ) : Container()
-
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          cartcount,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
-              )
-
-
-
-
-
-                ,
-                flex: 1,)
-
-
-            ],
-          ), flex: 2,)
-
-
-        ],
-      ):((count>1)? Column(
-
-        children: [
-
-          Expanded(child: (Adsimages.length > 0) ? Padding(
-            padding: EdgeInsets.all(ResponsiveInfo.isMobile(context) ? 10 : 15),
-
-            child: Column(
-              children: [
-
-                Stack(
-                  children: [
-
-                    Align(
-                        alignment: FractionalOffset.topRight,
-                        child: GestureDetector(
-
-                          child: (!iswishlist) ? Padding(padding: EdgeInsets
-                              .all(5),
-                            child: Icon(
-                              Icons.favorite_border, color: Colors.black,
-                              size: ResponsiveInfo.isMobile(context)
-                                  ? 20
-                                  : 25,),
-                          ) : Padding(padding: EdgeInsets.all(5),
-                            child: Icon(Icons.favorite, color: Colors.redAccent,
-                              size: ResponsiveInfo.isMobile(context)
-                                  ? 20
-                                  : 25,),
-                          ),
-                          onTap: () {
-                            if (!iswishlist) {
-                              addProductToWishlist();
-                            }
-                            else {
-                              deleteProductFromWishlist();
-                            }
-                          },
-                        )
-
-
-                    )
-                  ],
-                ),
-                CarouselSlider(options: CarouselOptions(
-                  autoPlayCurve: Curves.fastOutSlowIn,
-                  autoPlayAnimationDuration: Duration(microseconds: 800),
-                  autoPlayInterval: Duration(seconds: 2),
-                  autoPlay: true,
-                  //  height: 200,
-                  enlargeCenterPage: true,
-                  aspectRatio: 2.6,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      AdsCurrentIndex = index;
-                    });
-                  },
-                ),
-                  items: Adsimages,
-                ),
-                Padding(padding: EdgeInsets.all(5),
-
-                  child: AnimatedSmoothIndicator(activeIndex: AdsCurrentIndex,
-                    count: Adsimages.length,
-                    effect:
-                    WormEffect(
-                        dotWidth: 12,
-                        dotHeight: 12,
-                        dotColor: Colors.grey,
-                        // spacing: 2,
-                        activeDotColor: Colors.black,
-                        paintStyle: PaintingStyle.fill
-                    ),
-                  ),
-                ),
-
-                Padding(padding: EdgeInsets.all(5),
-
-                child: SizedBox(
-                  height: 75, // Fixed height for ListView
-                  child: GridView.builder(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.all(ResponsiveInfo.isMobile(context) ? 5 : 10),
-                    itemCount: pcdata.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: ResponsiveInfo.isMobile(context) ? 4 : 5,
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                      childAspectRatio: 2.5, // Adjust to control width/height ratio
-                    ),
-                    itemBuilder: (context, index) {
-                      bool isSelected = selectedindex == index;
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedindex = index;
-                            productByCategoryDataData = pcdata[selectedindex];
-                            setupProductImages();
-                            getReturnPolicies(productByCategoryDataData.id.toString());
-
-                            getProductStock();
-                            getCartCount();
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: isSelected ? Color(0xff0B7D97) : Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: isSelected
-                                ? null
-                                : Border.all(
-                              color: Color(0xff0B7D97),
-                              width: 1,
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            pcdata[index].size.toString(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: isSelected ? Colors.white : Color(0xff0B7D97),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  )
-
-                ),
-                )
-
-
-
-              ],
+              ),
             ),
-          )
-
-
-              : Image.asset("assets/web-error.png"), flex: 2,),
-
-          Expanded(child: Column(
-            children: [
-
-              Expanded(child: Column(
-
-                children: [
-
-                  TabBar(
-                    labelColor: Color(0xff0B7D97), // Color of the selected tab
-                    unselectedLabelColor: Colors.grey, // Color of unselected tabs
-                    indicatorColor: Color(0xff0B7D97), // Underline color of the selected tab
-                    indicatorWeight: 2.0, //
-                    controller: _tabController,
-
-
-                    tabs: [
-                      Tab(text: "Price"),
-                      Tab(text: "Description"),
-                      Tab(text: "Return Policy"),
-                    ],
-                  ),
-                  Expanded(
-                    child: TabBarView(
-
-                      controller: _tabController,
-                      children: [
-                        _buildTabContent(0),
-                        _buildTabContent(1),
-                        _buildTabContent(2),
-                      ],
-                    ),
-                  ),
-
-                ],
-
-
-              ), flex: 2,),
-
-
-              Expanded(child: Column(
-
-                children: [
-                  Stack(
-
-                    children: [
-                      (productStockEntity.status==1) ?   Align(
-                        alignment: FractionalOffset.center,
-                        child:  (productStockEntity.data!.currentQty.toString().isNotEmpty &&
-                            productStockEntity.data!.currentQty.toString().compareTo("0")!=0)? Padding(
-                          padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)
-                              ? 15
-                              : 20),
-                          child: Container(
-                            width: double.infinity,
-                            height: ResponsiveInfo.isMobile(context) ? 50 : 70,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xff0B7D97), // background
-                                foregroundColor: Colors.white, // foreground
-                              ),
-                              onPressed: () async {
-                                double current_walletpoints = await calculateWalletPoints();
-                                double ppredemption = 0;
-
-
-                                if (current_walletpoints != null) {
-
-                                  if (productStockEntity != null) {
-                                    if (productStockEntity.data!.ppRedemption !=
-                                        null) {
-                                      ppredemption = double.parse(
-                                          productStockEntity.data!.ppRedemption
-                                              .toString());
-
-                                      if (current_walletpoints >= ppredemption) {
-                                        Widget okButton = TextButton(
-                                          child: Text("Yes"),
-                                          onPressed: () {
-                                            tempwalletpoints =
-                                                current_walletpoints - ppredemption;
-                                            // AppStorage.setString(AppStorage.current_wallet_point, tempwalletpoints.toString());
-                                            ispointredeemeed = true;
-                                            getProductExistsinCart();
-
-                                            Navigator.pop(context);
-                                          },
-                                        );
-
-                                        Widget noButton = TextButton(
-                                          child: Text("No"),
-                                          onPressed: () {
-                                            ispointredeemeed = false;
-                                            getProductExistsinCart();
-
-                                            Navigator.pop(context);
-                                          },
-                                        );
-
-                                        // set up the AlertDialog
-                                        AlertDialog alert = AlertDialog(
-                                          title: Text("Savekart"),
-                                          content: Text("Your wallet point is " +
-                                              current_walletpoints.toString() +
-                                              ".So you are eligible to redeem points.Do you want to redeem now ?"),
-                                          actions: [
-                                            okButton,
-                                            noButton
-                                          ],
-                                        );
-
-                                        // show the dialog
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return alert;
-                                          },
-                                        );
-                                      }
-                                      else {
-                                        getProductExistsinCart();
-                                      }
-                                    }
-                                  }
-                                }
-                                else {
-                                  getProductExistsinCart();
-                                }
-                              },
-                              child: Text('Add to cart', style: TextStyle(
-                                  fontSize: ResponsiveInfo.isMobile(context)
-                                      ? 14
-                                      : 17),),
-                            ),
-                          ),) :
-                        Text("No Stock Available",style: TextStyle(color: Color(0xff0B7D97),fontSize: ResponsiveInfo.isMobile(context)?14:17,),
-                        )
-                        ,
-                      ) : Container()
-                    ],
-                  ),
-                  SizedBox(height: 10,)
-                ],
-              )
-
-
-
-
-
-
-
-
-                ,
-                flex: 1,)
-
-
-            ],
-          ), flex: 3,)
-
-
+          ),
         ],
-      ):
-      Container(width: double.infinity,
-      height: double.infinity,
-        child: Stack(
-
-          children: [
-
-            Align(
-              alignment: FractionalOffset.center,
-              child: CircularProgressIndicator(),
-            )
-          ],
-        ),
-
-      )),
-
-
+      ),
+      body: count == 0
+          ? const Center(child: CircularProgressIndicator(color: primaryTeal))
+          : Column(
+        children: [
+          Expanded(
+            flex: count > 1 ? 5 : 4,
+            child: _buildMediaAndVariantsCard(isMobile),
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            flex: 5,
+            child: _buildDetailsAndActionCard(isMobile),
+          ),
+        ],
+      ),
     );
   }
 
-  getProductCount()async{
-    EcommerceApiHelper apihelper = new EcommerceApiHelper();
-
-    var t = EcommerceApiHelper.getTimeStamp();
-
-    var response = await apihelper.get(
-        Apimethodes.getProductCountByName + "?id=" +
-            productByCategoryDataData.id.toString()+"&name="+productByCategoryDataData.productName.toString() + "&q=" + t.toString());
-
-    var js = jsonDecode(response);
-    ProductCountEntity entity=ProductCountEntity.fromJson(js);
-
-    if(entity.status==1)
-      {
-
-        if(entity.data!.length>0)
-          {
-
-            setState(() {
-              count=entity.data!.length;
-              if(count==1)
-                {
-                  setupProductImages();
-                  getReturnPolicies(productByCategoryDataData.id.toString());
-                  getProductStock();
-                  getCartCount();
-                }
-              else if(count>1)
-                {
-                  for(int i=0;i<entity.data!.length;i++)
-                    {
-                      ProductCountData pb=entity.data![i];
-                      ProductSubCategoryDataData pbc=new ProductSubCategoryDataData();
-                      pbc.id=pb.id;
-                      pbc.primeImage=pb.primeImage;
-                      pbc.productName=pb.productName;
-                      pbc.status=pb.status;
-                      pbc.productSpec=pb.productSpec;
-                      pbc.productDescription=pb.productDescription;
-                      pbc.sideImage4=pb.sideImage4;
-                      pbc.sideImage3=pb.sideImage3;
-                      pbc.sideImage2=pb.sideImage2;
-                      pbc.sideImage1=pb.sideImage1;
-                      pbc.categoryId=pb.categoryId;
-                      pbc.color=pb.color;
-                      pbc.colorEnabled=pb.colorEnabled;
-                      pbc.size=pb.size;
-                      pbc.sizeEnabled=pb.sizeEnabled;
-                      pbc.subCategoryId=pb.subCategoryId;
-                      pbc.unitId=pb.unitId;
-                      pbc.vendorId=pb.vendorId;
-                      pbc.returnDays=pb.returnDays;
-                      pbc.productCode=pb.productCode;
-                      pcdata.add(pbc);
+  Widget _buildMediaAndVariantsCard(bool isMobile) {
+    return Container(
+      margin: EdgeInsets.fromLTRB(isMobile ? 12 : 16, 12, isMobile ? 12 : 16, 0),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Adsimages.isEmpty
+          ? Center(
+        child: Image.asset(
+          "assets/web-error.png",
+          fit: BoxFit.contain,
+        ),
+      )
+          : Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Material(
+                color: iswishlist ? const Color(0xFFFFF1F2) : surfaceBg,
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () {
+                    if (!iswishlist) {
+                      addProductToWishlist();
+                    } else {
+                      deleteProductFromWishlist();
                     }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(
+                      iswishlist
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
+                      color: iswishlist
+                          ? Colors.redAccent
+                          : Colors.grey.shade700,
+                      size: isMobile ? 20 : 24,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: CarouselSlider(
+              options: CarouselOptions(
+                autoPlayCurve: Curves.fastOutSlowIn,
+                autoPlayAnimationDuration:
+                const Duration(milliseconds: 600),
+                autoPlayInterval: const Duration(seconds: 3),
+                autoPlay: Adsimages.length > 1,
+                enlargeCenterPage: true,
+                viewportFraction: 0.85,
+                onPageChanged: (index, reason) {
+                  if (mounted) {
+                    setState(() => AdsCurrentIndex = index);
+                  }
+                },
+              ),
+              items: Adsimages,
+            ),
+          ),
+          const SizedBox(height: 6),
+          AnimatedSmoothIndicator(
+            activeIndex: AdsCurrentIndex,
+            count: Adsimages.length,
+            effect: const WormEffect(
+              dotWidth: 9,
+              dotHeight: 9,
+              spacing: 6,
+              dotColor: Colors.black26,
+              activeDotColor: primaryTeal,
+            ),
+          ),
+          if (count > 1 && pcdata.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 36,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: pcdata.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  final isSelected = selectedindex == index;
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () {
+                      setState(() {
+                        selectedindex = index;
+                        productByCategoryDataData = pcdata[selectedindex];
+                        setupProductImages();
+                        getReturnPolicies(
+                          productByCategoryDataData.id.toString(),
+                        );
+                        getProductStock();
+                        getCartCount();
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: isSelected ? primaryTeal : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: primaryTeal, width: 1),
+                      ),
+                      child: Text(
+                        pcdata[index].size.toString(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: isSelected ? Colors.white : primaryTeal,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 
-                  productByCategoryDataData=pcdata[selectedindex];
-                  setupProductImages();
-                  getReturnPolicies(productByCategoryDataData.id.toString());
-                  getProductStock();
-                  getCartCount();
+  Widget _buildDetailsAndActionCard(bool isMobile) {
+    final qtyStr = productStockEntity.data?.currentQty?.toString() ?? "";
+    final hasStock = stockquantity > 0 &&
+        productStockEntity.status == 1 &&
+        qtyStr.isNotEmpty &&
+        qtyStr != "0";
 
-                }
+    return Container(
+      margin: EdgeInsets.fromLTRB(isMobile ? 12 : 16, 0, isMobile ? 12 : 16, 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          TabBar(
+            controller: _tabController,
+            labelColor: primaryTeal,
+            unselectedLabelColor: Colors.grey.shade600,
+            indicatorColor: primaryTeal,
+            indicatorWeight: 2.5,
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13.5,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 13.5,
+            ),
+            tabs: const [
+              Tab(text: "Price"),
+              Tab(text: "Description"),
+              Tab(text: "Return Policy"),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildTabContent(0, isMobile),
+                _buildTabContent(1, isMobile),
+                _buildTabContent(2, isMobile),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          Padding(
+            padding: EdgeInsets.all(isMobile ? 12 : 16),
+            child: hasStock
+                ? SizedBox(
+              width: double.infinity,
+              height: isMobile ? 46 : 54,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryTeal,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: _onAddToCartPressed,
+                child: Text(
+                  'Add to Cart',
+                  style: TextStyle(
+                    fontSize: isMobile ? 14.5 : 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            )
+                : Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF1F2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                "No Stock Available",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.red.shade700,
+                  fontWeight: FontWeight.w700,
+                  fontSize: isMobile ? 14 : 16,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Future<void> _onAddToCartPressed() async {
+    final currentWalletPoints = await calculateWalletPoints();
+    if (!mounted) return;
 
-            });
+    final redemptionStr = productStockEntity.data?.ppRedemption?.toString();
+    final ppRedemption =
+    (redemptionStr != null && redemptionStr.isNotEmpty)
+        ? (double.tryParse(redemptionStr) ?? 0.0)
+        : 0.0;
 
+    if (ppRedemption > 0 && currentWalletPoints >= ppRedemption) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            "Savekart",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            "Your wallet point is $currentWalletPoints. So you are eligible to redeem points. Do you want to redeem now?",
+          ),
+          actions: [
+            TextButton(
+              child: const Text("No", style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                ispointredeemeed = false;
+                Navigator.pop(dialogContext);
+                getProductExistsinCart();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                "Yes",
+                style: TextStyle(color: primaryTeal, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                tempwalletpoints = currentWalletPoints - ppRedemption;
+                ispointredeemeed = true;
+                Navigator.pop(dialogContext);
+                getProductExistsinCart();
+              },
+            ),
+          ],
+        ),
+      );
+    } else {
+      getProductExistsinCart();
+    }
+  }
+
+  Future<void> getProductCount() async {
+    final apiHelper = EcommerceApiHelper();
+    final t = EcommerceApiHelper.getTimeStamp();
+
+    final response = await apiHelper.get(
+      "${Apimethodes.getProductCountByName}?id=${productByCategoryDataData.id}&name=${productByCategoryDataData.productName}&q=$t",
+    );
+
+    final js = jsonDecode(response);
+    final entity = ProductCountEntity.fromJson(js);
+    if (!mounted) return;
+
+    if (entity.status == 1 && entity.data != null && entity.data!.isNotEmpty) {
+      setState(() {
+        count = entity.data!.length;
+        if (count == 1) {
+          setupProductImages();
+          getReturnPolicies(productByCategoryDataData.id.toString());
+          getProductStock();
+          getCartCount();
+        } else if (count > 1) {
+          pcdata.clear();
+          for (final pb in entity.data!) {
+            final pbc = ProductSubCategoryDataData()
+              ..id = pb.id
+              ..primeImage = pb.primeImage
+              ..productName = pb.productName
+              ..status = pb.status
+              ..productSpec = pb.productSpec
+              ..productDescription = pb.productDescription
+              ..sideImage4 = pb.sideImage4
+              ..sideImage3 = pb.sideImage3
+              ..sideImage2 = pb.sideImage2
+              ..sideImage1 = pb.sideImage1
+              ..categoryId = pb.categoryId
+              ..color = pb.color
+              ..colorEnabled = pb.colorEnabled
+              ..size = pb.size
+              ..sizeEnabled = pb.sizeEnabled
+              ..subCategoryId = pb.subCategoryId
+              ..unitId = pb.unitId
+              ..vendorId = pb.vendorId
+              ..returnDays = pb.returnDays
+              ..productCode = pb.productCode;
+            pcdata.add(pbc);
           }
 
-      }
-    else{
-
+          productByCategoryDataData = pcdata[selectedindex];
+          setupProductImages();
+          getReturnPolicies(productByCategoryDataData.id.toString());
+          getProductStock();
+          getCartCount();
+        }
+      });
+    } else {
       setState(() {
-
-        if(entity.message.toString().contains("values less than one")) {
+        if (entity.message.toString().contains("values less than one")) {
           count = 1;
           setupProductImages();
           getReturnPolicies(productByCategoryDataData.id.toString());
@@ -791,734 +516,412 @@ List<ProductSubCategoryDataData>pcdata=[];
           getCartCount();
         }
       });
-
-
     }
-
-
-
-    print(js);
   }
 
-  _buildTabContent(int index)
-  {
-    if(index==0) {
-      return SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(
-              ResponsiveInfo.isMobile(context) ? 10 : 15),
-          child: Text(
-            price_details, style: TextStyle(fontSize: ResponsiveInfo
-              .isMobile(context) ? 15 : 17, color: Colors.black),),
+  Widget _buildTabContent(int index, bool isMobile) {
+    final content = index == 0
+        ? price_details
+        : index == 1
+        ? description
+        : returnpolicies;
 
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(isMobile ? 14 : 18),
+      child: Text(
+        content.trim().isEmpty ? "No details available." : content.trim(),
+        style: TextStyle(
+          fontSize: isMobile ? 14 : 15.5,
+          height: 1.5,
+          color: const Color(0xFF1A1D1F),
         ),
-      )
-
-
-        ;
-    }
-    else if(index==1)
-      {
-        return SingleChildScrollView(
-          child:Padding(
-            padding: EdgeInsets.all(
-                ResponsiveInfo.isMobile(context) ? 10 : 15),
-            child: Text(
-              description, style: TextStyle(fontSize: ResponsiveInfo
-                .isMobile(context) ? 15 : 17, color: Colors.black),),
-
-          ) ,
-        )
-
-
-          ;
-      }
-    else{
-      return SingleChildScrollView(
-
-        child: Padding(
-          padding: EdgeInsets.all(
-              ResponsiveInfo.isMobile(context) ? 10 : 15),
-          child: Text(
-            returnpolicies, style: TextStyle(fontSize: ResponsiveInfo
-              .isMobile(context) ? 15 : 17, color: Colors.black),),
-
-        ),
-      )
-
-
-        ;
-    }
-
+      ),
+    );
   }
 
-  getProductStock() async {
-
-    setState(() {
-      productStockEntity=new ProductStockEntity();
-    });
-
-
-    EcommerceApiHelper apihelper = new EcommerceApiHelper();
-
-    var t = EcommerceApiHelper.getTimeStamp();
-
-    var response = await apihelper.get(
-        Apimethodes.getProductStock + "?product_id=" +
-            productByCategoryDataData.id.toString() + "&q=" + t.toString());
-
-    var js = jsonDecode(response);
-
-    productStockEntity = ProductStockEntity.fromJson(js);
-    getProductExistsinWishlist();
-    if (productStockEntity.data!=null&&productStockEntity.data!.currentQty.toString().compareTo("0") != 0) {
-      product_stockid = productStockEntity.data!.id.toString();
-      setState(() {
-        price_details="";
-        description="";
-        stockquantity=int.parse(productStockEntity.data!.currentQty.toString());
-        if(productStockEntity.status==1&&productStockEntity.data!=null&&productStockEntity.data!.id!.isNotEmpty)
-        {
-          if (productStockEntity.status.toString().compareTo("0") != 0) {
-
-
-            if (productStockEntity.data!.mrp != null && productStockEntity.data!
-                .mrp
-                .toString()
-                .isNotEmpty) {
-              price_details = "\n" + price_details +
-                  "Product Code : " + productByCategoryDataData.productCode.toString() + "\n\n";
-            }
-
-            if (productStockEntity.data!.mrp != null && productStockEntity.data!
-                .mrp
-                .toString()
-                .isNotEmpty) {
-              price_details = "\n" + price_details +
-                  "MRP : " + productStockEntity.data!.mrp.toString() + "\n\n";
-            }
-            if (productStockEntity.data!.savecartPrice != null &&
-                productStockEntity.data!
-                    .savecartPrice
-                    .toString()
-                    .isNotEmpty) {
-              price_details = price_details +
-                  "Save Kart Price : " +
-                  productStockEntity.data!.savecartPrice.toString() + "\n\n";
-            }
-
-            if (productStockEntity.data!.ppRedemption != null &&
-                productStockEntity.data!
-                    .ppRedemption
-                    .toString()
-                    .isNotEmpty) {
-              price_details = price_details +
-                  "PP Redeem  : " +
-                  productStockEntity.data!.ppRedemption.toString() + "\n\n";
-            }
-            if (productStockEntity.data!.priceSales != null &&
-                productStockEntity.data!
-                    .priceSales
-                    .toString()
-                    .isNotEmpty) {
-              price_details = price_details + "Your Price : " +
-                  productStockEntity.data!.priceSales.toString() + " (GST included)\n\n";
-            }
-            // if(productStockEntity.data!.margin!=null && productStockEntity.data!.margin.toString().isNotEmpty)
-            // {
-            //   description = description +
-            //       "SV : "+productStockEntity.data!.margin.toString()+"\n";
-            //
-            // }
-
-            if (productStockEntity.data!.savecartPrice != null &&
-                productStockEntity.data!
-                    .savecartPrice
-                    .toString()
-                    .isNotEmpty) {
-              if (productStockEntity.data!.mrp != null &&
-                  productStockEntity.data!
-                      .mrp
-                      .toString()
-                      .isNotEmpty) {
-                double mrp = double.parse(
-                    productStockEntity.data!.mrp.toString());
-                double savecartprice = double.parse(
-                    productStockEntity.data!.priceSales.toString());
-                double savedprice = mrp - savecartprice;
-                price_details = price_details +
-                    "You saved : " + savedprice.toString() + "  \n";
-              }
-            }
-            else {
-              price_details = price_details +
-                  "You saved : 0.0  \n";
-            }
-
-
-            price_details = price_details +"\nFree Delivery\n";
-          }
-
-
-          if (productByCategoryDataData.sizeEnabled.toString().compareTo("1") !=
-              0 && productByCategoryDataData.size != null &&
-              productByCategoryDataData.size
-                  .toString()
-                  .isNotEmpty) {
-            description = "\n" + description +
-                "Size : " + productByCategoryDataData.size.toString() + " \n";
-          }
-
-          if (productByCategoryDataData.colorEnabled.toString().compareTo(
-              "1") != 0 && productByCategoryDataData.color != null &&
-              productByCategoryDataData.color
-                  .toString()
-                  .isNotEmpty) {
-            description = description +
-                "Colour : " + productByCategoryDataData.color.toString() +
-                " \n\n";
-          }
-
-          if (productByCategoryDataData.productDescription != null &&
-              productByCategoryDataData.productDescription
-                  .toString()
-                  .isNotEmpty) {
-            description = description +
-                productByCategoryDataData.productDescription.toString();
-          }
-
-          if (productByCategoryDataData.productSpec != null &&
-              productByCategoryDataData.productSpec
-                  .toString()
-                  .isNotEmpty) {
-            description = description + "\n\n Specifications : \n\n" +
-                productByCategoryDataData.productSpec.toString();
-          }
-        }
-        else{
-          price_details="\n\n\n No Data Found \n\n\n";
-        }
-      });
-    }
-
-    else {
-      ResponsiveInfo.showAlertDialog(
-          context, "", "Product is out of stock");
+  Future<void> getProductStock() async {
+    if (mounted) {
       setState(() {
         productStockEntity = ProductStockEntity();
-        productStockEntity.status=1;
-        productStockEntity.data!.currentQty="0";
+        stockquantity = 0;
       });
-
     }
-  }
 
-  getReturnPolicies(String product_id) async {
+    final apiHelper = EcommerceApiHelper();
+    final t = EcommerceApiHelper.getTimeStamp();
 
-    EcommerceApiHelper apihelper = new EcommerceApiHelper();
+    final response = await apiHelper.get(
+      "${Apimethodes.getProductStock}?product_id=${productByCategoryDataData.id}&q=$t",
+    );
 
-    var t=EcommerceApiHelper.getTimeStamp();
+    final js = jsonDecode(response);
+    productStockEntity = ProductStockEntity.fromJson(js);
+    if (!mounted) return;
 
-    var response= await  apihelper.get(Apimethodes.getReturnPolicyData+"?q="+t.toString()+"&product_id="+product_id);
+    getProductExistsinWishlist();
 
+    final stockData = productStockEntity.data;
+    final currentQtyStr = stockData?.currentQty?.toString() ?? "";
 
-
-
-    var js= jsonDecode( response) ;
-    ReturnPolicyEntity entity=ReturnPolicyEntity.fromJson(js);
-
-    if(entity.status==1)
-    {
-
-setState(() {
-  returnpolicies=entity.data!.policy.toString()+"\n Return Period : "+productByCategoryDataData.returnDays.toString()+" Days";
-});
-
-
-    }
-    else{
-
+    if (stockData != null && currentQtyStr.isNotEmpty && currentQtyStr != "0") {
+      product_stockid = stockData.id.toString();
       setState(() {
+        price_details = "";
+        description = "";
+        stockquantity = int.tryParse(currentQtyStr) ?? 0;
 
-        if(productByCategoryDataData.returnDays!=null&&productByCategoryDataData.returnDays.toString().isNotEmpty)
-          {
-            returnpolicies = "\n\n\n \t\t\t Return Period : "+productByCategoryDataData.returnDays.toString()+" Days";
+        if (productStockEntity.status == 1 &&
+            stockData.id != null &&
+            stockData.id!.isNotEmpty) {
+          if (productStockEntity.status.toString() != "0") {
+            if (productByCategoryDataData.productCode != null &&
+                productByCategoryDataData.productCode.toString().isNotEmpty) {
+              price_details =
+              "${price_details}Product Code : ${productByCategoryDataData.productCode}\n\n";
+            }
+            if (stockData.mrp != null && stockData.mrp.toString().isNotEmpty) {
+              price_details = "${price_details}MRP : ${stockData.mrp}\n\n";
+            }
+            if (stockData.savecartPrice != null &&
+                stockData.savecartPrice.toString().isNotEmpty) {
+              price_details =
+              "${price_details}Save Kart Price : ${stockData.savecartPrice}\n\n";
+            }
+            if (stockData.ppRedemption != null &&
+                stockData.ppRedemption.toString().isNotEmpty) {
+              price_details =
+              "${price_details}PP Redeem : ${stockData.ppRedemption}\n\n";
+            }
+            if (stockData.priceSales != null &&
+                stockData.priceSales.toString().isNotEmpty) {
+              price_details =
+              "${price_details}Your Price : ${stockData.priceSales} (GST included)\n\n";
+            }
+            if (stockData.savecartPrice != null &&
+                stockData.savecartPrice.toString().isNotEmpty &&
+                stockData.mrp != null &&
+                stockData.mrp.toString().isNotEmpty &&
+                stockData.priceSales != null &&
+                stockData.priceSales.toString().isNotEmpty) {
+              final mrp = double.tryParse(stockData.mrp.toString()) ?? 0;
+              final sales = double.tryParse(stockData.priceSales.toString()) ?? 0;
+              final savedPrice = mrp - sales;
+              price_details = "${price_details}You saved : $savedPrice\n\n";
+            } else {
+              price_details = "${price_details}You saved : 0.0\n\n";
+            }
+            price_details = "${price_details}Free Delivery";
           }
-        else {
-          returnpolicies = "\n\n\n \t\t\t Non Returnable Product";
+
+          if (productByCategoryDataData.sizeEnabled.toString() != "1" &&
+              productByCategoryDataData.size != null &&
+              productByCategoryDataData.size.toString().isNotEmpty) {
+            description =
+            "${description}Size : ${productByCategoryDataData.size}\n\n";
+          }
+          if (productByCategoryDataData.colorEnabled.toString() != "1" &&
+              productByCategoryDataData.color != null &&
+              productByCategoryDataData.color.toString().isNotEmpty) {
+            description =
+            "${description}Colour : ${productByCategoryDataData.color}\n\n";
+          }
+          if (productByCategoryDataData.productDescription != null &&
+              productByCategoryDataData.productDescription.toString().isNotEmpty) {
+            description =
+            "$description${productByCategoryDataData.productDescription}";
+          }
+          if (productByCategoryDataData.productSpec != null &&
+              productByCategoryDataData.productSpec.toString().isNotEmpty) {
+            description =
+            "$description\n\nSpecifications :\n\n${productByCategoryDataData.productSpec}";
+          }
+        } else {
+          price_details = "No Data Found";
         }
       });
-
-      // ResponsiveInfo.showAlertDialog(context, "", "Error while fetching Return Policy of this product");
+    } else {
+      ResponsiveInfo.showAlertDialog(context, "", "Product is out of stock");
+      if (!mounted) return;
+      setState(() {
+        stockquantity = 0;
+        price_details = "No Data Found";
+      });
     }
-
-
-
-
   }
 
+  Future<void> getReturnPolicies(String product_id) async {
+    final apiHelper = EcommerceApiHelper();
+    final t = EcommerceApiHelper.getTimeStamp();
 
-  setupProductImages() async {
-    if (productByCategoryDataData.primeImage != null &&
-        productByCategoryDataData.primeImage
-            .toString()
-            .isNotEmpty) {
+    final response = await apiHelper.get(
+      "${Apimethodes.getReturnPolicyData}?q=$t&product_id=$product_id",
+    );
+
+    final js = jsonDecode(response);
+    final entity = ReturnPolicyEntity.fromJson(js);
+    if (!mounted) return;
+
+    if (entity.status == 1 && entity.data != null) {
       setState(() {
-        Adsimages.clear();
-        images.add(EcommerceApiHelper.productimageurl +
-            productByCategoryDataData.primeImage.toString());
-        Adsimages.add( GestureDetector(
-
-          child:Image.network(EcommerceApiHelper.productimageurl +
-              productByCategoryDataData.primeImage.toString(),
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child; // Image loaded successfully
-              return Center(child: CircularProgressIndicator()); // Show loader while loading
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-            },
-
-          ) ,
-
-          onTap: (){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder:
-                    (context) =>
-                    ZoomableImageScreen(EcommerceApiHelper.productimageurl +
-                        productByCategoryDataData.primeImage.toString(),images)
-                )
-            );
-          },
-        )
-
-
-
-            );
+        returnpolicies =
+        "${entity.data!.policy}\n\nReturn Period : ${productByCategoryDataData.returnDays} Days";
+      });
+    } else {
+      setState(() {
+        if (productByCategoryDataData.returnDays != null &&
+            productByCategoryDataData.returnDays.toString().isNotEmpty) {
+          returnpolicies =
+          "Return Period : ${productByCategoryDataData.returnDays} Days";
+        } else {
+          returnpolicies = "Non Returnable Product";
+        }
       });
     }
+  }
 
-    if (productByCategoryDataData.sideImage1 != null &&
-        productByCategoryDataData.sideImage1
-            .toString()
-            .isNotEmpty) {
+  void setupProductImages() {
+    final rawImages = <String?>[
+      productByCategoryDataData.primeImage,
+      productByCategoryDataData.sideImage1,
+      productByCategoryDataData.sideImage2,
+      productByCategoryDataData.sideImage3,
+      productByCategoryDataData.sideImage4,
+    ];
 
+    images.clear();
+    Adsimages.clear();
+    AdsCurrentIndex = 0;
 
-      setState(() {
-        images.add(EcommerceApiHelper.productimageurl +
-            productByCategoryDataData.sideImage1.toString());
-        Adsimages.add(GestureDetector(
-
-
-
-          child:  Image.network(EcommerceApiHelper.productimageurl +
-            productByCategoryDataData.sideImage1.toString(), loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child; // Image loaded successfully
-            return Center(child: CircularProgressIndicator()); // Show loader while loading
-          },
-            errorBuilder: (context, error, stackTrace) {
-              return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-            },),
-
-        onTap: (){
-          Navigator.push(context,
-              MaterialPageRoute(builder:
-                  (context) =>
-                  ZoomableImageScreen(EcommerceApiHelper.productimageurl +
-                      productByCategoryDataData.sideImage1.toString(),images)
-              )
-          );
-        },
-
-        ));
-      });
-    }
-
-    if (productByCategoryDataData.sideImage2 != null &&
-        productByCategoryDataData.sideImage2
-            .toString()
-            .isNotEmpty) {
-      setState(() {
-        images.add(EcommerceApiHelper.productimageurl +
-            productByCategoryDataData.sideImage2.toString());
+    for (final img in rawImages) {
+      if (img != null && img.toString().isNotEmpty) {
+        final fullUrl = EcommerceApiHelper.productimageurl + img.toString();
+        images.add(fullUrl);
         Adsimages.add(
-            GestureDetector(
-
-          child:  Image.network(EcommerceApiHelper.productimageurl +
-            productByCategoryDataData.sideImage2.toString(), loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child; // Image loaded successfully
-            return Center(child: CircularProgressIndicator()); // Show loader while loading
-          },
-            errorBuilder: (context, error, stackTrace) {
-              return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-            },),
-            onTap: (){
-              Navigator.push(context,
-                  MaterialPageRoute(builder:
-                      (context) =>
-                      ZoomableImageScreen(EcommerceApiHelper.productimageurl +
-                          productByCategoryDataData.sideImage2.toString(),images)
-                  )
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ZoomableImageScreen(fullUrl, images),
+                ),
               );
             },
-
-            ));
-      });
-    }
-
-    if (productByCategoryDataData.sideImage3 != null &&
-        productByCategoryDataData.sideImage3
-            .toString()
-            .isNotEmpty) {
-      setState(() {
-        images.add(EcommerceApiHelper.productimageurl +
-            productByCategoryDataData.sideImage3.toString());
-        Adsimages.add( GestureDetector(
-
-
-
-          child:  Image.network(EcommerceApiHelper.productimageurl +
-            productByCategoryDataData.sideImage3.toString(), loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child; // Image loaded successfully
-            return Center(child: CircularProgressIndicator()); // Show loader while loading
-          },
-            errorBuilder: (context, error, stackTrace) {
-              return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-            },),
-
-        onTap: (){
-
-          Navigator.push(context,
-              MaterialPageRoute(builder:
-                  (context) =>
-                  ZoomableImageScreen(EcommerceApiHelper.productimageurl +
-                      productByCategoryDataData.sideImage3.toString(),images)
-              )
-          );
-        },
-
-        ));
-      });
-    }
-
-    if (productByCategoryDataData.sideImage4 != null &&
-        productByCategoryDataData.sideImage4
-            .toString()
-            .isNotEmpty) {
-      setState(() {
-        images.add(EcommerceApiHelper.productimageurl +
-            productByCategoryDataData.sideImage4.toString());
-        Adsimages.add( GestureDetector(
-
-            child: Image.network(EcommerceApiHelper.productimageurl +
-            productByCategoryDataData.sideImage4.toString(), loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child; // Image loaded successfully
-              return Center(child: CircularProgressIndicator()); // Show loader while loading
-            },
-              errorBuilder: (context, error, stackTrace) {
-                return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-              },),
-        onTap: (){
-          Navigator.push(context,
-              MaterialPageRoute(builder:
-                  (context) =>
-                  ZoomableImageScreen(EcommerceApiHelper.productimageurl +
-                      productByCategoryDataData.sideImage4.toString(),images)
-              )
-          );
-
-        },
-
-        ));
-      });
+            child: Image.network(
+              fullUrl,
+              fit: BoxFit.contain,
+              loadingBuilder: (_, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: primaryTeal,
+                  ),
+                );
+              },
+              errorBuilder: (_, __, ___) => const Icon(
+                Icons.image_outlined,
+                size: 50,
+                color: Colors.black26,
+              ),
+            ),
+          ),
+        );
+      }
     }
   }
 
   Future<double> calculateWalletPoints() async {
     ResponsiveInfo.showLoaderDialog(context);
     double walletpoints = 0;
-    EcommerceApiHelper apihelper = new EcommerceApiHelper();
-    var t=EcommerceApiHelper.getTimeStamp();
-    var response1= await  apihelper.get(Apimethodes.getWalletPoints+"?q="+t.toString());
-
-    Navigator.pop(context);
-    var js1= jsonDecode( response1) ;
-    walletpoints=double.parse(js1['data'].toString());
-
+    final apiHelper = EcommerceApiHelper();
+    final t = EcommerceApiHelper.getTimeStamp();
+    final response1 =
+    await apiHelper.get("${Apimethodes.getWalletPoints}?q=$t");
+    if (mounted) {
+      Navigator.pop(context);
+    }
+    final js1 = jsonDecode(response1);
+    walletpoints = double.tryParse(js1['data'].toString()) ?? 0.0;
     return walletpoints;
   }
 
-
-  addToCart()async {
-
+  Future<void> addToCart() async {
     ResponsiveInfo.ShowProgressDialog(context);
+    final apiHelper = EcommerceApiHelper();
+    final t = EcommerceApiHelper.getTimeStamp();
 
+    final Map<String, String> mp = HashMap();
+    mp['product_id'] = productByCategoryDataData.id.toString();
+    mp['quantity'] = "1";
+    mp['stockid'] = product_stockid;
+    mp['points_redeemed'] = ispointredeemeed ? "1" : "0";
 
-    EcommerceApiHelper apihelper = new EcommerceApiHelper();
+    await apiHelper.post(
+      "${Apimethodes.addProductToCart}?q=$t",
+      formDataPayload: mp,
+    );
 
-    var t=EcommerceApiHelper.getTimeStamp();
-
-    Map<String,String> mp=new HashMap();
-    mp['product_id']=productByCategoryDataData.id.toString();
-    mp['quantity']="1";
-    mp['stockid']=product_stockid;
-    if(ispointredeemeed)
-      {
-        mp['points_redeemed']="1";
-      }
-    else{
-
-      mp['points_redeemed']="0";
-    }
-
-
-    var response= await  apihelper.post(Apimethodes.addProductToCart+"?q="+t.toString(),formDataPayload: mp);
-
-    var js= jsonDecode( jsonEncode(response) ) ;
-
+    if (!mounted) return;
     Navigator.pop(context);
-
-    // if(js['status']==1)
-    //   {
-
     getCartCount();
-
-        ResponsiveInfo.showAlertDialog(context, "SaveKart", "Product added to cart successfully");
-
-
-
-
+    ResponsiveInfo.showAlertDialog(
+      context,
+      "SaveKart",
+      "Product added to cart successfully",
+    );
   }
 
-  getProductExistsinCart() async{
+  Future<void> getProductExistsinCart() async {
+    final apiHelper = EcommerceApiHelper();
+    final t = EcommerceApiHelper.getTimeStamp();
 
-
-    if(productByCategoryDataData.id.toString().compareTo("432")==0)
-      {
-        ResponsiveInfo.ShowProgressDialog(context);
-
-        EcommerceApiHelper apihelper = new EcommerceApiHelper();
-
-        var t = EcommerceApiHelper.getTimeStamp();
-
-        var response = await apihelper.get(
-            Apimethodes.checkAutopoolCount + "?q=" + t.toString());
-
-        var js = jsonDecode(response);
-
-        Navigator.pop(context);
-
-        SoldcountEntity soldcountEntity=SoldcountEntity.fromJson(js);
-
-        if(soldcountEntity.status==1)
-          {
-
-            if(soldcountEntity.availableCount==-1)
-              {
-                ResponsiveInfo.ShowProgressDialog(context);
-                var response = await apihelper.get(
-                    Apimethodes.checkProductExistsCart + "?q=" + t.toString() +
-                        "&product_id=" + productByCategoryDataData.id.toString());
-
-                var js = jsonDecode(response);
-
-                Navigator.pop(context);
-
-                CartDataExistEntity exist = CartDataExistEntity.fromJson(js);
-                if (exist.data!.length > 0) {
-                  ResponsiveInfo.showAlertDialog(context, "", "Already added to cart");
-                }
-                else {
-                  addToCart();
-                }
-              }
-            else if(soldcountEntity.availableCount!>0)
-              {
-                ResponsiveInfo.ShowProgressDialog(context);
-                var response = await apihelper.get(
-                    Apimethodes.checkProductExistsCart + "?q=" + t.toString() +
-                        "&product_id=" + productByCategoryDataData.id.toString());
-
-                var js = jsonDecode(response);
-
-                Navigator.pop(context);
-
-                CartDataExistEntity exist = CartDataExistEntity.fromJson(js);
-                if (exist.data!.length > 0) {
-                  ResponsiveInfo.showAlertDialog(context, "", "Already added to cart");
-                }
-                else {
-                  addToCart();
-                }
-              }
-            else{
-              ResponsiveInfo.showAlertDialog(context, "", "Your SAVE APP PRO stock capacity exceeds. Please sale the stock to increase your purchasing power");
-
-            }
-
-
-          }
-
-
-      }
-    else {
+    if (productByCategoryDataData.id.toString() == "432") {
       ResponsiveInfo.ShowProgressDialog(context);
-
-      EcommerceApiHelper apihelper = new EcommerceApiHelper();
-
-      var t = EcommerceApiHelper.getTimeStamp();
-
-      var response = await apihelper.get(
-          Apimethodes.checkProductExistsCart + "?q=" + t.toString() +
-              "&product_id=" + productByCategoryDataData.id.toString());
-
-      var js = jsonDecode(response);
-
+      final response =
+      await apiHelper.get("${Apimethodes.checkAutopoolCount}?q=$t");
+      final js = jsonDecode(response);
+      if (!mounted) return;
       Navigator.pop(context);
 
-      CartDataExistEntity exist = CartDataExistEntity.fromJson(js);
-      if (exist.data!.length > 0) {
-        ResponsiveInfo.showAlertDialog(context, "", "Already added to cart");
+      final soldcountEntity = SoldcountEntity.fromJson(js);
+      if (soldcountEntity.status == 1) {
+        if (soldcountEntity.availableCount == -1 ||
+            (soldcountEntity.availableCount ?? 0) > 0) {
+          ResponsiveInfo.ShowProgressDialog(context);
+          final checkResponse = await apiHelper.get(
+            "${Apimethodes.checkProductExistsCart}?q=$t&product_id=${productByCategoryDataData.id}",
+          );
+          final checkJs = jsonDecode(checkResponse);
+          if (!mounted) return;
+          Navigator.pop(context);
+
+          final exist = CartDataExistEntity.fromJson(checkJs);
+          if ((exist.data?.length ?? 0) > 0) {
+            ResponsiveInfo.showAlertDialog(context, "", "Already added to cart");
+          } else {
+            addToCart();
+          }
+        } else {
+          ResponsiveInfo.showAlertDialog(
+            context,
+            "",
+            "Your SAVE APP PRO stock capacity exceeds. Please sale the stock to increase your purchasing power",
+          );
+        }
       }
-      else {
+    } else {
+      ResponsiveInfo.ShowProgressDialog(context);
+      final response = await apiHelper.get(
+        "${Apimethodes.checkProductExistsCart}?q=$t&product_id=${productByCategoryDataData.id}",
+      );
+      final js = jsonDecode(response);
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      final exist = CartDataExistEntity.fromJson(js);
+      if ((exist.data?.length ?? 0) > 0) {
+        ResponsiveInfo.showAlertDialog(context, "", "Already added to cart");
+      } else {
         addToCart();
       }
     }
-
   }
 
-  addProductToWishlist()async {
+  Future<void> addProductToWishlist() async {
     ResponsiveInfo.ShowProgressDialog(context);
+    final apiHelper = EcommerceApiHelper();
+    final t = EcommerceApiHelper.getTimeStamp();
+    final Map<String, String> mp = HashMap();
+    mp['product_id'] = productStockEntity.data!.productId.toString();
+    mp['stock_id'] = productStockEntity.data!.id.toString();
 
-    EcommerceApiHelper apihelper = new EcommerceApiHelper();
+    final response = await apiHelper.post(
+      "${Apimethodes.addProductToWishlist}?q=$t",
+      formDataPayload: mp,
+    );
 
-    var t=EcommerceApiHelper.getTimeStamp();
-    Map<String,String>mp=new HashMap();
-    mp['product_id']=productStockEntity.data!.productId.toString();
-    mp['stock_id']=productStockEntity.data!.id.toString();
-
-    var response= await  apihelper.post(Apimethodes.addProductToWishlist+"?q="+t.toString(),formDataPayload: mp);
-
-    String fullString=response.toString();
+    String fullString = response.toString();
     if (fullString.startsWith("\"") && fullString.endsWith("\"")) {
-      fullString = fullString.substring(1, fullString.length - 1)
+      fullString = fullString
+          .substring(1, fullString.length - 1)
           .replaceAll("\\\"", "\"");
     }
-    var js= jsonDecode( fullString) ;
+    final js = jsonDecode(fullString);
+    if (!mounted) return;
     Navigator.pop(context);
 
-    if(js['status']==1)
-      {
-
-        setState(() {
-          iswishlist=true;
-        });
-      }
-    else{
+    if (js['status'] == 1) {
+      setState(() => iswishlist = true);
+    } else {
       ResponsiveInfo.showAlertDialog(context, "", "Something went wrong");
     }
-
-
-
-
   }
 
-  deleteProductFromWishlist()async {
+  Future<void> deleteProductFromWishlist() async {
     ResponsiveInfo.ShowProgressDialog(context);
+    final apiHelper = EcommerceApiHelper();
+    final t = EcommerceApiHelper.getTimeStamp();
+    final Map<String, String> mp = HashMap();
+    mp['id'] = wishlist_id;
 
-    EcommerceApiHelper apihelper = new EcommerceApiHelper();
+    final response = await apiHelper.post(
+      "${Apimethodes.deleteFromWishlist}?q=$t",
+      formDataPayload: mp,
+    );
 
-    var t=EcommerceApiHelper.getTimeStamp();
-    Map<String,String>mp=new HashMap();
-    mp['id']=wishlist_id;
-
-
-    var response= await  apihelper.post(Apimethodes.deleteFromWishlist+"?q="+t.toString(),formDataPayload: mp);
-
-    String fullString=response.toString();
+    String fullString = response.toString();
     if (fullString.startsWith("\"") && fullString.endsWith("\"")) {
-      fullString = fullString.substring(1, fullString.length - 1)
+      fullString = fullString
+          .substring(1, fullString.length - 1)
           .replaceAll("\\\"", "\"");
     }
-    var js= jsonDecode( fullString) ;
+    final js = jsonDecode(fullString);
+    if (!mounted) return;
     Navigator.pop(context);
 
-    if(js['status']==1)
-    {
-
-      setState(() {
-        iswishlist=false;
-      });
-    }
-    else{
+    if (js['status'] == 1) {
+      setState(() => iswishlist = false);
+    } else {
       ResponsiveInfo.showAlertDialog(context, "", "Something went wrong");
     }
-
-
-
-
   }
 
-  getProductExistsinWishlist() async{
+  Future<void> getProductExistsinWishlist() async {
+    final stockData = productStockEntity.data;
+    if (stockData == null) return;
 
-    EcommerceApiHelper apihelper = new EcommerceApiHelper();
+    final apiHelper = EcommerceApiHelper();
+    final t = EcommerceApiHelper.getTimeStamp();
 
-    var t=EcommerceApiHelper.getTimeStamp();
+    final response = await apiHelper.get(
+      "${Apimethodes.checkProductExistsWishlist}?q=$t&product_id=${stockData.productId}&stock_id=${stockData.id}",
+    );
 
-    var response= await  apihelper.get(Apimethodes.checkProductExistsWishlist+"?q="+t.toString()+"&product_id="+productStockEntity.data!.productId.toString()+"&stock_id="+productStockEntity.data!.id.toString());
+    final js = jsonDecode(response);
+    final entity = WishlistcheckEntity.fromJson(js);
+    if (!mounted) return;
 
-    var js= jsonDecode( response) ;
-    print(js);
-    WishlistcheckEntity entity=WishlistcheckEntity.fromJson(js);
-
-
-  if(entity.status==1)
-    {
-      if(entity.data!.length>0)
-        {
-          setState(() {
-
-            wishlist_id=entity.data![0]!.id.toString();
-
-            iswishlist=true;
-          });
-        }
-
-    }
-
-
-
-
-
-  }
-
-
-  getCartCount()async {
-    // ResponsiveInfo.ShowProgressDialog(context);
-    EcommerceApiHelper apihelper = new EcommerceApiHelper();
-
-    var t=EcommerceApiHelper.getTimeStamp();
-
-    var response= await  apihelper.get(Apimethodes.getCartDataCount+"?q="+t.toString());
-
-    var js= jsonDecode( response) ;
-
-    if(js['status']==1)
-    {
-
-      String c=js['data'].toString();
-
+    if (entity.status == 1 && (entity.data?.length ?? 0) > 0) {
       setState(() {
-        cartcount=c;
-
+        wishlist_id = entity.data![0]!.id.toString();
+        iswishlist = true;
       });
-
     }
-
   }
 
+  Future<void> getCartCount() async {
+    final apiHelper = EcommerceApiHelper();
+    final t = EcommerceApiHelper.getTimeStamp();
 
+    final response =
+    await apiHelper.get("${Apimethodes.getCartDataCount}?q=$t");
+    final js = jsonDecode(response);
+    if (!mounted) return;
 
-
+    if (js['status'] == 1) {
+      setState(() {
+        cartcount = js['data'].toString();
+      });
+    }
+  }
 }

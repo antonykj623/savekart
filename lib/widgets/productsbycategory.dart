@@ -1,25 +1,32 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:savekart/design/ResponsiveInfo.dart';
 import 'package:savekart/widgets/product_details.dart';
+
+import '../../domain/products_entity.dart';
 import '../../web/apimethodes.dart';
 import '../../web/ecommerce_api_helper.dart';
-import '../../domain/products_entity.dart';
-import '../domain/product_by_category_entity.dart';
 import '../domain/product_sub_category_entity.dart';
 
 class ProductsByCategoryScreen extends StatefulWidget {
   final String categoryId;
   final String categoryname;
 
-  const ProductsByCategoryScreen({Key? key, required this.categoryId,required this.categoryname}) : super(key: key);
+  const ProductsByCategoryScreen({
+    super.key,
+    required this.categoryId,
+    required this.categoryname,
+  });
 
   @override
-  State<ProductsByCategoryScreen> createState() => _ProductsByCategoryScreenState();
+  State<ProductsByCategoryScreen> createState() =>
+      _ProductsByCategoryScreenState();
 }
 
 class _ProductsByCategoryScreenState extends State<ProductsByCategoryScreen> {
+  static const Color primaryTeal = Color(0xFF0B7D97);
+  static const Color surfaceBg = Color(0xFFF6F8FA);
+
   List<ProductsData> products = [];
   bool isLoading = true;
 
@@ -30,176 +37,232 @@ class _ProductsByCategoryScreenState extends State<ProductsByCategoryScreen> {
   }
 
   Future<void> fetchProducts(String categoryId) async {
-    setState(() => isLoading = true);
+    if (mounted) {
+      setState(() => isLoading = true);
+    }
+    try {
+      final apiHelper = EcommerceApiHelper();
+      final response = await apiHelper.get(
+        "${Apimethodes.getProductListBySubcategory}?id=$categoryId&q=${EcommerceApiHelper.getTimeStamp()}",
+      );
+      final js = jsonDecode(response);
+      final productEntity = ProductsEntity.fromJson(js);
 
-    EcommerceApiHelper apiHelper = EcommerceApiHelper();
-    var response = await apiHelper.get("${Apimethodes.getProductListBySubcategory}?id=$categoryId"+"&q="+EcommerceApiHelper.getTimeStamp());
-    var js = jsonDecode(response);
-    ProductsEntity productEntity = ProductsEntity.fromJson(js);
+      if (!mounted) return;
 
-    if (productEntity.status == 1) {
-      setState(() {
-        products = productEntity.data!.where((p) => p.status.toString() == "0").toList();
-        isLoading = false;
-      });
-    } else {
+      if (productEntity.status == 1 && productEntity.data != null) {
+        setState(() {
+          products = productEntity.data!
+              .where((p) => p.status.toString() == "0")
+              .toList();
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          products = [];
+          isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (!mounted) return;
       setState(() => isLoading = false);
     }
   }
 
+  ProductSubCategoryDataData _toSubCategoryProduct(ProductsData pb) {
+    final pbc = ProductSubCategoryDataData();
+    pbc.id = pb.id;
+    pbc.productCode = pb.productCode;
+    pbc.primeImage = pb.primeImage;
+    pbc.productName = pb.productName;
+    pbc.status = pb.status;
+    pbc.productSpec = pb.productSpec;
+    pbc.productDescription = pb.productDescription;
+    pbc.sideImage4 = pb.sideImage4;
+    pbc.sideImage3 = pb.sideImage3;
+    pbc.sideImage2 = pb.sideImage2;
+    pbc.sideImage1 = pb.sideImage1;
+    pbc.categoryId = pb.categoryId;
+    pbc.color = pb.color;
+    pbc.colorEnabled = pb.colorEnabled;
+    pbc.size = pb.size;
+    pbc.sizeEnabled = pb.sizeEnabled;
+    pbc.subCategoryId = pb.subCategoryId;
+    pbc.unitId = pb.unitId;
+    pbc.vendorId = pb.vendorId;
+    return pbc;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isMobile = ResponsiveInfo.isMobile(context);
+
     return Scaffold(
-      appBar: AppBar(title: Text(widget.categoryname,style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:17,color: Color(0xff0B7D97)),),
-
-
+      backgroundColor: surfaceBg,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        surfaceTintColor: Colors.white,
+        iconTheme: const IconThemeData(color: primaryTeal),
+        title: Text(
+          widget.categoryname,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: isMobile ? 16 : 19,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF1A1D1F),
+          ),
+        ),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())  // Show loading indicator
+          ? const Center(child: CircularProgressIndicator(color: primaryTeal))
           : products.isEmpty
-          ? Center(child: Text("No products available"))
-          : Column(
-
-        children: [
-
-          Expanded(
-flex: 5,
-            child: GridView.builder(
-              primary: false,
-              shrinkWrap: true,
-              padding: EdgeInsets.all(10),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,  // Two products per row
-                childAspectRatio: 0.8,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+          ? Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.inventory_2_outlined,
+              size: 46,
+              color: Colors.grey.shade400,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "No products available",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
               ),
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final product = products[index];
+            ),
+          ],
+        ),
+      )
+          : RefreshIndicator(
+        color: primaryTeal,
+        onRefresh: () => fetchProducts(widget.categoryId),
+        child: GridView.builder(
+          padding: EdgeInsets.all(isMobile ? 12 : 16),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount:
+            MediaQuery.of(context).size.width < 600 ? 2 : 3,
+            childAspectRatio: 0.78,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+          ),
+          itemCount: products.length,
+          itemBuilder: (context, index) =>
+              _buildProductCard(products[index], isMobile),
+        ),
+      ),
+    );
+  }
 
-                return Stack(
+  Widget _buildProductCard(ProductsData product, bool isMobile) {
+    final isOutOfStock = product.currentQty.toString() == "0";
 
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ProductDetails(_toSubCategoryProduct(product)),
+            ),
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-
-
-
-                    Align(
-                      alignment: FractionalOffset.center,
-
-                      child: GestureDetector(
-                          onTap: (){
-                            ProductsData pb=product;
-                            ProductSubCategoryDataData pbc=new ProductSubCategoryDataData();
-                            pbc.id=pb.id;
-                            pbc.productCode=pb.productCode;
-                            pbc.primeImage=pb.primeImage;
-                            pbc.productName=pb.productName;
-                            pbc.status=pb.status;
-                            pbc.productSpec=pb.productSpec;
-                            pbc.productDescription=pb.productDescription;
-                            pbc.sideImage4=pb.sideImage4;
-                            pbc.sideImage3=pb.sideImage3;
-                            pbc.sideImage2=pb.sideImage2;
-                            pbc.sideImage1=pb.sideImage1;
-                            pbc.categoryId=pb.categoryId;
-                            pbc.color=pb.color;
-                            pbc.colorEnabled=pb.colorEnabled;
-                            pbc.size=pb.size;
-                            pbc.sizeEnabled=pb.sizeEnabled;
-                            pbc.subCategoryId=pb.subCategoryId;
-                            pbc.unitId=pb.unitId;
-                            pbc.vendorId=pb.vendorId;
-
-                            Navigator.push(context,
-                                MaterialPageRoute(builder:
-                                    (context) =>
-                                    ProductDetails(pbc)
-                                )
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: surfaceBg,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Image.network(
+                          EcommerceApiHelper.productimageurl +
+                              product.primeImage.toString(),
+                          fit: BoxFit.contain,
+                          loadingBuilder: (_, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(
+                              child: SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: primaryTeal,
+                                ),
+                              ),
                             );
                           },
-
-
-
-
-                          child: Card(
-                            elevation: 3,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Image.network(
-                                    EcommerceApiHelper.productimageurl+  product.primeImage.toString(),
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    loadingBuilder: (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child; // Image loaded successfully
-                                      return Center(child: CircularProgressIndicator()); // Show loader while loading
-                                    },
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-                                    },
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        product.productName.toString(),
-                                        style: TextStyle(fontWeight: FontWeight.bold),
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      SizedBox(height: 4),
-                                      // Text(
-                                      //   "₹${product.price}",
-                                      //   style: TextStyle(color: Colors.green, fontSize: 16),
-                                      // ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                          errorBuilder: (_, __, ___) => const Center(
+                            child: Icon(
+                              Icons.image_outlined,
+                              size: 44,
+                              color: Colors.black26,
                             ),
-                          ) )
-                    ),
-
-                    Align(
-                      alignment: FractionalOffset.topRight,
-                      child: Padding(padding: EdgeInsets.all(5),
-
-                        child:(product.currentQty.toString().compareTo("0")==0)? Container(
-                            color: Colors.red,
-                            child: Padding(padding: EdgeInsets.all(0),
-
-                              child: Text(" out of stock ",style: TextStyle(color: Colors.white)),
-
-
-                            )
-
-                        ) :Container(),
-
+                          ),
+                        ),
                       ),
-                    )
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      product.productName.toString(),
+                      style: TextStyle(
+                        fontSize: isMobile ? 13 : 14.5,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF1A1D1F),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
                   ],
-                );
-
-
-
-
-
-              },
-            ),
+                ),
+              ),
+              if (isOutOfStock)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade600,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      "Out of stock",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
-          Expanded(child: Container(),flex: 1,)
-        ],
-      )
-
-
-
-
+        ),
+      ),
     );
   }
 }

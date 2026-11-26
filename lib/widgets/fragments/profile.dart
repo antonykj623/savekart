@@ -1,4 +1,3 @@
-
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
@@ -7,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:savekart/domain/app_version_entity.dart';
 import 'package:savekart/domain/network_data_entity.dart';
 import 'package:savekart/web/ecommerce_api_helper.dart';
@@ -17,7 +17,7 @@ import 'package:savekart/widgets/wallet_transaction.dart';
 import 'package:savekart/widgets/wishlist_page.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:path_provider/path_provider.dart';
+
 import '../../design/ResponsiveInfo.dart';
 import '../../domain/profile_data_entity.dart';
 import '../../domain/sliderShareImage.dart';
@@ -26,610 +26,568 @@ import '../../web/api_helper.dart';
 import '../../web/apimethodes.dart';
 import '../login_page.dart';
 
-
-
 class Profile extends StatefulWidget {
-   Profile() ;
+  const Profile({super.key});
 
   @override
   _ProfileState createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
+  static const Color primaryTeal = Color(0xFF0B7D97);
+  static const Color surfaceBg = Color(0xFFF6F8FA);
 
+  final List<String> arricons = [
+    'assets/icons/editprofile.png',
+    'assets/icons/house-location.png',
+    'assets/icons/wallet.png',
+    'assets/icons/product-return.png',
+    'assets/icons/update.png',
+    'assets/icons/privacypolicy.png',
+    'assets/icons/refer.png',
+    'assets/icons/logout.png',
+    'assets/icons/user.png',
+  ];
 
-  List<String>arricons=['assets/icons/editprofile.png','assets/icons/house-location.png','assets/icons/wallet.png','assets/icons/product-return.png','assets/icons/update.png','assets/icons/privacypolicy.png','assets/icons/refer.png','assets/icons/logout.png','assets/icons/user.png'];
+  final List<String> arrmenus = [
+    'Edit Profile',
+    'My Address',
+    'Savekart Wallet',
+    'Return Requests',
+    'App update',
+    'Privacy Policy',
+    'Refer now',
+    'Logout',
+    'Delete Account',
+  ];
 
-  List<String>arrmenus=['Edit Profile','My Address','Savekart Wallet','Return Requests','App update','Privacy Policy','Refer now','Logout','Delete Account'];
-
-  String name="";
+  String name = "";
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getProfile();
     getAppUpdates();
   }
 
+  Future<void> getAppUpdates() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      final currentVersion = double.tryParse(packageInfo.version) ?? 0.0;
 
-  getAppUpdates()async{
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      final apiHelper = EcommerceApiHelper();
+      final t = EcommerceApiHelper.getTimeStamp();
+      final response1 =
+      await apiHelper.get("${Apimethodes.getCartUpdate}?q=$t");
+      final appVersion = AppVersionEntity.fromJson(jsonDecode(response1));
 
+      if (!mounted || appVersion.status != 1 || appVersion.data == null) {
+        return;
+      }
 
-    String version = packageInfo.version;
+      final versionFromServer = appVersion.data!.version.toString();
+      final appVersionFromServer = double.tryParse(versionFromServer) ?? 0.0;
 
-
-    EcommerceApiHelper apihelper=new EcommerceApiHelper();
-    var t=EcommerceApiHelper.getTimeStamp();
-    var response1= await  apihelper.get(Apimethodes.getCartUpdate+"?q="+t.toString());
-    AppVersionEntity appversion=AppVersionEntity.fromJson(jsonDecode(response1));
-    if(appversion.status==1) {
-
-      double currentversion=double.parse(version);
-      String versionfromserver=appversion.data!.version.toString();
-      double appversionfromserver=double.parse(versionfromserver);
-
-      if (appversionfromserver>currentversion) {
+      if (appVersionFromServer > currentVersion && mounted) {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) =>
-              AlertDialog(
-                title: Text("App Version"),
-
-                content: Text("New version: $versionfromserver is available"),
-                actions: [
-                  (appversionfromserver > currentversion) ? TextButton(
-                    onPressed: () async {
-                      final Uri url = Uri.parse(
-                          "https://play.google.com/store/apps/details?id=com.integra.savekart"); // Change URL based on platform
-
-                      if (await canLaunchUrl(url)) {
-                        await launchUrl(
-                            url, mode: LaunchMode.externalApplication);
-                      } else {
-                        throw "Could not launch $url";
-                      }
-                    },
-                    child: Text("Update"),
-                  ) : Container(),
-
-                ],
+          builder: (dialogContext) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text(
+              "App Version",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: Text("New version: $versionFromServer is available"),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  final Uri url = Uri.parse(
+                    "https://play.google.com/store/apps/details?id=com.integra.savekart",
+                  );
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  } else {
+                    throw "Could not launch $url";
+                  }
+                },
+                child: const Text(
+                  "Update",
+                  style: TextStyle(
+                    color: primaryTeal,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
+            ],
+          ),
         );
       }
+    } catch (_) {
+      // Keep profile screen active if version check fails.
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = ResponsiveInfo.isMobile(context);
+
     return Scaffold(
-
-      // bottomNavigationBar: BottomNavigationBar(
-      //   selectedItemColor: Colors.orange,
-      //
-      //
-      //   currentIndex: 0,
-      //   items: const [
-      //     BottomNavigationBarItem(icon: Icon(Icons.home,color: Colors.grey,), label: 'Home',),
-      //     BottomNavigationBarItem(icon: Icon(Icons.category,color: Colors.grey,), label: 'Categories'),
-      //     BottomNavigationBarItem(icon: Icon(Icons.shopping_cart,color: Colors.grey,), label: 'Orders'),
-      //     BottomNavigationBarItem(icon: Icon(Icons.person,color: Colors.grey,), label: 'Profile'),
-      //   ],
-      // ),
+      backgroundColor: surfaceBg,
       appBar: AppBar(
-
-        title: const Text('Profile',style: TextStyle(fontWeight: FontWeight.w600),),
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        surfaceTintColor: Colors.white,
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            color: Color(0xFF1A1D1F),
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.home),
+          icon: const Icon(Icons.home_outlined, color: primaryTeal),
           onPressed: () {
-            // handle back button press
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            }
           },
-
         ),
-
       ),
-      body:
-
-
-      Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: ListView(
+        padding: EdgeInsets.all(isMobile ? 12 : 18),
         children: [
-          Expanded(child: Padding(
-            padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?15:20,),
-            child:Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichText(
-                text: TextSpan(
-                  text: "Hey ",
-                  style: TextStyle(color: Colors.black, fontSize: ResponsiveInfo.isMobile(context)?17:20),
-                  children: <TextSpan>[
-                    TextSpan(text: '\n'+name, style: TextStyle(color: Colors.red,fontSize: ResponsiveInfo.isMobile(context)?17:20,),),
-                  ],
-                ),
+          _buildHeaderCard(isMobile),
+          const SizedBox(height: 18),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              "Account Settings",
+              style: TextStyle(
+                fontSize: isMobile ? 16 : 18,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF1A1D1F),
               ),
-              Padding(padding: EdgeInsets.fromLTRB(0, ResponsiveInfo.isMobile(context)?10:15, 0, 0),
-
-              child: Row(
-
-                children: [
-
-                  Expanded(child: GestureDetector(
-
-    child: Padding(
-
-      padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?3:5),
-      child:Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.redAccent,
             ),
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-            color: Colors.transparent,
           ),
-          width: double.infinity,
-          height: ResponsiveInfo.isMobile(context)?50:60,
-          child: Row(
-            children: [
-              Expanded(child: Icon(Icons.favorite_border,color: Colors.redAccent,size: ResponsiveInfo.isMobile(context)?18:24,),flex: 1,),
-              Expanded(child:     Text( "Wishlist",
-                style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:17,color: Colors.redAccent),
-
-
-
-
-              ),flex: 2,)
-
-
-            ],
-          )
-
-
-
-
-      ) ,
-    ) ,
-                    onTap: (){
-
-                      Navigator.push(context,
-                          MaterialPageRoute(builder:
-                              (context) =>
-                              WishlistPage()
-                          )
-                      );
-
-                    },
-    )
-
-
-
-
-                   ,flex: 1,),
-                  Expanded(child: GestureDetector(
-
-    child:  Padding(
-
-      padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?3:5),
-      child:Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.black54,
-            ),
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-            color: Colors.transparent,
-          ),
-          width: double.infinity,
-          height: ResponsiveInfo.isMobile(context)?50:60,
-          child: Row(
-            children: [
-              Expanded(child: Icon(Icons.help_sharp,color: Colors.blueAccent,size: ResponsiveInfo.isMobile(context)?18:24,),flex: 1,),
-              Expanded(child:     Text( "Help Desk",
-                style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:17,color: Colors.blueAccent),
-
-
-
-
-              ),flex: 2,)
-
-
-            ],
-          )
-
-
-
-
-      ) ,
-    ),
-                    onTap: () async {
-      ////ResponsiveInfo.showAlertDialog(context, "SaveKart", "Help Desk  No, : "+"9946109501");
-
-
-      final Uri url = Uri.parse('https://wa.me/919946109501');
-
-      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-                      throw 'Could not launch $url';
-                      }
-
-                    },
-    )
-
-
-
-
-                    ,flex: 1,)
-                ],
-              ),
-
-              )
-            ],
-            )
-
-
-
-          ),flex: 1,)
-          ,
-          Expanded(child:    Padding(padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?5:10),
-            child:
-                SingleChildScrollView(
-
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-
-      children: [
-
-        Text( "Account Settings",
-            style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?17:20,color: Colors.black87,fontWeight: FontWeight.bold)
-        ),
-        ListView.builder(
-            itemCount: arrmenus.length,
-            shrinkWrap: true,
-            primary: false,
-            itemBuilder: (BuildContext context, int index) {
-              return GestureDetector(
-
-                child: Padding(padding: EdgeInsets.all(ResponsiveInfo.isMobile(context)?5:8),
-
-                  child:      ListTile(
-                    leading: Image.asset(arricons[index],width: ResponsiveInfo.isMobile(context)?25:30,height: ResponsiveInfo.isMobile(context)?25:30,),
-
-                    title: Text(arrmenus[index],style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?15:17,color: Colors.black),),
-
-                  ),
-                ),
-                onTap: ()
-                async {
-                  if(index==0)
-                  {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder:
-                            (context) =>
-                            ProfilePage()
-                        )
-                    );
-                  }
-
-                  else  if(index==1)
-                  {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder:
-                            (context) =>
-                            AddressList()
-                        )
-                    );
-                  }
-
-                  else if(index==2)
-                  {
-
-                    Navigator.push(context,
-                        MaterialPageRoute(builder:
-                            (context) =>
-                            WalletTransaction()
-                        )
-                    );
-                  }
-                  else if(index==3)
-                  {
-
-                    Navigator.push(context,
-                        MaterialPageRoute(builder:
-                            (context) =>
-                            ReturnRequestsScreen()
-                        )
-                    );
-                  }
-
-                  else if(index==4)
-                    {
-                      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
-
-                      String version = packageInfo.version;
-
-
-                      ResponsiveInfo.showLoaderDialog(context);
-
-                      EcommerceApiHelper apihelper=new EcommerceApiHelper();
-                      var t=EcommerceApiHelper.getTimeStamp();
-
-                      var response1= await  apihelper.get(Apimethodes.getCartUpdate+"?q="+t.toString());
-
-                      Navigator.pop(context);
-                      AppVersionEntity appversion=AppVersionEntity.fromJson(jsonDecode(response1));
-
-
-                      // var js1= jsonDecode(jsonDecode(response1)) ;
-                      if(appversion.status==1) {
-
-                        double currentversion=double.parse(version);
-                        String versionfromserver=appversion.data!.version.toString();
-                        double appversionfromserver=double.parse(versionfromserver);
-
-
-                        showDialog(
-                          context: context,
-                          builder: (context) =>
-                              AlertDialog(
-                                title: Text("App Version"),
-                                content: Text("Current Version: $version"),
-                                actions: [
-                                  (appversionfromserver>currentversion)?  TextButton(
-                                    onPressed: () async {
-                                      final Uri url = Uri.parse("https://play.google.com/store/apps/details?id=com.integra.savekart"); // Change URL based on platform
-
-                                      if (await canLaunchUrl(url)) {
-                                      await launchUrl(url, mode: LaunchMode.externalApplication);
-                                      } else {
-                                      throw "Could not launch $url";
-                                      }
-                                    },
-                                    child: Text("Update"),
-                                  ):Container(),
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text("Close"),
-                                  ),
-                                ],
-                              ),
-                        );
-                      }
-
-
-                    }
-
-                  else if(index==5)
-                    {
-                      final Uri url = Uri.parse('https://mysaving.in/IntegraAccount/privacypolicy.html?q='+EcommerceApiHelper.getTimeStamp());
-
-                      if (!await launchUrl(url)) {
-                        throw 'Could not launch $url';
-                      }
-                    }
-
-                  else if(index==6)
-                    {
-
-                      ResponsiveInfo.showLoaderDialog(context);
-
-                      Map<String,String> m=new HashMap();
-
-
-                      ApiHelper apihelper = new ApiHelper();
-
-                      var response= await  apihelper.post(Apimethodes.getUserDetails,formDataPayload: m);
-
-                      Navigator.pop(context);
-
-
-                      var js= jsonDecode(jsonDecode(response)) ;
-
-                      print(js);
-
-                      ProfileDataEntity entity=ProfileDataEntity.fromJson(js);
-
-                   String   phoneNumber=entity.data!.mobile.toString();
-
-
-                      ResponsiveInfo.showLoaderDialog(context);
-
-                      var response1= await  apihelper.get(Apimethodes.showMemberDetails+"?mobile="+phoneNumber+"&timestamp="+ResponsiveInfo.getRandomNumber().toString());
-
-                      Navigator.pop(context);
-
-                      print(response1);
-
-                      NetworkDataEntity networkdataentity=NetworkDataEntity.fromJson(jsonDecode(response1));
-
-                      if(networkdataentity.status==1)
-                        {
-
-
-
-                          ResponsiveInfo.showLoaderDialog(context);
-
-                          var response2= await  apihelper.get(Apimethodes.getSettingsSlider+"?mobile="+phoneNumber+"&timestamp="+ResponsiveInfo.getRandomNumber().toString());
-
-                          Navigator.pop(context);
-
-                          print(response2);
-
-                          //Map mp=jsonDecode(response2);
-
-                          showShareDialog( context,  response2);
-
-
-
-
-
-
-                        }
-                      else{
-
-                     //   ResponsiveInfo.showAlertDialog(context, "SaveKart", "You are not purchased this application.do you want to purchase now ?");
-                      }
-
-
-
-
-
-                    }
-
-
-                  else if(index==7)
-                  {
-                    Widget okButton = TextButton(
-                      child: Text("Yes"),
-                      onPressed: () {
-
-                        Navigator.pop(context);
-
-                        AppStorage.SaveToken(AppStorage.token, "");
-
-                        Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder:
-                                (context) =>
-                                LoginPage()
-                            )
-                        );
-
-                      },
-                    );
-
-                    Widget noButton = TextButton(
-                      child: Text("No"),
-                      onPressed: () {
-
-                        Navigator.pop(context);
-
-                      },
-                    );
-
-                    // set up the AlertDialog
-                    AlertDialog alert = AlertDialog(
-                      title: Text("Savekart"),
-                      content: Text("Do you want to logout from Savekart ?"),
-                      actions: [
-                        okButton,
-                        noButton
-                      ],
-                    );
-
-                    // show the dialog
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return alert;
-                      },
-                    );
-                  }
-                  else if(index==8)
-                  {
-                    Widget okButton = TextButton(
-                      child: Text("Yes"),
-                      onPressed: () {
-
-
-
-                        _showDeleteAccountDialog(context);
-
-
-                      },
-                    );
-
-                    Widget noButton = TextButton(
-                      child: Text("No"),
-                      onPressed: () {
-
-                        Navigator.pop(context);
-
-                      },
-                    );
-
-                    // set up the AlertDialog
-                    AlertDialog alert = AlertDialog(
-                      title: Text("Savekart"),
-                      content: Text("Do you want to delete your account from Savekart ?"),
-                      actions: [
-                        okButton,
-                        noButton
-                      ],
-                    );
-
-                    // show the dialog
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return alert;
-                      },
-                    );
-
-                  }
-
-
-                },
-              )
-
-
-
-
-
-
-
-              ;
-            }),
-
-
-
-
-
-      ],
-    ),
-    )
-
-
-
-
-
-
-          ),flex: 3,)
-
-
-
-
-
+          const SizedBox(height: 10),
+          _buildMenuCard(isMobile),
+          const SizedBox(height: 20),
         ],
       ),
     );
   }
 
+  Widget _buildHeaderCard(bool isMobile) {
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 14 : 18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: isMobile ? 24 : 28,
+                backgroundColor: primaryTeal.withOpacity(0.12),
+                child: Icon(
+                  Icons.person_rounded,
+                  color: primaryTeal,
+                  size: isMobile ? 26 : 30,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Hey",
+                      style: TextStyle(
+                        fontSize: isMobile ? 13 : 14,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      name.isEmpty ? "Member" : name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: isMobile ? 17 : 20,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1A1D1F),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickActionTile(
+                  label: "Wishlist",
+                  icon: Icons.favorite_outline_rounded,
+                  accentColor: Colors.redAccent,
+                  bgColor: const Color(0xFFFFF1F2),
+                  isMobile: isMobile,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => WishlistPage()),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildQuickActionTile(
+                  label: "Help Desk",
+                  icon: Icons.support_agent_rounded,
+                  accentColor: primaryTeal,
+                  bgColor: const Color(0xFFEBF7FA),
+                  isMobile: isMobile,
+                  onTap: () async {
+                    final Uri url = Uri.parse('https://wa.me/919946109501');
+                    if (!await launchUrl(
+                      url,
+                      mode: LaunchMode.externalApplication,
+                    )) {
+                      throw 'Could not launch $url';
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionTile({
+    required String label,
+    required IconData icon,
+    required Color accentColor,
+    required Color bgColor,
+    required bool isMobile,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: bgColor,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Container(
+          height: isMobile ? 46 : 54,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: accentColor, size: isMobile ? 19 : 22),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: isMobile ? 13.5 : 15,
+                    fontWeight: FontWeight.w700,
+                    color: accentColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuCard(bool isMobile) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: ListView.separated(
+        itemCount: arrmenus.length,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        separatorBuilder: (_, __) => Divider(
+          height: 1,
+          indent: 56,
+          endIndent: 12,
+          color: Colors.grey.shade100,
+        ),
+        itemBuilder: (context, index) {
+          final isDelete = index == 8;
+          return ListTile(
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: isMobile ? 2 : 6,
+            ),
+            leading: Container(
+              width: isMobile ? 34 : 38,
+              height: isMobile ? 34 : 38,
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: isDelete ? const Color(0xFFFFF1F2) : surfaceBg,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Image.asset(
+                arricons[index],
+                fit: BoxFit.contain,
+              ),
+            ),
+            title: Text(
+              arrmenus[index],
+              style: TextStyle(
+                fontSize: isMobile ? 14.5 : 16,
+                fontWeight: FontWeight.w600,
+                color: isDelete ? Colors.red.shade700 : const Color(0xFF1A1D1F),
+              ),
+            ),
+            trailing: Icon(
+              Icons.chevron_right_rounded,
+              color: isDelete ? Colors.red.shade300 : Colors.grey.shade400,
+            ),
+            onTap: () => _handleMenuTap(index),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _handleMenuTap(int index) async {
+    if (index == 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ProfilePage()),
+      );
+    } else if (index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => AddressList()),
+      );
+    } else if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => WalletTransaction()),
+      );
+    } else if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ReturnRequestsScreen()),
+      );
+    } else if (index == 4) {
+      final packageInfo = await PackageInfo.fromPlatform();
+      final version = packageInfo.version;
+      if (!mounted) return;
+
+      ResponsiveInfo.showLoaderDialog(context);
+      final apiHelper = EcommerceApiHelper();
+      final t = EcommerceApiHelper.getTimeStamp();
+      final response1 =
+      await apiHelper.get("${Apimethodes.getCartUpdate}?q=$t");
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      final appVersion = AppVersionEntity.fromJson(jsonDecode(response1));
+      if (appVersion.status == 1 && appVersion.data != null && mounted) {
+        final currentVersion = double.parse(version);
+        final versionFromServer = appVersion.data!.version.toString();
+        final appVersionFromServer = double.parse(versionFromServer);
+
+        showDialog(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text(
+              "App Version",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: Text("Current Version: $version"),
+            actions: [
+              if (appVersionFromServer > currentVersion)
+                TextButton(
+                  onPressed: () async {
+                    final Uri url = Uri.parse(
+                      "https://play.google.com/store/apps/details?id=com.integra.savekart",
+                    );
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(
+                        url,
+                        mode: LaunchMode.externalApplication,
+                      );
+                    } else {
+                      throw "Could not launch $url";
+                    }
+                  },
+                  child: const Text(
+                    "Update",
+                    style: TextStyle(
+                      color: primaryTeal,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text("Close"),
+              ),
+            ],
+          ),
+        );
+      }
+    } else if (index == 5) {
+      final Uri url = Uri.parse(
+        'https://mysaving.in/IntegraAccount/privacypolicy.html?q=${EcommerceApiHelper.getTimeStamp()}',
+      );
+      if (!await launchUrl(url)) {
+        throw 'Could not launch $url';
+      }
+    } else if (index == 6) {
+      ResponsiveInfo.showLoaderDialog(context);
+      final Map<String, String> m = HashMap();
+      final apiHelper = ApiHelper();
+      final response =
+      await apiHelper.post(Apimethodes.getUserDetails, formDataPayload: m);
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      final js = jsonDecode(jsonDecode(response));
+      final entity = ProfileDataEntity.fromJson(js);
+      final phoneNumber = entity.data!.mobile.toString();
+
+      ResponsiveInfo.showLoaderDialog(context);
+      final response1 = await apiHelper.get(
+        "${Apimethodes.showMemberDetails}?mobile=$phoneNumber&timestamp=${ResponsiveInfo.getRandomNumber()}",
+      );
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      final networkDataEntity =
+      NetworkDataEntity.fromJson(jsonDecode(response1));
+      if (networkDataEntity.status == 1 && mounted) {
+        ResponsiveInfo.showLoaderDialog(context);
+        final response2 = await apiHelper.get(
+          "${Apimethodes.getSettingsSlider}?mobile=$phoneNumber&timestamp=${ResponsiveInfo.getRandomNumber()}",
+        );
+        if (!mounted) return;
+        Navigator.pop(context);
+        showShareDialog(context, response2);
+      }
+    } else if (index == 7) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            "Savekart",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const Text("Do you want to logout from Savekart ?"),
+          actions: [
+            TextButton(
+              child: const Text("No", style: TextStyle(color: Colors.grey)),
+              onPressed: () => Navigator.pop(dialogContext),
+            ),
+            TextButton(
+              child: const Text(
+                "Yes",
+                style: TextStyle(
+                  color: primaryTeal,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                AppStorage.SaveToken(AppStorage.token, "");
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => LoginPage()),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    } else if (index == 8) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            "Savekart",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            "Do you want to delete your account from Savekart ?",
+          ),
+          actions: [
+            TextButton(
+              child: const Text("No", style: TextStyle(color: Colors.grey)),
+              onPressed: () => Navigator.pop(dialogContext),
+            ),
+            TextButton(
+              child: Text(
+                "Yes",
+                style: TextStyle(
+                  color: Colors.red.shade700,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                _showDeleteAccountDialog(context);
+              },
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   Future<void> showShareDialog(BuildContext context, String data) async {
     try {
       final jsonObject = jsonDecode(data);
 
       if (jsonObject['status'] == 1) {
-        List<dynamic> jsonArray = jsonObject['data'];
-        List<SliderShareImage> sliderShareImages =
+        final List<dynamic> jsonArray = jsonObject['data'];
+        final List<SliderShareImage> sliderShareImages =
         jsonArray.map((e) => SliderShareImage.fromJson(e)).toList();
 
         final PageController pageController = PageController();
         int currentIndex = 0;
-       String? token=await AppStorage.getString(AppStorage.token);
-       //Replace with your PreferenceHelper logic
-        final String link = "https://mysaveapp.com/signup?sponserid=" + token.toString();
+        final String? token = await AppStorage.getString(AppStorage.token);
+        final String link =
+            "https://mysaveapp.com/signup?sponserid=${token.toString()}";
+
+        if (!context.mounted) return;
 
         showDialog(
           context: context,
           builder: (ctx) {
             return StatefulBuilder(
-              builder: (context, setState) {
+              builder: (context, setModalState) {
                 return Dialog(
                   insetPadding: EdgeInsets.zero,
                   child: Container(
@@ -643,14 +601,14 @@ class _ProfileState extends State<Profile> {
                             controller: pageController,
                             itemCount: sliderShareImages.length,
                             onPageChanged: (index) {
-                              setState(() => currentIndex = index);
+                              setModalState(() => currentIndex = index);
                             },
                             itemBuilder: (context, index) {
                               return Column(
                                 children: [
                                   Expanded(
                                     child: Image.network(
-                                      "https://mysaving.in/images/"+sliderShareImages[index].image,
+                                      "https://mysaving.in/images/${sliderShareImages[index].image}",
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -661,8 +619,6 @@ class _ProfileState extends State<Profile> {
                             },
                           ),
                         ),
-
-                        // Indicator like TabLayout
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(
@@ -674,73 +630,73 @@ class _ProfileState extends State<Profile> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: currentIndex == index
-                                    ? Colors.blue
+                                    ? primaryTeal
                                     : Colors.grey,
                               ),
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 12),
-
-                        // Share / Copy / Purchase
-                        Text(link, style: const TextStyle(color: Colors.blue)),
-
+                        Text(
+                          link,
+                          style: const TextStyle(color: primaryTeal),
+                        ),
+                        const SizedBox(height: 8),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             ElevatedButton(
                               onPressed: () async {
                                 await Clipboard.setData(
-                                    ClipboardData(text: link));
+                                  ClipboardData(text: link),
+                                );
+                                if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                      content: Text("Link copied to clipboard")),
+                                    content: Text("Link copied to clipboard"),
+                                  ),
                                 );
                               },
                               child: const Text("Copy Link"),
                             ),
                             ElevatedButton(
                               onPressed: () async {
-                                // Share.share(
-                                //     "${sliderShareImages[currentIndex].description}\n$link");
-
-
                                 ResponsiveInfo.showLoaderDialog(context);
-
                                 try {
-                                  // Download image
-                                  final response = await http.get(Uri.parse("https://mysaving.in/images/"+sliderShareImages[currentIndex].image));
+                                  final response = await http.get(
+                                    Uri.parse(
+                                      "https://mysaving.in/images/${sliderShareImages[currentIndex].image}",
+                                    ),
+                                  );
                                   final bytes = response.bodyBytes;
-
-                                  // Save to temporary file
                                   final tempDir = await getTemporaryDirectory();
-                                  final file = File('${tempDir.path}/shared_image'+ResponsiveInfo.getRandomNumber().toString()+'.jpg');
+                                  final file = File(
+                                    '${tempDir.path}/shared_image${ResponsiveInfo.getRandomNumber()}.jpg',
+                                  );
                                   await file.writeAsBytes(bytes);
 
-                                  // Share file + text
-                                  await Share.shareXFiles([XFile(file.path)], text: sliderShareImages[currentIndex].description+"\n\n"+link);
+                                  await Share.shareXFiles(
+                                    [XFile(file.path)],
+                                    text:
+                                    "${sliderShareImages[currentIndex].description}\n\n$link",
+                                  );
 
-                                  Navigator.pop(context);
-
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                  }
                                 } catch (e) {
-
-                                  ResponsiveInfo.showAlertDialog(context, "Savekart", "Cannot fetch image from url");
-
-                                  Navigator.pop(context);
-                                  print("Error sharing image: $e");
+                                  if (context.mounted) {
+                                    ResponsiveInfo.showAlertDialog(
+                                      context,
+                                      "Savekart",
+                                      "Cannot fetch image from url",
+                                    );
+                                    Navigator.pop(context);
+                                  }
                                 }
-
                               },
                               child: const Text("Share"),
                             ),
-                            // ElevatedButton(
-                            //   onPressed: () {
-                            //     Navigator.pop(context);
-                            //     // Call your purchase logic here
-                            //   },
-                            //   child: const Text("Purchase"),
-                            // ),
                           ],
                         ),
                       ],
@@ -757,59 +713,54 @@ class _ProfileState extends State<Profile> {
     }
   }
 
+  Future<void> getProfile() async {
+    try {
+      final Map<String, String> m = HashMap();
+      final apiHelper = ApiHelper();
+      final response =
+      await apiHelper.post(Apimethodes.getUserDetails, formDataPayload: m);
+      final js = jsonDecode(jsonDecode(response));
+      final entity = ProfileDataEntity.fromJson(js);
 
-  getProfile()async{
-
-    Map<String,String> m=new HashMap();
-
-
-    ApiHelper apihelper = new ApiHelper();
-
-    var response= await  apihelper.post(Apimethodes.getUserDetails,formDataPayload: m);
-
-
-
-    var js= jsonDecode(jsonDecode(response)) ;
-
-    print(js);
-
-    ProfileDataEntity entity=ProfileDataEntity.fromJson(js);
-
-    if(entity.status==1)
-      {
-
+      if (!mounted) return;
+      if (entity.status == 1 && entity.data != null) {
         setState(() {
-
-          String cleanedText = entity.data!.fullName.toString().replaceAll(RegExp(r'[^a-zA-Z0-9\s]'), '');
-        print(cleanedText);
-          name=cleanedText.trim();
+          final cleanedText = entity.data!.fullName
+              .toString()
+              .replaceAll(RegExp(r'[^a-zA-Z0-9\s]'), '');
+          name = cleanedText.trim();
         });
-
       }
-
-
-
+    } catch (_) {
+      // Keep UI usable if profile lookup fails.
+    }
   }
 
   void _showDeleteAccountDialog(BuildContext context) {
     final TextEditingController mobileController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
-          title: Text("Confirm Delete Account"),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            "Confirm Delete Account",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           content: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
                   controller: mobileController,
                   keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: "Enter Mobile Number",
                     border: OutlineInputBorder(),
                   ),
@@ -820,11 +771,11 @@ class _ProfileState extends State<Profile> {
                     return null;
                   },
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextFormField(
                   controller: passwordController,
                   obscureText: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: "Enter Password",
                     border: OutlineInputBorder(),
                   ),
@@ -840,92 +791,82 @@ class _ProfileState extends State<Profile> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Cancel"),
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text("Cancel"),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade700,
+                foregroundColor: Colors.white,
+              ),
               onPressed: () async {
                 if (mobileController.text.isNotEmpty) {
                   if (passwordController.text.isNotEmpty) {
+                    ResponsiveInfo.showLoaderDialog(context);
+                    final Map<String, String> m = HashMap();
+                    m['uuid'] = "siuhdfid";
+                    m['mobile'] = mobileController.text.toString();
+                    m['password'] = passwordController.text.toString();
+                    m['timestamp'] = ApiHelper.getTimeStamp();
 
-    ResponsiveInfo.showLoaderDialog(
-    context);
-    Map<String,String> m=new HashMap();
-    m['uuid']="siuhdfid";
-    m['mobile']=mobileController.text.toString();
-    m['password']=passwordController.text.toString();
-    m['timestamp']=ApiHelper.getTimeStamp();
-    ApiHelper apihelper = new ApiHelper();
-    var response= await  apihelper.post(Apimethodes.login,formDataPayload: m);
-    Navigator.pop(context);
-    var js= jsonDecode(jsonDecode(response)) ;
+                    final apiHelper = ApiHelper();
+                    final response = await apiHelper.post(
+                      Apimethodes.login,
+                      formDataPayload: m,
+                    );
+                    if (!context.mounted) return;
+                    Navigator.pop(context);
 
-    if(js['status'].toString().compareTo("0") !=0)
-    {
+                    final js = jsonDecode(jsonDecode(response));
+                    if (js['status'].toString() != "0") {
+                      ResponsiveInfo.showLoaderDialog(context);
+                      final response1 =
+                      await apiHelper.get(Apimethodes.deleteAccount);
+                      if (!context.mounted) return;
+                      Navigator.pop(context);
 
-
-      ResponsiveInfo.showLoaderDialog(context);
-
-      var response1= await  apihelper.get(Apimethodes.deleteAccount);
-      Navigator.pop(context);
-
-      var js1= jsonDecode(jsonDecode(response1)) ;
-
-    if(js1['status'].toString().compareTo("0") !=0)
-    {
-
-      AppStorage.SaveToken(AppStorage.token, "");
-
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder:
-              (context) =>
-              LoginPage()
-          )
-      );
-
-    }
-    else{
-      ResponsiveInfo.showAlertDialog(context, "", "Something went wrong");
-    }
-
-
-    }
-    else{
-
-      ResponsiveInfo.showAlertDialog(context, "", "This user account is not exist");
-    }
-
-
-
-
-
-
-
-
+                      final js1 = jsonDecode(jsonDecode(response1));
+                      if (js1['status'].toString() != "0") {
+                        AppStorage.SaveToken(AppStorage.token, "");
+                        if (!context.mounted) return;
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => LoginPage()),
+                        );
+                      } else if (context.mounted) {
+                        ResponsiveInfo.showAlertDialog(
+                          context,
+                          "",
+                          "Something went wrong",
+                        );
+                      }
+                    } else if (context.mounted) {
+                      ResponsiveInfo.showAlertDialog(
+                        context,
+                        "",
+                        "This user account is not exist",
+                      );
+                    }
+                  } else {
+                    ResponsiveInfo.showAlertDialog(
+                      context,
+                      "",
+                      "Please enter your account password",
+                    );
                   }
-                  else{
-
-                    ResponsiveInfo.showAlertDialog(context, "", "Please enter your account password");
-                  }
-
-
-                }
-                else{
-
-                  ResponsiveInfo.showAlertDialog(context, "", "Please enter your registered mobile number");
+                } else {
+                  ResponsiveInfo.showAlertDialog(
+                    context,
+                    "",
+                    "Please enter your registered mobile number",
+                  );
                 }
               },
-              child: Text("Delete"),
+              child: const Text("Delete"),
             ),
           ],
         );
       },
     );
   }
-
-
-
-
-
 }

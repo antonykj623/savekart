@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:savekart/design/ResponsiveInfo.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../../domain/app_version_entity.dart';
 import '../../domain/category_entity.dart';
-
-import '../../domain/product_by_category_entity.dart';
 import '../../domain/product_sub_category_entity.dart';
 import '../../domain/products_entity.dart';
 import '../../web/apimethodes.dart';
@@ -14,15 +13,23 @@ import '../../web/ecommerce_api_helper.dart';
 import '../product_details.dart';
 
 class CategoryProductScreen extends StatefulWidget {
+  const CategoryProductScreen({super.key});
+
   @override
   State<CategoryProductScreen> createState() => _CategoryProductScreenState();
 }
 
-class _CategoryProductScreenState extends State<CategoryProductScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  List<CategoryData> categories = [];
-  List<ProductsData> products = [];
+class _CategoryProductScreenState extends State<CategoryProductScreen>
+    with SingleTickerProviderStateMixin {
+  static const Color primaryTeal = Color(0xFF0B7D97);
+  static const Color surfaceBg = Color(0xFFF6F8FA);
+
+  TabController? _tabController;
+  final List<CategoryData> categories = [];
+  final List<ProductsData> products = [];
   bool isLoading = true;
+  bool isCategoriesLoading = true;
+  int _lastFetchedTabIndex = -1;
 
   @override
   void initState() {
@@ -31,150 +38,282 @@ class _CategoryProductScreenState extends State<CategoryProductScreen> with Sing
     getAppUpdates();
   }
 
-  getAppUpdates()async{
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  @override
+  void dispose() {
+    _tabController?.removeListener(_handleTabChange);
+    _tabController?.dispose();
+    super.dispose();
+  }
 
+  void _handleTabChange() {
+    final controller = _tabController;
+    if (controller == null || controller.indexIsChanging) return;
+    if (controller.index != _lastFetchedTabIndex &&
+        controller.index < categories.length) {
+      _lastFetchedTabIndex = controller.index;
+      fetchProducts(categories[controller.index].id.toString());
+    }
+  }
 
-    String version = packageInfo.version;
+  Future<void> getAppUpdates() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      final currentVersion = double.tryParse(packageInfo.version) ?? 0.0;
 
+      final apiHelper = EcommerceApiHelper();
+      final t = EcommerceApiHelper.getTimeStamp();
+      final response1 =
+      await apiHelper.get("${Apimethodes.getCartUpdate}?q=$t");
+      final appVersion = AppVersionEntity.fromJson(jsonDecode(response1));
 
-    EcommerceApiHelper apihelper=new EcommerceApiHelper();
-    var t=EcommerceApiHelper.getTimeStamp();
-    var response1= await  apihelper.get(Apimethodes.getCartUpdate+"?q="+t.toString());
-    AppVersionEntity appversion=AppVersionEntity.fromJson(jsonDecode(response1));
-    if(appversion.status==1) {
+      if (!mounted || appVersion.status != 1 || appVersion.data == null) {
+        return;
+      }
 
-      double currentversion=double.parse(version);
-      String versionfromserver=appversion.data!.version.toString();
-      double appversionfromserver=double.parse(versionfromserver);
+      final versionFromServer = appVersion.data!.version.toString();
+      final appVersionFromServer = double.tryParse(versionFromServer) ?? 0.0;
 
-      if (appversionfromserver>currentversion) {
+      if (appVersionFromServer > currentVersion && mounted) {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) =>
-              AlertDialog(
-                title: Text("App Version"),
-
-                content: Text("New version: $versionfromserver is available"),
-                actions: [
-                  (appversionfromserver > currentversion) ? TextButton(
-                    onPressed: () async {
-                      final Uri url = Uri.parse(
-                          "https://play.google.com/store/apps/details?id=com.integra.savekart"); // Change URL based on platform
-
-                      if (await canLaunchUrl(url)) {
-                        await launchUrl(
-                            url, mode: LaunchMode.externalApplication);
-                      } else {
-                        throw "Could not launch $url";
-                      }
-                    },
-                    child: Text("Update"),
-                  ) : Container(),
-
-                ],
+          builder: (dialogContext) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text(
+              "Update Available",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: Text("A new version ($versionFromServer) is available."),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  final Uri url = Uri.parse(
+                    "https://play.google.com/store/apps/details?id=com.integra.savekart",
+                  );
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  } else {
+                    throw "Could not launch $url";
+                  }
+                },
+                child: const Text(
+                  "Update",
+                  style: TextStyle(
+                    color: primaryTeal,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
+            ],
+          ),
         );
       }
+    } catch (_) {
+      // Keep UI running if version check fails.
     }
-
   }
 
-  fetchCategories() async {
-    EcommerceApiHelper apiHelper = EcommerceApiHelper();
-    var response = await apiHelper.get(Apimethodes.getCategories);
-    var js = jsonDecode(response);
-    CategoryEntity categoryEntity = CategoryEntity.fromJson(js);
+  Future<void> fetchCategories() async {
+    setState(() => isCategoriesLoading = true);
+    try {
+      final apiHelper = EcommerceApiHelper();
+      final response = await apiHelper.get(Apimethodes.getCategories);
+      final js = jsonDecode(response);
+      final categoryEntity = CategoryEntity.fromJson(js);
 
-    if (categoryEntity.status == 1) {
-      setState(() {
+      if (!mounted) return;
 
-        for(int i=0;i<categoryEntity.data!.length;i++)
-        {
-          if(categoryEntity.data![i].status.toString().compareTo("0")==0)
-          {
-            categories.add(categoryEntity.data![i]);
+      final activeCategories = <CategoryData>[];
+      if (categoryEntity.status == 1 && categoryEntity.data != null) {
+        for (final item in categoryEntity.data!) {
+          if (item.status.toString() == "0") {
+            activeCategories.add(item);
           }
-
         }
-        // categories = categoryEntity.data!;
-        _tabController = TabController(length: categories.length, vsync: this);
+      }
+
+      _tabController?.removeListener(_handleTabChange);
+      _tabController?.dispose();
+      _tabController = null;
+
+      setState(() {
+        categories
+          ..clear()
+          ..addAll(activeCategories);
+        if (categories.isNotEmpty) {
+          _tabController = TabController(
+            length: categories.length,
+            vsync: this,
+          )..addListener(_handleTabChange);
+        }
+        isCategoriesLoading = false;
       });
 
-      // Fetch products for the first category by default
-      fetchProducts(categories.first.id.toString());
-    }
-  }
-
-  fetchProducts(String categoryId) async {
-    setState(() => isLoading = true);
-    EcommerceApiHelper apiHelper = EcommerceApiHelper();
-    var t=EcommerceApiHelper.getTimeStamp();
-    var response = await apiHelper.get("${Apimethodes.getProductsByCategory}?id=$categoryId"+"&q="+t);
-    var js = jsonDecode(response);
-    ProductsEntity productEntity = ProductsEntity.fromJson(js);
-
-    if (productEntity.status == 1) {
+      if (categories.isNotEmpty) {
+        _lastFetchedTabIndex = 0;
+        await fetchProducts(categories.first.id.toString());
+      } else if (mounted) {
+        setState(() => isLoading = false);
+      }
+    } catch (_) {
+      if (!mounted) return;
       setState(() {
-
-        products.clear();
-
-        for(int i=0;i<productEntity.data!.length;i++)
-          {
-            if(productEntity.data![i].status.toString().compareTo("0")==0)
-              {
-
-                products.add(productEntity.data![i]);
-              }
-          }
-
-
+        isCategoriesLoading = false;
         isLoading = false;
       });
     }
   }
 
+  Future<void> fetchProducts(String categoryId) async {
+    if (!mounted) return;
+    setState(() => isLoading = true);
+    try {
+      final apiHelper = EcommerceApiHelper();
+      final t = EcommerceApiHelper.getTimeStamp();
+      final response = await apiHelper
+          .get("${Apimethodes.getProductsByCategory}?id=$categoryId&q=$t");
+      final js = jsonDecode(response);
+      final productEntity = ProductsEntity.fromJson(js);
+
+      if (!mounted) return;
+
+      final activeProducts = <ProductsData>[];
+      if (productEntity.status == 1 && productEntity.data != null) {
+        for (final item in productEntity.data!) {
+          if (item.status.toString() == "0") {
+            activeProducts.add(item);
+          }
+        }
+      }
+
+      setState(() {
+        products
+          ..clear()
+          ..addAll(activeProducts);
+        isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isMobile = ResponsiveInfo.isMobile(context);
+
     return Scaffold(
-      appBar: AppBar(title: Text("Categories",style: TextStyle(fontSize: ResponsiveInfo.isMobile(context)?14:17),),),
-      body: categories.isEmpty
-          ? Center(child: CircularProgressIndicator())
+      backgroundColor: surfaceBg,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        surfaceTintColor: Colors.white,
+        title: Text(
+          "Categories",
+          style: TextStyle(
+            color: const Color(0xFF1A1D1F),
+            fontWeight: FontWeight.bold,
+            fontSize: isMobile ? 16 : 19,
+          ),
+        ),
+      ),
+      body: isCategoriesLoading
+          ? const Center(child: CircularProgressIndicator(color: primaryTeal))
+          : categories.isEmpty || _tabController == null
+          ? const Center(
+        child: Text(
+          "No categories available",
+          style: TextStyle(color: Colors.grey, fontSize: 15),
+        ),
+      )
           : Column(
         children: [
-          // Dynamic Category Tabs
           Container(
-            color: Colors.white,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                bottom: BorderSide(color: Colors.grey.shade200),
+              ),
+            ),
             child: TabBar(
               controller: _tabController,
               isScrollable: true,
-              indicatorColor: Color(0xff0B7D97),
-              labelColor: Color(0xff0B7D97),
-              unselectedLabelColor: Colors.grey,
-              tabs: categories.map((category) => Tab(text: category.categoryName)).toList(),
-              onTap: (index) => fetchProducts(categories[index].id.toString()),
+              tabAlignment: TabAlignment.start,
+              indicatorColor: primaryTeal,
+              indicatorWeight: 3,
+              indicatorSize: TabBarIndicatorSize.label,
+              labelColor: primaryTeal,
+              unselectedLabelColor: Colors.grey.shade600,
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+              ),
+              tabs: categories
+                  .map(
+                    (category) => Tab(
+                  text: category.categoryName.toString(),
+                ),
+              )
+                  .toList(),
+              onTap: (index) {
+                if (index != _lastFetchedTabIndex) {
+                  _lastFetchedTabIndex = index;
+                  fetchProducts(categories[index].id.toString());
+                }
+              },
             ),
           ),
-
-          // Product List
           Expanded(
             child: isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(
+              child: CircularProgressIndicator(
+                color: primaryTeal,
+              ),
+            )
                 : products.isEmpty
-                ? Center(child: Text("No products found"))
+                ? Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.inventory_2_outlined,
+                    size: 44,
+                    color: Colors.grey.shade400,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "No products found",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            )
                 : GridView.builder(
-              padding: EdgeInsets.all(8),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: MediaQuery.of(context).size.width < 600 ? 2 : 3,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                childAspectRatio: 0.9,
+              padding: const EdgeInsets.all(12),
+              gridDelegate:
+              SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount:
+                MediaQuery.of(context).size.width < 600
+                    ? 2
+                    : 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.78,
               ),
               itemCount: products.length,
-              itemBuilder: (context, index) {
-                return ProductCard(products[index]);
-              },
+              itemBuilder: (context, index) =>
+                  ProductCard(products[index]),
             ),
           ),
         ],
@@ -186,62 +325,105 @@ class _CategoryProductScreenState extends State<CategoryProductScreen> with Sing
 class ProductCard extends StatelessWidget {
   final ProductsData product;
 
-  ProductCard(this.product);
+  const ProductCard(this.product, {super.key});
+
+  ProductSubCategoryDataData _toSubCategoryProduct(ProductsData pb) {
+    final pbc = ProductSubCategoryDataData();
+    pbc.id = pb.id;
+    pbc.primeImage = pb.primeImage;
+    pbc.productName = pb.productName;
+    pbc.status = pb.status;
+    pbc.productSpec = pb.productSpec;
+    pbc.productDescription = pb.productDescription;
+    pbc.sideImage4 = pb.sideImage4;
+    pbc.sideImage3 = pb.sideImage3;
+    pbc.sideImage2 = pb.sideImage2;
+    pbc.sideImage1 = pb.sideImage1;
+    pbc.categoryId = pb.categoryId;
+    pbc.color = pb.color;
+    pbc.colorEnabled = pb.colorEnabled;
+    pbc.size = pb.size;
+    pbc.sizeEnabled = pb.sizeEnabled;
+    pbc.subCategoryId = pb.subCategoryId;
+    pbc.unitId = pb.unitId;
+    pbc.vendorId = pb.vendorId;
+    return pbc;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: (){
-
-        ProductsData pb=product;
-        ProductSubCategoryDataData pbc=new ProductSubCategoryDataData();
-        pbc.id=pb.id;
-        pbc.primeImage=pb.primeImage;
-        pbc.productName=pb.productName;
-        pbc.status=pb.status;
-        pbc.productSpec=pb.productSpec;
-        pbc.productDescription=pb.productDescription;
-        pbc.sideImage4=pb.sideImage4;
-        pbc.sideImage3=pb.sideImage3;
-        pbc.sideImage2=pb.sideImage2;
-        pbc.sideImage1=pb.sideImage1;
-        pbc.categoryId=pb.categoryId;
-        pbc.color=pb.color;
-        pbc.colorEnabled=pb.colorEnabled;
-        pbc.size=pb.size;
-        pbc.sizeEnabled=pb.sizeEnabled;
-        pbc.subCategoryId=pb.subCategoryId;
-        pbc.unitId=pb.unitId;
-        pbc.vendorId=pb.vendorId;
-        Navigator.push(context,
-            MaterialPageRoute(builder:
-                (context) =>
-                ProductDetails(pbc)
-            )
-        );
-
-      },
-
-      child:
-      Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Image.network(EcommerceApiHelper.productimageurl + product.primeImage.toString(), height: 100, fit: BoxFit.cover,loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child; // Image loaded successfully
-            return Center(child: CircularProgressIndicator()); // Show loader while loading
-          },
-            errorBuilder: (context, error, stackTrace) {
-              return Icon(Icons.image,size: 50,color: Colors.black26,); // Show a local placeholder on error
-            },),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(product.productName.toString(), maxLines: 2, textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ProductDetails(_toSubCategoryProduct(product)),
+            ),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.grey.shade200),
           ),
-          // Text("\$${product.price}", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF6F8FA),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Image.network(
+                    EcommerceApiHelper.productimageurl +
+                        product.primeImage.toString(),
+                    fit: BoxFit.contain,
+                    loadingBuilder: (_, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(
+                        child: SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Color(0xFF0B7D97),
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (_, __, ___) => const Center(
+                      child: Icon(
+                        Icons.image_outlined,
+                        size: 44,
+                        color: Colors.black26,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                product.productName.toString(),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1A1D1F),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-    ) );
+    );
   }
 }
