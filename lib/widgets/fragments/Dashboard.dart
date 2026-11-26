@@ -1277,7 +1277,11 @@ class _DashboardState extends State<Dashboard> {
     {
       setState(() {
         productbycategorydata.clear();
-        productbycategorydata.addAll(brandEntity.data!);
+        if (brandEntity.data != null) {
+          productbycategorydata
+            ..addAll(brandEntity.data!)
+            ..shuffle();
+        }
 
       });
     }
